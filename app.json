@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "eurion_app",
-    "slug": "eurion_app",
+    "slug": "eurionapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -36,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1fcd3c47-7ecd-497b-a92a-34f69508447e"
+      }
+    },
+    "owner": "byrongodoy"
   }
 }
