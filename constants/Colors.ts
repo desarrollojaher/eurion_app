@@ -5,6 +5,7 @@ export const AZUL = "#0671B7";
 export const BLANCO = "#fff";
 export const NEGRO = "#000000";
 export const GRIS = "#918989";
+export const GRIS_CLARO = "#E9ECEF";
 
 export const Colors = {
   light: {

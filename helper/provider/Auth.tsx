@@ -27,7 +27,7 @@ export function useSession() {
   return value;
 }
 
-export function SessionProvider({ children }: PropsWithChildren) {
+export function SessionProvider({ children, token }: any) {
   const [[isLoading, session], setSession] = useStorageState("session");
   const router = useRouter();
 
@@ -56,17 +56,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
   };
 
   const handleToken = useCallback(async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        router.replace("/principal");
-      } else {
-        router.replace("/auth");
-      }
-    } catch (e) {
-      console.log(e);
+    if (token) {
+      router.replace("/principal");
+    } else {
+      router.replace("/auth");
     }
-  }, [router]);
+  }, [router, token]);
 
   useEffect(() => {
     handleToken();

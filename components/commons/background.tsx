@@ -13,7 +13,7 @@ interface Props {
 const Background: React.FC<Props> = ({ children }) => {
   return (
     <View style={styles.fondo}>
-      <Text style={styles.text}>EurionApp</Text>
+      <Text style={styles.text}>Eurion</Text>
       {children}
     </View>
   );

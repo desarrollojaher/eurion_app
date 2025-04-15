@@ -4,5 +4,6 @@ module.exports = {
     rules: {
       'prettier/prettier': 'error',
     },
+    "trailingComma": "es5"
   };
   
