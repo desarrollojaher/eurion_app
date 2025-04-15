@@ -43,7 +43,7 @@ const IniciarSesionComponent = () => {
             isPassword={true}
           />
           <Pressable style={styles.containerRecover}>
-            <Text style={styles.textRecover}>Recuerar contraseña</Text>
+            <Text style={styles.textRecover}>Recuperar contraseña</Text>
           </Pressable>
           <ButtonCustom
             label="Iniciar Sesión"

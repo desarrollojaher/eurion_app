@@ -10,10 +10,12 @@ import IconFont from "react-native-vector-icons/FontAwesome5";
 import { AZUL } from "@/constants/Colors";
 import ModalDatos from "./modal/ModalDatos";
 import ModalSincronizarImagenes from "./modal/ModalSincronizarImagenes";
+import Camara from "../commons/camera/Camara";
 
 const SincronizarDatos = () => {
   const [modalInformacion, setModalInformacion] = useState(false);
   const [modalImagenes, setModalImagenes] = useState(false);
+  const [modalCamara, setModalCamara] = useState(false);
 
   const handleSincronizarDatos = useCallback(() => {
     setModalInformacion(true);
@@ -28,6 +30,14 @@ const SincronizarDatos = () => {
 
   const handleCloseModalImagenes = useCallback(() => {
     setModalImagenes(false);
+  }, []);
+
+  const handleCloseModalCamaraOpen = useCallback(() => {
+    setModalCamara(true);
+  }, []);
+
+  const handleCloseModalCamara = useCallback(() => {
+    setModalCamara(false);
   }, []);
 
   return (
@@ -65,6 +75,40 @@ const SincronizarDatos = () => {
           </TouchableOpacity>
         </Card>
       </View>
+
+      <View style={styles.containerBotones}>
+        <Card
+          width={convertirTamanoHorizontal(160)}
+          heigth={convertirTamanoVertical(156)}
+          style={styles.styleCard}
+        >
+          <TouchableOpacity onPress={handleCloseModalCamaraOpen}>
+            <IconFont
+              name="info"
+              color={AZUL}
+              size={convertirTamanoHorizontal(60)}
+              style={styles.iconModulosStyle}
+            />
+            <Text style={styles.textIconos}>Camara</Text>
+          </TouchableOpacity>
+        </Card>
+        {/* <Card
+          width={convertirTamanoHorizontal(160)}
+          heigth={convertirTamanoVertical(156)}
+          style={styles.styleCard}
+        >
+          <TouchableOpacity onPress={handleSincronizarImagenes}>
+            <IconFont
+              name="file-image"
+              color={AZUL}
+              size={convertirTamanoHorizontal(60)}
+              style={styles.iconModulosStyle}
+            />
+            <Text style={styles.textIconos}>Imagenes</Text>
+          </TouchableOpacity>
+        </Card> */}
+      </View>
+
       {modalInformacion && (
         <ModalDatos
           onClose={handleCloseModalInformacion}
@@ -76,6 +120,9 @@ const SincronizarDatos = () => {
           onClose={handleCloseModalImagenes}
           visible={modalImagenes}
         />
+      )}
+      {modalCamara && (
+        <Camara onClose={handleCloseModalCamara} visible={modalCamara} />
       )}
     </View>
   );
