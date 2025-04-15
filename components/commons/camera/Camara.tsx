@@ -56,11 +56,18 @@ const Camara: React.FC<PropsCamara> = ({ onClose, visible }) => {
 
   const handleRemoveImage = useCallback(
     (indexElemento: number) => {
-      const datos = remove(imagenes, (_, index) => index !== index);
-      console.log(datos);
+      console.log(imagenes);
 
-      const newImages = imagenes.filter((_, i) => i !== indexElemento);
-      setImagenes(newImages);
+      console.log(indexElemento);
+      console.log(imagenes[indexElemento]);
+
+      //   const datos = remove(
+      //     imagenes,
+      //     (item) => item === imagenes[indexElemento]
+      //   );
+
+      //   const newImages = imagenes.filter((_, i) => i !== indexElemento);
+      //   setImagenes(newImages);
     },
     [imagenes]
   );
