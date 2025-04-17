@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from "react-native";
+import { Text } from "react-native";
 import React from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Select from "@/components/commons/select/Select";
@@ -37,5 +37,3 @@ const ModalDatos: React.FC<PropsModalDatos> = ({ onClose, visible }) => {
 };
 
 export default ModalDatos;
-
-const styles = StyleSheet.create({});

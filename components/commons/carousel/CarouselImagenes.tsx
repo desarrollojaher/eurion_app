@@ -3,7 +3,6 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import React, { useCallback, useRef, useState } from "react";
@@ -22,7 +21,6 @@ interface PropsCarouselImagenes {
   height?: number;
   width: number;
   paginacion?: boolean;
-  onTapImagen?: (dato: any) => void;
 }
 
 const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
@@ -30,7 +28,6 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
   height,
   width,
   paginacion,
-  onTapImagen,
 }) => {
   const [modalImagenCompleta, setModalImagenCompleta] =
     useState<boolean>(false);
@@ -65,7 +62,7 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
         width={width}
       />
     ),
-    [height, slideValue, width]
+    [handleOpenImagenCompleta, height, slideValue, width]
   );
 
   const onScroll = useCallback(

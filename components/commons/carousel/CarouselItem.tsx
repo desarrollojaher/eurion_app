@@ -39,7 +39,7 @@ const CarouselItem: React.FC<PropsCarouselItem> = ({
 
   const handleOpenImage = useCallback(() => {
     handleOpenImagenCompleta(item);
-  }, []);
+  }, [handleOpenImagenCompleta, item]);
 
   return (
     <TouchableOpacity onPress={handleOpenImage}>

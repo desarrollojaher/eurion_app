@@ -48,7 +48,7 @@ const Camara: React.FC<PropsCamara> = ({ onClose, visible }) => {
     } else {
       setImagenes((current) => [...current, photo.uri]);
     }
-  }, []);
+  }, [setImagenes]);
 
   const handleGuardarDatos = useCallback(() => {
     onClose();
@@ -56,18 +56,11 @@ const Camara: React.FC<PropsCamara> = ({ onClose, visible }) => {
 
   const handleRemoveImage = useCallback(
     (indexElemento: number) => {
-      console.log(imagenes);
-
-      console.log(indexElemento);
-      console.log(imagenes[indexElemento]);
-
-      //   const datos = remove(
-      //     imagenes,
-      //     (item) => item === imagenes[indexElemento]
-      //   );
-
-      //   const newImages = imagenes.filter((_, i) => i !== indexElemento);
-      //   setImagenes(newImages);
+      const datos = remove(
+        imagenes,
+        (item) => item !== imagenes[indexElemento]
+      );
+      setImagenes(datos);
     },
     [imagenes]
   );
@@ -92,7 +85,7 @@ const Camara: React.FC<PropsCamara> = ({ onClose, visible }) => {
         </TouchableOpacity>
       </View>
     ),
-    []
+    [handleRemoveImage]
   );
 
   if (!permission) {

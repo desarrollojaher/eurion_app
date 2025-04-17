@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import React, { useMemo, useRef } from "react";
+import React, { useRef } from "react";
 import LottieView from "lottie-react-native";
 import {
   convertirTamanoHorizontal,

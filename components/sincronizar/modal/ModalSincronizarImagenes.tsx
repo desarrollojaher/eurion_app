@@ -1,12 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import React from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import ImagenCompleta from "@/components/commons/carousel/ImagenCompleta";
 interface PropsModalSincronizarImagenes {
   visible: boolean;
   onClose: () => void;
@@ -37,7 +36,6 @@ const ModalSincronizarImagenes: React.FC<PropsModalSincronizarImagenes> = ({
           />
         </View>
       </ModalCustom>
-      
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { Image, ImageStyle, StyleSheet } from "react-native";
+import { Image, ImageStyle } from "react-native";
 import React from "react";
 
 interface PropsImagenContainer {
@@ -14,5 +14,3 @@ const ImagenContainer: React.FC<PropsImagenContainer> = ({
 };
 
 export default ImagenContainer;
-
-const styles = StyleSheet.create({});
