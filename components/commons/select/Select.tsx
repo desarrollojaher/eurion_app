@@ -7,8 +7,8 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { GRIS_CLARO, NEGRO } from "@/constants/Colors";
-interface IDatosSelect {
+import { BLANCO, GRIS, GRIS_CLARO, NEGRO } from "@/constants/Colors";
+export interface IDatosSelect {
   label: string;
   value: string;
 }
@@ -19,6 +19,8 @@ interface PropsSelect {
   onSelect?: (value: IDatosSelect) => void;
   search?: boolean;
   searchPlaceholder?: string;
+  defaultValue?: IDatosSelect;
+  styleContainer?: any;
 }
 const Select: React.FC<PropsSelect> = ({
   datos,
@@ -26,6 +28,8 @@ const Select: React.FC<PropsSelect> = ({
   placeholder = "Seleccione",
   search,
   searchPlaceholder = "Buscar",
+  defaultValue,
+  styleContainer,
 }) => {
   const handleSelect = useCallback(
     (datos: IDatosSelect) => {
@@ -42,7 +46,7 @@ const Select: React.FC<PropsSelect> = ({
       }}
       renderButton={(selectedItem, isOpened) => {
         return (
-          <View style={styles.dropdownButtonStyle}>
+          <View style={[styles.dropdownButtonStyle, styleContainer]}>
             <Text style={styles.dropdownButtonTxtStyle}>
               {(selectedItem && selectedItem.label) || placeholder}
             </Text>
@@ -69,6 +73,7 @@ const Select: React.FC<PropsSelect> = ({
       dropdownStyle={styles.dropdownMenuStyle}
       search={search}
       searchPlaceHolder={searchPlaceholder}
+      defaultValue={defaultValue}
       renderSearchInputLeftIcon={() => (
         <Icons name="search" style={styles.dropdownButtonArrowStyle} />
       )}
@@ -80,9 +85,9 @@ export default Select;
 
 const styles = StyleSheet.create({
   dropdownButtonStyle: {
-    height: convertirTamanoVertical(50),
-    backgroundColor: "#E9ECEF",
-    borderRadius: convertirTamanoHorizontal(12),
+    height: convertirTamanoVertical(60),
+    backgroundColor: BLANCO,
+    borderRadius: convertirTamanoHorizontal(30),
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -90,12 +95,12 @@ const styles = StyleSheet.create({
   },
   dropdownButtonTxtStyle: {
     flex: 1,
-    fontSize: convertirTamanoHorizontal(18),
-    fontWeight: "500",
-    color: NEGRO,
+    fontSize: convertirTamanoHorizontal(16),
+    fontWeight: "regular",
+    color: GRIS,
   },
   dropdownButtonArrowStyle: {
-    fontSize: convertirTamanoHorizontal(28),
+    fontSize: convertirTamanoHorizontal(30),
   },
 
   dropdownMenuStyle: {
@@ -109,6 +114,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: convertirTamanoVertical(8),
+    marginTop: convertirTamanoVertical(5),
   },
   dropdownItemTxtStyle: {
     flex: 1,

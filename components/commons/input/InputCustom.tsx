@@ -12,7 +12,7 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/Feather";
-import { GRIS, NEGRO } from "@/constants/Colors";
+import { BLANCO, GRIS, NEGRO } from "@/constants/Colors";
 
 interface PropsInputCustom extends TextInputProps {
   labelError?: string;
@@ -20,6 +20,7 @@ interface PropsInputCustom extends TextInputProps {
   styleContainer?: any;
   styleInput?: any;
   isPassword?: boolean;
+  leftIcon?: React.ReactNode;
 }
 
 const InputCustom: React.FC<PropsInputCustom> = ({
@@ -28,6 +29,7 @@ const InputCustom: React.FC<PropsInputCustom> = ({
   isPassword,
   styleContainer,
   styleInput,
+  leftIcon,
   ...inputsProps
 }) => {
   const [pass, setPass] = useState(isPassword);
@@ -38,6 +40,7 @@ const InputCustom: React.FC<PropsInputCustom> = ({
   return (
     <View>
       <View style={[styles.input, styleContainer]}>
+        {leftIcon && leftIcon}
         <TextInput
           style={[styles.textInputStyle, styleInput]}
           {...inputsProps}
@@ -72,6 +75,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     gap: convertirTamanoHorizontal(5),
+    backgroundColor: BLANCO,
   },
   textInputStyle: {
     flex: 1,

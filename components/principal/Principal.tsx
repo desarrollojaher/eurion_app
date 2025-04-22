@@ -31,6 +31,10 @@ const Principal = () => {
     router.push("/principal/sincronizar");
   }, [router]);
 
+  const handleOpenVerificaciones = useCallback(() => {
+    router.push("/principal/verificaciones/verificaciones-principal");
+  }, [router]);
+
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
@@ -65,7 +69,7 @@ const Principal = () => {
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleOpenVerificaciones}>
             <IconFont
               name="user-check"
               color={AZUL}

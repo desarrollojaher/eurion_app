@@ -12,12 +12,13 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
+import { IImagenCompleta } from "@/models/IImagenCompleta";
 
 interface PropsCarouselItem {
-  handleOpenImagenCompleta: (dato: any) => void;
+  handleOpenImagenCompleta: (dato: IImagenCompleta) => void;
   slideValue: SharedValue<number>;
   index: number;
-  item: any;
+  item: IImagenCompleta;
   height?: number;
   width?: number;
 }

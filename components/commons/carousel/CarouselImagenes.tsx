@@ -15,12 +15,15 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import { AZUL, GRIS } from "@/constants/Colors";
 import ImagenCompleta from "./ImagenCompleta";
+import { IImagenCompleta } from "@/models/IImagenCompleta";
 
 interface PropsCarouselImagenes {
-  data: any[];
+  data: IImagenCompleta[];
   height?: number;
   width: number;
   paginacion?: boolean;
+  modulo?: "camara" | "galeria";
+  handleRemoveImage?: (index: string) => void;
 }
 
 const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
@@ -28,16 +31,18 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
   height,
   width,
   paginacion,
+  handleRemoveImage,
+  modulo,
 }) => {
   const [modalImagenCompleta, setModalImagenCompleta] =
     useState<boolean>(false);
-  const [imagen, setImagen] = useState<any>(null);
+  const [imagen, setImagen] = useState<IImagenCompleta | null>(null);
 
   const handleCloseModal = useCallback(() => {
     setModalImagenCompleta(false);
   }, []);
 
-  const handleOpenImagenCompleta = useCallback((dato: any) => {
+  const handleOpenImagenCompleta = useCallback((dato: IImagenCompleta) => {
     setImagen(dato);
     setModalImagenCompleta(true);
   }, []);
@@ -46,10 +51,6 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
   const [activeIndex, setActiveIndex] = useState(0);
 
   const flatListRef = useRef<any>(null);
-
-  // const handleOpenImagenCompleta = useCallback((dato: any) => {
-  //   onTapImagen && onTapImagen(dato);
-  // }, []);
 
   const renderItem = useCallback(
     ({ item, index }: any) => (
@@ -83,41 +84,41 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
   }, []);
 
   return (
-    <>
-      <View style={styles.container}>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          horizontal
-          pagingEnabled
-          onScroll={onScroll}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(datos) => datos.titulo.toString()}
-        />
-        {paginacion && (
-          <View style={styles.containerPuntos}>
-            {data.map((point, index) => (
-              <TouchableOpacity
-                disabled
-                key={index}
-                onPress={() => handlePointPress(index)}
-                style={[
-                  styles.point,
-                  index === activeIndex && styles.selectedPoint,
-                ]}
-              />
-            ))}
-          </View>
-        )}
-      </View>
-      {modalImagenCompleta && (
+    <View style={styles.container}>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        onScroll={onScroll}
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(datos) => datos.titulo.toString()}
+      />
+      {paginacion && (
+        <View style={styles.containerPuntos}>
+          {data.map((point, index) => (
+            <TouchableOpacity
+              disabled
+              key={index}
+              onPress={() => handlePointPress(index)}
+              style={[
+                styles.point,
+                index === activeIndex && styles.selectedPoint,
+              ]}
+            />
+          ))}
+        </View>
+      )}
+      {modalImagenCompleta && imagen && (
         <ImagenCompleta
           onClose={handleCloseModal}
           visible={modalImagenCompleta}
           item={imagen}
+          deleteImage={handleRemoveImage}
+          modulo={modulo}
         />
       )}
-    </>
+    </View>
   );
 };
 
