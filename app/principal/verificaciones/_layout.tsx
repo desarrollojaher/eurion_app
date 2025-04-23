@@ -7,6 +7,10 @@ export default function AppLayout() {
         name="verificaciones-principal"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="verifcaciones-detalles"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

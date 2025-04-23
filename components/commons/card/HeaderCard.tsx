@@ -7,6 +7,7 @@ interface PropsHeaderCard {
   labelRight?: string;
   styleLeft?: any;
   styleRight?: any;
+  styleContainer?: any;
 }
 
 const HeaderCard: React.FC<PropsHeaderCard> = ({
@@ -14,9 +15,10 @@ const HeaderCard: React.FC<PropsHeaderCard> = ({
   labelRight,
   styleLeft,
   styleRight,
+  styleContainer,
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, styleContainer]}>
       <Text style={[styles.textLeft, styleLeft]}>{labelLeft}</Text>
       <Text style={[styles.textRight, styleRight]}>{labelRight}</Text>
     </View>

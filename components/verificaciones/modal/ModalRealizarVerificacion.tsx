@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Separador from "@/components/commons/separador/Separador";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -12,6 +12,7 @@ import ButtonCustom from "@/components/commons/button/ButtonCustom";
 import Camara from "@/components/commons/camera/Camara";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
 import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
+import { remove } from "lodash";
 
 interface PropsModalRealizarVerificacion {
   visible: boolean;
@@ -25,34 +26,58 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   cliente,
 }) => {
   const [visibleCamara, setVisibleCamara] = useState(false);
+  const [visibleCarrucel, setVisibleCarrucel] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
   const onOpenCamara = useCallback(() => {
+    setVisibleCarrucel(false);
     setVisibleCamara(true);
   }, []);
 
   const onCloseCamara = useCallback(() => {
+    if (imagenes.length > 0) setVisibleCarrucel(true);
     setVisibleCamara(false);
-  }, []);
+  }, [imagenes.length]);
 
-  const handleCaptureImage = useCallback((images: IImagenCompleta[]) => {
-    setImagenes(images);
-  }, []);
+  const handleCaptureImage = useCallback(
+    (images: IImagenCompleta[]) => {
+      const union = imagenes.concat(images);
+      setImagenes(union);
+      setVisibleCarrucel(true);
+    },
+    [imagenes]
+  );
 
-  const handleRemoveImage = useCallback((indexElemento: string) => {
-    console.log("indexElemento", indexElemento);
-  }, []);
+  const handleRemoveImage = useCallback(
+    (indexElemento: number) => {
+      const images = remove(
+        imagenes,
+        (item) => item !== imagenes[indexElemento]
+      );
+      setImagenes(images);
+    },
+    [imagenes]
+  );
+
+  useEffect(() => {
+    if (imagenes.length === 0) {
+      setVisibleCarrucel(false);
+    }
+  }, [imagenes]);
 
   return (
     <ModalCustom onClose={onClose} visible={visible} titulo={cliente}>
       <View style={styles.container}>
-        {imagenes.length > 0 ? (
+        {visibleCarrucel ? (
           <CarouselImagenes
             data={imagenes}
             width={convertirTamanoHorizontal(330)}
             paginacion={true}
             handleRemoveImage={handleRemoveImage}
             modulo="galeria"
+            remove
+            camera
+            handleOpenCamara={onOpenCamara}
           />
         ) : (
           <Pressable onPress={onOpenCamara}>
@@ -97,7 +122,7 @@ export default ModalRealizarVerificacion;
 
 const styles = StyleSheet.create({
   container: {
-    height: convertirTamanoVertical(200),
+    height: convertirTamanoVertical(250),
     width: "100%",
     justifyContent: "center",
     alignItems: "center",

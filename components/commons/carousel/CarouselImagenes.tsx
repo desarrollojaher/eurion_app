@@ -2,10 +2,11 @@ import {
   FlatList,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Pressable,
   StyleSheet,
   View,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, { act, useCallback, useRef, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
 import CarouselItem from "./CarouselItem";
 import { TouchableOpacity } from "react-native";
@@ -16,6 +17,7 @@ import {
 import { AZUL, GRIS } from "@/constants/Colors";
 import ImagenCompleta from "./ImagenCompleta";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 interface PropsCarouselImagenes {
   data: IImagenCompleta[];
@@ -23,7 +25,10 @@ interface PropsCarouselImagenes {
   width: number;
   paginacion?: boolean;
   modulo?: "camara" | "galeria";
-  handleRemoveImage?: (index: string) => void;
+  handleRemoveImage?: (index: number) => void;
+  remove?: boolean;
+  camera?: boolean;
+  handleOpenCamara?: () => void;
 }
 
 const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
@@ -33,6 +38,9 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
   paginacion,
   handleRemoveImage,
   modulo,
+  remove,
+  camera,
+  handleOpenCamara,
 }) => {
   const [modalImagenCompleta, setModalImagenCompleta] =
     useState<boolean>(false);
@@ -51,6 +59,10 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
   const [activeIndex, setActiveIndex] = useState(0);
 
   const flatListRef = useRef<any>(null);
+
+  const handleEliminarImagen = useCallback(() => {
+    handleRemoveImage && handleRemoveImage(activeIndex);
+  }, [activeIndex, handleRemoveImage]);
 
   const renderItem = useCallback(
     ({ item, index }: any) => (
@@ -83,6 +95,10 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
     flatListRef.current?.scrollToIndex({ index, animated: true });
   }, []);
 
+  const handleCamara = useCallback(() => {
+    handleOpenCamara && handleOpenCamara();
+  }, [handleOpenCamara]);
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -94,6 +110,7 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
         showsHorizontalScrollIndicator={false}
         keyExtractor={(datos) => datos.titulo.toString()}
       />
+
       {paginacion && (
         <View style={styles.containerPuntos}>
           {data.map((point, index) => (
@@ -109,12 +126,25 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
           ))}
         </View>
       )}
+      <View
+        style={[styles.containerPuntos, { gap: convertirTamanoHorizontal(10) }]}
+      >
+        {remove && (
+          <Pressable onPress={handleEliminarImagen}>
+            <Icon name="trash" size={convertirTamanoHorizontal(30)} />
+          </Pressable>
+        )}
+        {camera && (
+          <Pressable onPress={handleCamara}>
+            <Icon name="camera" size={convertirTamanoHorizontal(30)} />
+          </Pressable>
+        )}
+      </View>
       {modalImagenCompleta && imagen && (
         <ImagenCompleta
           onClose={handleCloseModal}
           visible={modalImagenCompleta}
           item={imagen}
-          deleteImage={handleRemoveImage}
           modulo={modulo}
         />
       )}

@@ -11,14 +11,23 @@ import { useRouter } from "expo-router";
 interface PropsHeader {
   title?: string;
   iconRight?: React.ReactNode;
+  handleTapIconRight?: () => void;
 }
 
-const Header: React.FC<PropsHeader> = ({ title = "", iconRight }) => {
+const Header: React.FC<PropsHeader> = ({
+  title = "",
+  iconRight,
+  handleTapIconRight,
+}) => {
   const router = useRouter();
 
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
+
+  const handleIconRight = useCallback(() => {
+    handleTapIconRight && handleTapIconRight();
+  }, [handleTapIconRight]);
 
   return (
     <View style={styles.container}>
@@ -31,7 +40,10 @@ const Header: React.FC<PropsHeader> = ({ title = "", iconRight }) => {
       </TouchableOpacity>
       <Text style={styles.textHeader}>{title}</Text>
       {iconRight && (
-        <TouchableOpacity onPress={handleBack} style={styles.containerStyle}>
+        <TouchableOpacity
+          onPress={handleIconRight}
+          style={styles.containerStyle}
+        >
           {iconRight}
         </TouchableOpacity>
       )}

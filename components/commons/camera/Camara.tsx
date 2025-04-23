@@ -23,6 +23,7 @@ import { Toast } from "toastify-react-native";
 import { remove } from "lodash";
 import ImagenCompleta from "../carousel/ImagenCompleta";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
+import uuid from "react-native-uuid";
 
 interface PropsCamara {
   onClose: () => void;
@@ -61,8 +62,9 @@ const Camara: React.FC<PropsCamara> = ({
   const handleGuardarDatos = useCallback(() => {
     const res: IImagenCompleta[] = [];
     for (let i = 0; i < imagenes.length; i++) {
-      res.push({ titulo: `imagen ${i + 1}`, url: imagenes[i] });
+      res.push({ titulo: uuid.v4(), url: imagenes[i] });
     }
+    setImagenes([]);
     handleCaptureImage(res);
     onClose();
   }, [handleCaptureImage, imagenes, onClose]);

@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useCallback, useState } from "react";
@@ -26,12 +27,15 @@ import TextCard from "../commons/card/TextCard";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarVerificacion from "./modal/ModalRealizarVerificacion";
+import { useRouter } from "expo-router";
 
 const VeriPrincipal = () => {
   const [openImagenes, setOpenImagenes] = useState(false);
   const [openGuardar, setOpenGuardar] = useState(false);
 
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+
+  const router = useRouter();
 
   const handleLlamarPersona = useCallback(async (telefono: string) => {
     await Linking.openURL(`tel:${telefono}`);
@@ -58,33 +62,39 @@ const VeriPrincipal = () => {
     setOpenGuardar(true);
   }, []);
 
+  const handleChangePage = useCallback(() => {
+    router.push("/principal/verificaciones/verifcaciones-detalles");
+  }, [router]);
+
   const renderItem = useCallback(
     ({ item, index }: { item: any; index: number }) => (
       <Card style={styles.cardStyle}>
-        <HeaderCard
-          labelLeft="VERIFICACION DOMICILIO"
-          labelRight="04-03-2025"
-        />
-        <Separador />
-        <TextCard
-          titulo="AREVALO RIVAS FAUSTO GEOVANY"
-          subtitulo="010254555-5"
-        />
-        <Text style={styles.textDescripcion}>
-          DOM CRISTOBAL COLON 1 DOCE DE OCTUBRE CASA DE 3 PISOS COLOR CREA
-        </Text>
-        <Separador />
-        <View style={styles.containerIcons}>
-          <Pressable onPress={() => handleOpenImagenes([])}>
-            <FontAwesome5 name="images" color={NEGRO} size={30} />
-          </Pressable>
-          <Pressable onPress={() => handleLlamarPersona("0968718441")}>
-            <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
-          </Pressable>
-          <Pressable onPress={handleOpenGuardar}>
-            <FontAwesome5 name="save" color={NEGRO} size={30} />
-          </Pressable>
-        </View>
+        <TouchableOpacity onPress={handleChangePage}>
+          <HeaderCard
+            labelLeft="VERIFICACION DOMICILIO"
+            labelRight="04-03-2025"
+          />
+          <Separador />
+          <TextCard
+            titulo="AREVALO RIVAS FAUSTO GEOVANY"
+            subtitulo="010254555-5"
+          />
+          <Text style={styles.textDescripcion}>
+            DOM CRISTOBAL COLON 1 DOCE DE OCTUBRE CASA DE 3 PISOS COLOR CREA
+          </Text>
+          <Separador />
+          <View style={styles.containerIcons}>
+            <Pressable onPress={() => handleOpenImagenes([])}>
+              <FontAwesome5 name="images" color={NEGRO} size={30} />
+            </Pressable>
+            <Pressable onPress={() => handleLlamarPersona("0968718441")}>
+              <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
+            </Pressable>
+            <Pressable onPress={handleOpenGuardar}>
+              <FontAwesome5 name="save" color={NEGRO} size={30} />
+            </Pressable>
+          </View>
+        </TouchableOpacity>
       </Card>
     ),
     [handleLlamarPersona, handleOpenGuardar, handleOpenImagenes]
