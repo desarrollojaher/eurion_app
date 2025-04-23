@@ -1,9 +1,9 @@
 import {
-  Button,
   Dimensions,
   Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import React from "react";
@@ -16,7 +16,6 @@ import { BLANCO } from "@/constants/Colors";
 import IconFont from "react-native-vector-icons/FontAwesome";
 import { Image } from "react-native";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
-import { Alert } from "react-native";
 
 interface PropsImagenCompleta {
   visible: boolean;
@@ -43,45 +42,47 @@ const ImagenCompleta: React.FC<PropsImagenCompleta> = ({
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={styles.modalView} pointerEvents="auto">
-        <View style={styles.headerModal} pointerEvents="auto">
-          <Text style={styles.textHeaderModal}>{item.titulo}</Text>
-          <Button
-            title="Press me"
-            color="#f194ff"
-            onPress={() => Alert.alert("Button with adjusted color pressed")}
-          />
-          {/* <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <IconFont
-              name="close"
-              size={convertirTamanoHorizontal(20)}
-              color={BLANCO}
-            />
-          </TouchableOpacity> */}
+      <Pressable
+        style={styles.overlay}
+        onPress={onClose}
+        disabled={modulo === "camara"}
+      >
+        <View style={styles.modalView}>
+          <View style={styles.headerModal}>
+            <Text style={styles.textHeaderModal}>{item.titulo}</Text>
 
-          {modulo === "camara" && (
-            <Pressable
-              onPress={() => deleteImage && deleteImage(item.url)}
-              style={styles.closeButton}
-            >
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <IconFont
-                name="trash"
+                name="close"
                 size={convertirTamanoHorizontal(20)}
                 color={BLANCO}
               />
-            </Pressable>
-          )}
+            </TouchableOpacity>
+
+            {modulo === "camara" && (
+              <Pressable
+                onPress={() => deleteImage && deleteImage(item.url)}
+                style={styles.closeButton}
+              >
+                <IconFont
+                  name="trash"
+                  size={convertirTamanoHorizontal(20)}
+                  color={BLANCO}
+                />
+              </Pressable>
+            )}
+          </View>
+          <View style={styles.body}>
+            <Image
+              style={[styles.imagen]}
+              source={{
+                uri: item.url,
+              }}
+              resizeMode={"contain"}
+            />
+          </View>
         </View>
-        <View style={styles.body}>
-          <Image
-            style={[styles.imagen]}
-            source={{
-              uri: item.url,
-            }}
-            resizeMode={"contain"}
-          />
-        </View>
-      </View>
+      </Pressable>
     </Modal>
   );
 };
@@ -102,11 +103,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    width: "100%",
+    paddingVertical: convertirTamanoVertical(2),
   },
   textHeaderModal: {
     flex: 1,
     fontSize: convertirTamanoHorizontal(15),
-    fontWeight: "regular",
+    fontWeight: "300",
     color: BLANCO,
   },
   closeButton: {
@@ -122,6 +125,12 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   imagen: {
+    width: "100%",
+    height: "100%",
+  },
+
+  overlay: {
+    position: "absolute",
     width: "100%",
     height: "100%",
   },

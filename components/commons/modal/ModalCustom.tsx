@@ -28,15 +28,15 @@ const ModalCustom: React.FC<PropsModalCustom> = ({
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.centeredView} pointerEvents="auto">
-        <View style={styles.modalView} pointerEvents="auto">
+      <View style={styles.centeredView}>
+        <View style={styles.modalView}>
           <View style={styles.headerModal}>
             <Text style={styles.textHeaderModal}>{titulo}</Text>
             <Pressable onPress={onClose} style={styles.closeButton}>
               <IconFont name="close" size={convertirTamanoHorizontal(20)} />
             </Pressable>
           </View>
-          <View style={styles.bodyModal} pointerEvents="auto">
+          <View style={styles.bodyModal}>
             <ScrollView style={{ width: "100%" }}>{children}</ScrollView>
           </View>
         </View>

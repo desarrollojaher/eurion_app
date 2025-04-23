@@ -52,7 +52,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
             width={convertirTamanoHorizontal(330)}
             paginacion={true}
             handleRemoveImage={handleRemoveImage}
-            modulo="camara"
+            modulo="galeria"
           />
         ) : (
           <Pressable onPress={onOpenCamara}>
