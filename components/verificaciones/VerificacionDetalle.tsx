@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from "react-native-vector-icons/FontAwesome5";
 import { BLANCO, GRIS } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
@@ -29,7 +29,7 @@ const VerificacionDetalle = () => {
         title="BYRON GODOY"
         iconRight={
           <Icon
-            name="save"
+            name="plus"
             color={BLANCO}
             size={convertirTamanoHorizontal(30)}
           />

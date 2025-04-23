@@ -91,13 +91,18 @@ const VeriPrincipal = () => {
               <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
             </Pressable>
             <Pressable onPress={handleOpenGuardar}>
-              <FontAwesome5 name="save" color={NEGRO} size={30} />
+              <FontAwesome5 name="plus" color={NEGRO} size={30} />
             </Pressable>
           </View>
         </TouchableOpacity>
       </Card>
     ),
-    [handleLlamarPersona, handleOpenGuardar, handleOpenImagenes]
+    [
+      handleChangePage,
+      handleLlamarPersona,
+      handleOpenGuardar,
+      handleOpenImagenes,
+    ]
   );
 
   const handleCerrarImagenes = useCallback(() => {
@@ -125,10 +130,11 @@ const VeriPrincipal = () => {
         />
         <Select
           datos={[
+            { label: "TODOS", value: "todos" },
             { label: "VERIFICACION DOMICILIO", value: "domicilio" },
             { label: "VERIFICACION TRABAJO", value: "trabajo" },
           ]}
-          defaultValue={{ label: "VERIFICACION DOMICILIO", value: "domicilio" }}
+          defaultValue={{ label: "TODOS", value: "todos" }}
         />
         <FlatList
           style={{ height: convertirTamanoVertical(600) }}
