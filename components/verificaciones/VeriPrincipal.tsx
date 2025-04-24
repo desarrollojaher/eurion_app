@@ -28,14 +28,20 @@ import { IImagenCompleta } from "@/models/IImagenCompleta";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarVerificacion from "./modal/ModalRealizarVerificacion";
 import { useRouter } from "expo-router";
+import { cabeceraVerificacionPrueba } from "@/helper/json/jsonCabeceraVerificacion";
+import { IVerificacionPruebaCabecera } from "@/models/IVerificacionPrueba";
+import { useVerificacionStore } from "@/helper/store/stroreVerificacion";
 
 const VeriPrincipal = () => {
   const [openImagenes, setOpenImagenes] = useState(false);
   const [openGuardar, setOpenGuardar] = useState(false);
 
+  const [nombre, setNombre] = useState("");
+
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
   const router = useRouter();
+  const { setDatos, setDatosDetalles } = useVerificacionStore();
 
   const handleLlamarPersona = useCallback(async (telefono: string) => {
     await Linking.openURL(`tel:${telefono}`);
@@ -43,54 +49,51 @@ const VeriPrincipal = () => {
 
   const handleOpenImagenes = useCallback(
     (data: IImagenCompleta[]) => {
-      setImagenes([
-        {
-          titulo: "imagen1",
-          url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfmCTuSXDYOST7RSIGtE_1Dm5cONyi2OsZvg&s",
-        },
-        {
-          titulo: "imagen2",
-          url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBIayrHifILdPMYmacWqWfgTZD4eFBgPZP3A&s",
-        },
-      ]);
+      setImagenes(data);
       setOpenImagenes(true);
     },
     [setImagenes]
   );
 
-  const handleOpenGuardar = useCallback(() => {
+  const handleOpenGuardar = useCallback((nombre: string) => {
+    setNombre(nombre);
     setOpenGuardar(true);
   }, []);
 
-  const handleChangePage = useCallback(() => {
-    router.push("/principal/verificaciones/verifcaciones-detalles");
-  }, [router]);
+  const handleChangePage = useCallback(
+    (item: IVerificacionPruebaCabecera) => {
+      setDatos(item);
+      setDatosDetalles();
+      router.push("/principal/verificaciones/verifcaciones-detalles");
+    },
+    [router, setDatos, setDatosDetalles]
+  );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => (
+    ({ item, index }: { item: IVerificacionPruebaCabecera; index: number }) => (
       <Card style={styles.cardStyle}>
-        <TouchableOpacity onPress={handleChangePage}>
+        <TouchableOpacity onPress={() => handleChangePage(item)}>
           <HeaderCard
-            labelLeft="VERIFICACION DOMICILIO"
-            labelRight="04-03-2025"
+            labelLeft={item.tipoVerificacion}
+            labelRight={item.fechaVerificacion}
           />
           <Separador />
           <TextCard
-            titulo="AREVALO RIVAS FAUSTO GEOVANY"
-            subtitulo="010254555-5"
+            titulo={item.nombreCliente}
+            subtitulo={item.cedulaCliente}
           />
-          <Text style={styles.textDescripcion}>
-            DOM CRISTOBAL COLON 1 DOCE DE OCTUBRE CASA DE 3 PISOS COLOR CREA
-          </Text>
+          <Text style={styles.textDescripcion}>{item.direccionCliente}</Text>
           <Separador />
           <View style={styles.containerIcons}>
-            <Pressable onPress={() => handleOpenImagenes([])}>
+            <Pressable onPress={() => handleOpenImagenes(item.imagenes)}>
               <FontAwesome5 name="images" color={NEGRO} size={30} />
             </Pressable>
-            <Pressable onPress={() => handleLlamarPersona("0968718441")}>
+            <Pressable
+              onPress={() => handleLlamarPersona(item.telefonoCliente)}
+            >
               <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
             </Pressable>
-            <Pressable onPress={handleOpenGuardar}>
+            <Pressable onPress={() => handleOpenGuardar(item.nombreCliente)}>
               <FontAwesome5 name="plus" color={NEGRO} size={30} />
             </Pressable>
           </View>
@@ -138,7 +141,7 @@ const VeriPrincipal = () => {
         />
         <FlatList
           style={{ height: convertirTamanoVertical(600) }}
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          data={cabeceraVerificacionPrueba}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
         />
@@ -152,7 +155,7 @@ const VeriPrincipal = () => {
       )}
       {openGuardar && (
         <ModalRealizarVerificacion
-          cliente="Byron Godoy"
+          cliente={nombre}
           onClose={handleCloseGuardar}
           visible={openGuardar}
         />

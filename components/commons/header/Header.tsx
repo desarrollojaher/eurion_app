@@ -38,7 +38,9 @@ const Header: React.FC<PropsHeader> = ({
           color={BLANCO}
         />
       </TouchableOpacity>
-      <Text style={styles.textHeader}>{title}</Text>
+      <Text style={styles.textHeader} numberOfLines={1}>
+        {title}
+      </Text>
       {iconRight && (
         <TouchableOpacity
           onPress={handleIconRight}
