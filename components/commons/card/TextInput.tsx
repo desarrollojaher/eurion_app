@@ -6,7 +6,6 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import Select, { IDatosSelect } from "../select/Select";
-import ButtonCustom from "../button/ButtonCustom";
 
 interface PropsTextInput {
   placeholder?: string;
@@ -21,6 +20,8 @@ interface PropsTextInput {
   tipo: "text" | "select";
   direction?: "row" | "column";
   styleContainer?: any;
+  styleHeader?: any;
+  styleTextInput?: any;
 }
 
 const TextInput: React.FC<PropsTextInput> = ({
@@ -36,30 +37,38 @@ const TextInput: React.FC<PropsTextInput> = ({
   onChangeSelect,
   direction = "row",
   styleContainer,
+  styleHeader,
+  styleTextInput,
 }) => {
   const styleInput = useMemo(
     () =>
-      direction === "column" && {
-        width: "100%",
-        height: convertirTamanoVertical(160),
-      },
-    [direction]
+      direction === "column" && multiline
+        ? {
+            width: "100%",
+            height: convertirTamanoVertical(160),
+          }
+        : {
+            width: "100%",
+            height: convertirTamanoVertical(60),
+          },
+    [direction, multiline]
   );
 
   return (
     <View
       style={[styles.container, { flexDirection: direction }, styleContainer]}
     >
-      <Text style={[styles.textStyle]}>{text}</Text>
+      {text && <Text style={[styles.textStyle, styleHeader]}>{text}</Text>}
       {tipo === "text" && (
         <InputCustom
-          styleContainer={[styles.inputStyle, styleInput]}
+          styleContainer={[styles.inputStyle, styleInput, styleTextInput]}
           keyboardType={keyboardType}
           onChangeText={onChangeText}
           placeholder={placeholder}
           value={defaultValueText}
           multiline={multiline}
-          numberOfLines={multiline ? 10 : 1}
+          numberOfLines={multiline ? 5 : 1}
+          textAlignVertical="top"
         />
       )}
       {tipo === "select" && datos && (
@@ -71,7 +80,6 @@ const TextInput: React.FC<PropsTextInput> = ({
           styleContainer={styles.containerSelect}
         />
       )}
-      {/* <ButtonCustom /> */}
     </View>
   );
 };

@@ -37,7 +37,12 @@ const ModalCustom: React.FC<PropsModalCustom> = ({
             </Pressable>
           </View>
           <View style={styles.bodyModal}>
-            <ScrollView style={{ width: "100%" }}>{children}</ScrollView>
+            <ScrollView
+              style={{ width: "100%" }}
+              showsVerticalScrollIndicator={false}
+            >
+              {children}
+            </ScrollView>
           </View>
         </View>
       </View>

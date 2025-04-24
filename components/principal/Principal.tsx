@@ -35,6 +35,9 @@ const Principal = () => {
     router.push("/principal/verificaciones/verificaciones-principal");
   }, [router]);
 
+  const handleOpenGestiones = useCallback(() => {
+    router.push("/principal/gestiones/gestiones-principal");
+  }, [router]);
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
@@ -86,7 +89,7 @@ const Principal = () => {
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleOpenGestiones}>
             <IconFont6
               name="list"
               color={AZUL}

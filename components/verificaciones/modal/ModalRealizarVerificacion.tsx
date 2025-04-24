@@ -99,7 +99,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
         ]}
       />
       <TextInput
-        text={"Calificación: "}
+        text=""
         tipo="text"
         multiline
         direction="column"
