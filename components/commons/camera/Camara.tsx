@@ -161,6 +161,7 @@ const Camara: React.FC<PropsCamara> = ({
       transparent={false}
       visible={visible}
       onRequestClose={onClose}
+      style={{ zIndex: 9999 }}
     >
       <View style={styles.container}>
         <CameraView

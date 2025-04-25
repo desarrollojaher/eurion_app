@@ -13,7 +13,7 @@ export const useCarousel = (slideValue: SharedValue<number>, index: number) => {
       slideValue.value,
       inputValues,
       [80, 100, 80],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     ),
     transform: [
       {
@@ -21,7 +21,7 @@ export const useCarousel = (slideValue: SharedValue<number>, index: number) => {
           slideValue.value,
           inputValues,
           [-50, 0, 50],
-          Extrapolation.CLAMP,
+          Extrapolation.CLAMP
         ),
       },
     ],
@@ -29,8 +29,9 @@ export const useCarousel = (slideValue: SharedValue<number>, index: number) => {
       slideValue.value,
       inputValues,
       [0.5, 1, 0.5], // Las imágenes laterales son translúcidas
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     ),
+    pointerEvents: "none",
   }));
 
   const imageStyle = useAnimatedStyle(() => ({
@@ -40,7 +41,7 @@ export const useCarousel = (slideValue: SharedValue<number>, index: number) => {
           slideValue.value,
           inputValues,
           [0.5, 1, 0.5],
-          Extrapolation.CLAMP,
+          Extrapolation.CLAMP
         ),
       },
     ],

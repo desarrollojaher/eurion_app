@@ -77,7 +77,6 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
             modulo="galeria"
             remove
             camera
-            handleOpenCamara={onOpenCamara}
           />
         ) : (
           <Pressable onPress={onOpenCamara}>

@@ -1,0 +1,70 @@
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
+import Footer from "../commons/footer/Footer";
+import Header from "../commons/header/Header";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import { BLANCO } from "@/constants/Colors";
+import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
+import ModalRealizarGestion from "./modal/ModalRealizarGestion";
+import GestionPageDetallesCliente from "./GestionPageDetallesCliente";
+import GestionesPageDetallesDocumenos from "./GestionesPageDetallesDocumenos";
+import GestionesPageDetallesDireccion from "./GestionesPageDetallesDireccion";
+
+const GestionPageDetalles = () => {
+  const [modalGestionar, setModalGestionar] = useState(false);
+  const [tab, setTab] = useState(0);
+
+  const tabs = useMemo(() => ["Cliente", "Documentos", "Dirección"], []);
+
+  const tabCorrespondiente = useMemo(() => {
+    if (tabs[tab] === "Cliente") {
+      return <GestionPageDetallesCliente />;
+    } else if (tabs[tab] === "Documentos") {
+      return <GestionesPageDetallesDocumenos />;
+    } else {
+      return <GestionesPageDetallesDireccion />;
+    }
+  }, [tab, tabs]);
+
+  const handleOpenModalGestion = useCallback(() => {
+    setModalGestionar(true);
+  }, []);
+
+  const handleCloseModalGestion = useCallback(() => {
+    setModalGestionar(false);
+  }, []);
+
+  return (
+    <View style={styles.containerGeneral}>
+      <Header
+        title="Byron godoy"
+        iconRight={
+          <TouchableOpacity onPress={handleOpenModalGestion}>
+            <Icon
+              name="plus"
+              color={BLANCO}
+              size={convertirTamanoHorizontal(30)}
+            />
+          </TouchableOpacity>
+        }
+      />
+      {tabCorrespondiente}
+      <Footer items={tabs} setTab={setTab} />
+
+      {modalGestionar && (
+        <ModalRealizarGestion
+          onClose={handleCloseModalGestion}
+          visible={modalGestionar}
+        />
+      )}
+    </View>
+  );
+};
+
+export default GestionPageDetalles;
+
+const styles = StyleSheet.create({
+  containerGeneral: {
+    flex: 1,
+  },
+});

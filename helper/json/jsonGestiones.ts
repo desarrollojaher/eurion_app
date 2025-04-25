@@ -101,3 +101,6 @@ export const tiposGestion: IDatosSelect[] = [
     value: "cob-negativa-pago",
   },
 ];
+
+
+

@@ -7,6 +7,10 @@ export default function AppLayout() {
         name="gestiones-principal"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="gestiones-detalles"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

@@ -12,7 +12,7 @@ interface PropsCard {
 
 const Card: React.FC<PropsCard> = ({ children, style, heigth, width }) => {
   return (
-    <View style={[styles.card, style, { width: width, height: heigth }]}>
+    <View style={[styles.card, { width: width, height: heigth }, style]}>
       {children}
     </View>
   );

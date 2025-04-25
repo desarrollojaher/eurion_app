@@ -45,10 +45,12 @@ const CarouselItem: React.FC<PropsCarouselItem> = ({
   return (
     <TouchableOpacity onPress={handleOpenImage}>
       <View style={[styles.container, styleContaner, { width }]}>
-        <Animated.View style={[styles.imagenContainer, animatedContainerStyle]}>
+        <Animated.View style={[styles.imagenContainer]}>
+          {/*animatedContainerStyle*/}
           <Text style={styles.overlayText}>{item.titulo}</Text>
+          {/*imageStyle*/}
           <Animated.Image
-            style={[styles.imagen, imageStyle]}
+            style={[styles.imagen]}
             source={{
               uri: item.url,
             }}

@@ -30,6 +30,7 @@ import { IGstionesPrueba } from "@/models/IGestionesPrueba";
 import ModalFiltros from "./modal/ModalFiltros";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
+import { router } from "expo-router";
 
 const GestionesPagePrincipal = () => {
   const [modalFiltros, setModalFiltros] = useState(false);
@@ -67,58 +68,72 @@ const GestionesPagePrincipal = () => {
     setModalGestionar(false);
   }, []);
 
+  const handleCambiarPagina = useCallback(() => {
+    router.push("/principal/gestiones/gestiones-detalles");
+  }, []);
+
   const renderItem = useCallback(
     ({ item, index }: { item: IGstionesPrueba; index: number }) => (
       <Card style={styles.cardStyle}>
-        <HeaderCard labelRight="Ruta" />
-        <Separador />
-        <TextCard titulo={item.nombreCliente} subtitulo={item.cedulaCliente} />
-        <Text style={styles.styleText}>
-          DOM CRISTOBAL COLON 1 DOCE DE OCTUBRE CASA DE 3 PISOS
-        </Text>
-        <Separador />
-        <HeaderCard
-          labelLeft="DEUDA TOTAL"
-          labelRight={`$ ${item.deudaTotal}`}
-          styleContainer={styles.rowCardStyle}
-          styleLeft={styles.labelCardLeft}
-          styleRight={styles.labelCardRight}
-        />
-        <HeaderCard
-          labelLeft="VENCIDO"
-          labelRight={`$ ${item.vencimineto}`}
-          styleContainer={styles.rowCardStyle}
-          styleLeft={styles.labelCardLeft}
-          styleRight={styles.labelCardRight}
-        />
-        <HeaderCard
-          labelLeft="TRAMO"
-          labelRight="TRAMO"
-          styleContainer={styles.rowCardStyle}
-          styleLeft={styles.labelCardLeft}
-          styleRight={styles.labelCardRight}
-        />
-        <HeaderCard
-          labelLeft="ZONA"
-          labelRight="CUENCA ZONA 7 GAYARA (CORR)"
-          styleContainer={styles.rowCardStyle}
-          styleLeft={styles.labelCardLeft}
-          styleRight={styles.labelCardRight}
-        />
-        <View style={styles.containerIcons}>
-          <Pressable onPress={() => handleOpenImagenes(item.imagenes)}>
-            <FontAwesome5 name="images" color={NEGRO} size={30} />
-          </Pressable>
-          <Pressable onPress={() => handleAbrirGps(item.posicion)}>
-            <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
-          </Pressable>
-          <Pressable onPress={handleOpenModalGestion}>
-            <FontAwesome5 name="plus" color={NEGRO} size={30} />
-          </Pressable>
-        </View>
+        <TouchableOpacity onPress={handleCambiarPagina}>
+          <HeaderCard labelRight="Ruta" />
+          <Separador />
+          <TextCard
+            titulo={item.nombreCliente}
+            subtitulo={item.cedulaCliente}
+          />
+          <Text style={styles.styleText}>
+            DOM CRISTOBAL COLON 1 DOCE DE OCTUBRE CASA DE 3 PISOS
+          </Text>
+          <Separador />
+          <HeaderCard
+            labelLeft="DEUDA TOTAL"
+            labelRight={`$ ${item.deudaTotal}`}
+            styleContainer={styles.rowCardStyle}
+            styleLeft={styles.labelCardLeft}
+            styleRight={styles.labelCardRight}
+          />
+          <HeaderCard
+            labelLeft="VENCIDO"
+            labelRight={`$ ${item.vencimineto}`}
+            styleContainer={styles.rowCardStyle}
+            styleLeft={styles.labelCardLeft}
+            styleRight={styles.labelCardRight}
+          />
+          <HeaderCard
+            labelLeft="TRAMO"
+            labelRight="TRAMO"
+            styleContainer={styles.rowCardStyle}
+            styleLeft={styles.labelCardLeft}
+            styleRight={styles.labelCardRight}
+          />
+          <HeaderCard
+            labelLeft="ZONA"
+            labelRight="CUENCA ZONA 7 GAYARA (CORR)"
+            styleContainer={styles.rowCardStyle}
+            styleLeft={styles.labelCardLeft}
+            styleRight={styles.labelCardRight}
+          />
+          <View style={styles.containerIcons}>
+            <Pressable onPress={() => handleOpenImagenes(item.imagenes)}>
+              <FontAwesome5 name="images" color={NEGRO} size={30} />
+            </Pressable>
+            <Pressable onPress={() => handleAbrirGps(item.posicion)}>
+              <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
+            </Pressable>
+            <Pressable onPress={handleOpenModalGestion}>
+              <FontAwesome5 name="plus" color={NEGRO} size={30} />
+            </Pressable>
+          </View>
+        </TouchableOpacity>
       </Card>
     ),
-    [handleAbrirGps, handleOpenImagenes, handleOpenModalGestion]
+    [
+      handleAbrirGps,
+      handleCambiarPagina,
+      handleOpenImagenes,
+      handleOpenModalGestion,
+    ]
   );
 
   return (

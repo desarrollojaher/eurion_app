@@ -127,7 +127,7 @@ const CarouselImagenes: React.FC<PropsCarouselImagenes> = ({
         </View>
       )}
       <View
-        style={[styles.containerPuntos, { gap: convertirTamanoHorizontal(10) }]}
+        style={[styles.containerPuntos, { gap: convertirTamanoHorizontal(30) }]}
       >
         {remove && (
           <Pressable onPress={handleEliminarImagen}>
