@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Separador from "@/components/commons/separador/Separador";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -26,24 +26,21 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   cliente,
 }) => {
   const [visibleCamara, setVisibleCamara] = useState(false);
-  const [visibleCarrucel, setVisibleCarrucel] = useState(false);
+
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
   const onOpenCamara = useCallback(() => {
-    setVisibleCarrucel(false);
     setVisibleCamara(true);
   }, []);
 
   const onCloseCamara = useCallback(() => {
-    if (imagenes.length > 0) setVisibleCarrucel(true);
     setVisibleCamara(false);
-  }, [imagenes.length]);
+  }, []);
 
   const handleCaptureImage = useCallback(
     (images: IImagenCompleta[]) => {
       const union = imagenes.concat(images);
       setImagenes(union);
-      setVisibleCarrucel(true);
     },
     [imagenes]
   );
@@ -59,27 +56,22 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
     [imagenes]
   );
 
-  useEffect(() => {
-    if (imagenes.length === 0) {
-      setVisibleCarrucel(false);
-    }
-  }, [imagenes]);
-
   return (
     <ModalCustom onClose={onClose} visible={visible} titulo={cliente}>
       <View style={styles.container}>
-        {visibleCarrucel ? (
+        {imagenes.length > 0 ? (
           <CarouselImagenes
             data={imagenes}
             width={convertirTamanoHorizontal(330)}
             paginacion={true}
             handleRemoveImage={handleRemoveImage}
+            handleOpenCamara={onOpenCamara}
             modulo="galeria"
             remove
             camera
           />
         ) : (
-          <Pressable onPress={onOpenCamara}>
+          <Pressable onPress={onOpenCamara} style={styles.containerPressable}>
             <Icon name="camera" size={convertirTamanoHorizontal(80)} />
           </Pressable>
         )}
@@ -135,5 +127,12 @@ const styles = StyleSheet.create({
   buttonStyle: {
     marginTop: convertirTamanoVertical(10),
     alignSelf: "center",
+  },
+
+  containerPressable: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

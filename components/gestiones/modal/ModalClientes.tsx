@@ -3,8 +3,9 @@ import React from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import HeaderCard from "@/components/commons/card/HeaderCard";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import { IVerificacionDetalleGeneral } from "@/models/IVerificacionPrueba";
+import Separador from "@/components/commons/separador/Separador";
 
 interface PropsModalClientes {
   visible: boolean;
@@ -26,6 +27,7 @@ const ModalClientes: React.FC<PropsModalClientes> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Nombre"
         labelRight={datos.nombreCliente}
@@ -33,6 +35,7 @@ const ModalClientes: React.FC<PropsModalClientes> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Estado Civil"
         labelRight={datos.estadoCivil}
@@ -40,6 +43,7 @@ const ModalClientes: React.FC<PropsModalClientes> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Dependientes"
         labelRight={String(datos.dependientes)}
@@ -47,6 +51,7 @@ const ModalClientes: React.FC<PropsModalClientes> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Telefono"
         labelRight={datos.telefono}
@@ -54,6 +59,7 @@ const ModalClientes: React.FC<PropsModalClientes> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Referencia"
         labelRight={datos.referencias}
@@ -61,6 +67,7 @@ const ModalClientes: React.FC<PropsModalClientes> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Observaciones"
         labelRight={datos.observacion}

@@ -23,6 +23,7 @@ interface PropsCarouselItem {
   width?: number;
 }
 const screenWidth = Dimensions.get("window").width;
+
 const CarouselItem: React.FC<PropsCarouselItem> = ({
   handleOpenImagenCompleta,
   index,

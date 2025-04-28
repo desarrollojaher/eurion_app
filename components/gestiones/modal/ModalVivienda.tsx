@@ -3,8 +3,9 @@ import React from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import HeaderCard from "@/components/commons/card/HeaderCard";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import { IVerificacionDatosVivienda } from "@/models/IVerificacionPrueba";
+import Separador from "@/components/commons/separador/Separador";
 
 interface PropsModalVivienda {
   visible: boolean;
@@ -26,6 +27,7 @@ const ModalVivienda: React.FC<PropsModalVivienda> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Tipo Vivienda"
         labelRight={datos.tipoVivienda}
@@ -33,6 +35,7 @@ const ModalVivienda: React.FC<PropsModalVivienda> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Nombre del dueño"
         labelRight={datos.nombrePropietario}
@@ -40,6 +43,7 @@ const ModalVivienda: React.FC<PropsModalVivienda> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="telefono del dueño"
         labelRight={datos.telefonoPropietario}
@@ -47,6 +51,7 @@ const ModalVivienda: React.FC<PropsModalVivienda> = ({
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Tipo construccion"
         labelRight={datos.construccion}

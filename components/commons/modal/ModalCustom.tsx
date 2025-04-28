@@ -94,5 +94,6 @@ const styles = StyleSheet.create({
   bodyModal: {
     maxHeight: convertirTamanoVertical(800),
     width: "100%",
+    marginTop: convertirTamanoVertical(10),
   },
 });

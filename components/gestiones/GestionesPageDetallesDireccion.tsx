@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import Card from "../commons/card/Card";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -27,12 +27,10 @@ const GestionesPageDetallesDireccion = () => {
     null
   );
   const [modalCamara, setModalCamara] = useState(false);
-  const [visibleCarrucel, setVisibleCarrucel] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
   const handleOpenCamara = useCallback(() => {
     setModalCamara(true);
-    setVisibleCarrucel(false);
   }, []);
   const handleCloseCamara = useCallback(() => {
     setModalCamara(false);
@@ -42,7 +40,6 @@ const GestionesPageDetallesDireccion = () => {
     (data: IImagenCompleta[]) => {
       const union = imagenes.concat(data);
       setImagenes(union);
-      setVisibleCarrucel(true);
     },
     [imagenes]
   );
@@ -68,12 +65,6 @@ const GestionesPageDetallesDireccion = () => {
     setLocation(location);
   }, []);
 
-  useEffect(() => {
-    if (imagenes.length === 0) {
-      setVisibleCarrucel(false);
-    }
-  }, [imagenes]);
-
   return (
     <View style={styles.containerGeneral}>
       {modalCamara && (
@@ -85,10 +76,10 @@ const GestionesPageDetallesDireccion = () => {
       )}
       <ScrollView showsVerticalScrollIndicator={false}>
         <Card style={styles.cardStyle}>
-          {visibleCarrucel ? (
+          {imagenes.length > 0 ? (
             <CarouselImagenes
               data={imagenes}
-              width={convertirTamanoHorizontal(330)}
+              width={convertirTamanoHorizontal(350)}
               paginacion={true}
               handleRemoveImage={handleRemoveImage}
               modulo="galeria"
@@ -97,7 +88,10 @@ const GestionesPageDetallesDireccion = () => {
               handleOpenCamara={handleOpenCamara}
             />
           ) : (
-            <Pressable onPress={handleOpenCamara}>
+            <Pressable
+              onPress={handleOpenCamara}
+              style={styles.containerPressable}
+            >
               <Icon name="camera" size={convertirTamanoHorizontal(80)} />
             </Pressable>
           )}
@@ -154,9 +148,6 @@ const GestionesPageDetallesDireccion = () => {
                 size={convertirTamanoHorizontal(35)}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.containerBoton}>
-              <Icon name="save" size={convertirTamanoHorizontal(35)} />
-            </TouchableOpacity>
           </View>
         </Card>
       </ScrollView>
@@ -204,6 +195,12 @@ const styles = StyleSheet.create({
   containerBoton: {
     height: convertirTamanoVertical(60),
     width: convertirTamanoHorizontal(60),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  containerPressable: {
+    flex: 1,
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
   },

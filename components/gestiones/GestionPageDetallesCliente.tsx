@@ -64,7 +64,7 @@ const GestionPageDetallesCliente = () => {
       dependientes: 0,
       telefono: "099880412",
       observacion:
-        "COMERCINATE / PAGOS PUNTUTALES POR SALIR DE UN CREDITO / DOMICILIO CON ESTABILIDAD FAMILIAR ",
+        "COMERCINATE / PAGOS PUNTUTALES POR SALIR DE UN CREDITO / DOMICILIO CON ESTABILIDAD FAMILIAR nsvsan lkmn lkmfasfde sfms efns fsmef semfioe msfme oisef oesofsofnmsefn  ",
       referencias:
         "GUTAMA MARIO 0998801412 072420298 SAN CARLOS GUTAMA EVA 0958993962 072420298 SAB CARLOS / SUSTENTO AGRICULTOR",
     });

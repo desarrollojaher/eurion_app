@@ -1,6 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import {
+  NativeSyntheticEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextLayoutEventData,
+  View,
+} from "react-native";
+import React, { useCallback, useState } from "react";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import ModalCustom from "../modal/ModalCustom";
 
 interface PropsHeaderCard {
   labelLeft?: string;
@@ -8,6 +17,7 @@ interface PropsHeaderCard {
   styleLeft?: any;
   styleRight?: any;
   styleContainer?: any;
+  numberOfLine?: number;
 }
 
 const HeaderCard: React.FC<PropsHeaderCard> = ({
@@ -16,11 +26,55 @@ const HeaderCard: React.FC<PropsHeaderCard> = ({
   styleLeft,
   styleRight,
   styleContainer,
+  numberOfLine = 2,
 }) => {
+  const [modalDatos, setModalDatos] = useState(false);
+
+  const [expanded, setExpanded] = useState(false);
+
+  const handleTextLaayout = useCallback(
+    (event: NativeSyntheticEvent<TextLayoutEventData>) => {
+      if (event.nativeEvent.lines.length > numberOfLine) {
+        setExpanded(true);
+      }
+    },
+    [numberOfLine]
+  );
+
+  const handleOpenModalDatos = useCallback(() => {
+    setModalDatos(true);
+  }, []);
+
+  const handleCloseModalDatos = useCallback(() => {
+    setModalDatos(false);
+  }, []);
+
   return (
     <View style={[styles.container, styleContainer]}>
       <Text style={[styles.textLeft, styleLeft]}>{labelLeft}</Text>
-      <Text style={[styles.textRight, styleRight]}>{labelRight}</Text>
+      <Text
+        style={[styles.textRight, styleRight]}
+        numberOfLines={numberOfLine}
+        onTextLayout={handleTextLaayout}
+        onPress={handleOpenModalDatos}
+        disabled={!expanded}
+      >
+        {labelRight}
+      </Text>
+      {/* {expanded && (
+        <Pressable
+          onPress={handleOpenModalDatos}
+          style={{ alignSelf: "center" }}
+        >
+          <Icon name="expand-arrows-alt" />
+        </Pressable>
+      )} */}
+
+      {modalDatos && (
+        <ModalCustom onClose={handleCloseModalDatos} visible={modalDatos}>
+          <Text>{labelRight}</Text>
+        </ModalCustom>
+      )}
     </View>
   );
 };
@@ -41,4 +95,5 @@ const styles = StyleSheet.create({
     fontSize: convertirTamanoHorizontal(13),
     fontWeight: "regular",
   },
+  // StyleProp
 });

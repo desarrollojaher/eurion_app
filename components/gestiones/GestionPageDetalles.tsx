@@ -9,6 +9,7 @@ import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import GestionPageDetallesCliente from "./GestionPageDetallesCliente";
 import GestionesPageDetallesDocumenos from "./GestionesPageDetallesDocumenos";
 import GestionesPageDetallesDireccion from "./GestionesPageDetallesDireccion";
+import { Toast } from "toastify-react-native";
 
 const GestionPageDetalles = () => {
   const [modalGestionar, setModalGestionar] = useState(false);
@@ -26,9 +27,20 @@ const GestionPageDetalles = () => {
     }
   }, [tab, tabs]);
 
+  const tabIcon = useMemo(() => {
+    if (tabs[tab] === "Dirección") {
+      return "save";
+    }
+    return "plus";
+  }, [tab, tabs]);
+
   const handleOpenModalGestion = useCallback(() => {
+    if (tabs[tab] === "Dirección") {
+      Toast.success("Datos actualizados");
+      return;
+    }
     setModalGestionar(true);
-  }, []);
+  }, [tab, tabs]);
 
   const handleCloseModalGestion = useCallback(() => {
     setModalGestionar(false);
@@ -41,7 +53,7 @@ const GestionPageDetalles = () => {
         iconRight={
           <TouchableOpacity onPress={handleOpenModalGestion}>
             <Icon
-              name="plus"
+              name={tabIcon}
               color={BLANCO}
               size={convertirTamanoHorizontal(30)}
             />
