@@ -38,6 +38,11 @@ const Principal = () => {
   const handleOpenGestiones = useCallback(() => {
     router.push("/principal/gestiones/gestiones-principal");
   }, [router]);
+
+  const handleOpenRecibos = useCallback(() => {
+    router.push("/principal/recibos/recibos-principal");
+  }, [router]);
+
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
@@ -104,7 +109,7 @@ const Principal = () => {
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleOpenRecibos}>
             <IconFont
               name="receipt"
               color={AZUL}

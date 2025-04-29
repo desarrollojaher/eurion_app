@@ -7,7 +7,7 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { BLANCO, GRIS, GRIS_CLARO, NEGRO } from "@/constants/Colors";
+import { BLANCO, GRIS, GRIS_CLARO, NEGRO, ROJO } from "@/constants/Colors";
 export interface IDatosSelect {
   label: string;
   value: string;
@@ -21,6 +21,8 @@ interface PropsSelect {
   searchPlaceholder?: string;
   defaultValue?: IDatosSelect;
   styleContainer?: any;
+  labelError?: string;
+  isError?: boolean;
 }
 const Select: React.FC<PropsSelect> = ({
   datos,
@@ -30,6 +32,8 @@ const Select: React.FC<PropsSelect> = ({
   searchPlaceholder = "Buscar",
   defaultValue,
   styleContainer,
+  isError,
+  labelError,
 }) => {
   const handleSelect = useCallback(
     (datos: IDatosSelect) => {
@@ -46,14 +50,17 @@ const Select: React.FC<PropsSelect> = ({
       }}
       renderButton={(selectedItem, isOpened) => {
         return (
-          <View style={[styles.dropdownButtonStyle, styleContainer]}>
-            <Text style={styles.dropdownButtonTxtStyle}>
-              {(selectedItem && selectedItem.label) || placeholder}
-            </Text>
-            <Icon
-              name={isOpened ? "chevron-up" : "chevron-down"}
-              style={styles.dropdownButtonArrowStyle}
-            />
+          <View>
+            <View style={[styles.dropdownButtonStyle, styleContainer]}>
+              <Text style={styles.dropdownButtonTxtStyle}>
+                {(selectedItem && selectedItem.label) || placeholder}
+              </Text>
+              <Icon
+                name={isOpened ? "chevron-up" : "chevron-down"}
+                style={styles.dropdownButtonArrowStyle}
+              />
+            </View>
+            {isError && <Text style={styles.labelError}>{labelError}</Text>}
           </View>
         );
       }}
@@ -121,5 +128,10 @@ const styles = StyleSheet.create({
     fontSize: convertirTamanoHorizontal(18),
     fontWeight: "500",
     color: NEGRO,
+  },
+  labelError: {
+    fontSize: convertirTamanoHorizontal(10),
+    color: ROJO,
+    textAlign: "right",
   },
 });

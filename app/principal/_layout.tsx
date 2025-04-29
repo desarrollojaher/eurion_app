@@ -7,6 +7,7 @@ export default function AppLayout() {
       <Stack.Screen name="sincronizar" options={{ headerShown: false }} />
       <Stack.Screen name="verificaciones" options={{ headerShown: false }} />
       <Stack.Screen name="gestiones" options={{ headerShown: false }} />
+      <Stack.Screen name="recibos" options={{ headerShown: false }} />
     </Stack>
   );
 }

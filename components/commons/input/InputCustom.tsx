@@ -12,7 +12,7 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/Feather";
-import { BLANCO, GRIS, NEGRO } from "@/constants/Colors";
+import { BLANCO, GRIS, NEGRO, ROJO } from "@/constants/Colors";
 
 interface PropsInputCustom extends TextInputProps {
   labelError?: string;
@@ -55,7 +55,7 @@ const InputCustom: React.FC<PropsInputCustom> = ({
           </Pressable>
         )}
       </View>
-      {isError && <Text>{labelError}</Text>}
+      {isError && <Text style={styles.labelError}>{labelError}</Text>}
     </View>
   );
 };
@@ -86,5 +86,10 @@ const styles = StyleSheet.create({
     height: convertirTamanoVertical(40),
     justifyContent: "center",
     alignItems: "center",
+  },
+  labelError: {
+    fontSize: convertirTamanoHorizontal(10),
+    color: ROJO,
+    textAlign: "right",
   },
 });

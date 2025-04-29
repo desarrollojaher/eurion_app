@@ -1,11 +1,18 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useMemo } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
 import InputCustom from "../input/InputCustom";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import Select, { IDatosSelect } from "../select/Select";
+import { GRIS } from "@/constants/Colors";
+import RNDateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import { format, parseISO } from "date-fns";
+import { find } from "lodash";
 
 interface PropsTextInput {
   placeholder?: string;
@@ -15,13 +22,15 @@ interface PropsTextInput {
   multiline?: boolean;
   defaultValueText?: string;
   datos?: IDatosSelect[];
-  defaultValue?: IDatosSelect;
+  defaultValue?: string;
   onChangeSelect?: (value: IDatosSelect) => void;
-  tipo: "text" | "select";
+  tipo: "text" | "select" | "date";
   direction?: "row" | "column";
   styleContainer?: any;
   styleHeader?: any;
   styleTextInput?: any;
+  isError?: boolean;
+  labelError?: string;
 }
 
 const TextInput: React.FC<PropsTextInput> = ({
@@ -39,7 +48,11 @@ const TextInput: React.FC<PropsTextInput> = ({
   styleContainer,
   styleHeader,
   styleTextInput,
+  isError,
+  labelError,
 }) => {
+  const [modalFecha, setModalFecha] = useState(false);
+
   const styleInput = useMemo(
     () =>
       direction === "column" && multiline
@@ -52,6 +65,21 @@ const TextInput: React.FC<PropsTextInput> = ({
             height: convertirTamanoVertical(60),
           },
     [direction, multiline]
+  );
+
+  const handleOpenModalFecha = useCallback(() => {
+    setModalFecha(true);
+  }, []);
+
+  const handleAcceptar = useCallback(
+    (event: DateTimePickerEvent, date: Date | undefined) => {
+      if (event.type === "set" && date) {
+        const fechaString = format(date, "yyyy-MM-dd");
+        onChangeText && onChangeText(fechaString);
+      }
+      setModalFecha(false);
+    },
+    [onChangeText]
   );
 
   return (
@@ -69,15 +97,46 @@ const TextInput: React.FC<PropsTextInput> = ({
           multiline={multiline}
           numberOfLines={multiline ? 5 : 1}
           textAlignVertical="top"
+          isError={isError}
+          labelError={labelError}
         />
+      )}
+      {tipo === "date" && (
+        <Pressable onPress={handleOpenModalFecha}>
+          <InputCustom
+            styleContainer={[styles.inputStyle, styleInput, styleTextInput]}
+            placeholder={placeholder}
+            value={defaultValueText}
+            textAlignVertical="top"
+            onPress={handleOpenModalFecha}
+            leftIcon={
+              <Icon
+                name="calendar"
+                color={GRIS}
+                size={convertirTamanoHorizontal(25)}
+              />
+            }
+            readOnly
+            isError={isError}
+            labelError={labelError}
+          />
+        </Pressable>
       )}
       {tipo === "select" && datos && (
         <Select
           datos={datos}
           placeholder={placeholder}
-          defaultValue={defaultValue}
+          defaultValue={find(datos, (item) => item.value === defaultValue)}
           onSelect={onChangeSelect}
           styleContainer={styles.containerSelect}
+          isError={isError}
+          labelError={labelError}
+        />
+      )}
+      {modalFecha && (
+        <RNDateTimePicker
+          value={defaultValueText ? parseISO(defaultValueText) : new Date()}
+          onChange={handleAcceptar}
         />
       )}
     </View>
@@ -100,10 +159,12 @@ const styles = StyleSheet.create({
   inputStyle: {
     width: convertirTamanoHorizontal(187),
     height: convertirTamanoVertical(50),
+    borderColor: GRIS,
   },
   containerSelect: {
     width: convertirTamanoHorizontal(187),
     height: convertirTamanoVertical(50),
     borderWidth: 1,
+    borderColor: GRIS,
   },
 });
