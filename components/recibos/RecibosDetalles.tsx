@@ -1,5 +1,5 @@
-import { StyleSheet, View } from "react-native";
-import React, { useMemo, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo, useState } from "react";
 import Header from "../commons/header/Header";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -16,31 +16,67 @@ import { z } from "zod";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Toast } from "toastify-react-native";
+import { intersection, isEqual, isEqualWith, pick, sumBy } from "lodash";
 
 const schema = z.object({
   datos: z.array(
     z.object({
       doctran: z.string().min(1, "El número de transacción es requerido"),
-      valores: z.array(
-        z.object({
-          tipoPago: z.string().min(1, "El tipo de pago es requerido"),
-          numeroDocumento: z.string().optional(),
-          fechaVencimiento: z.string().optional(),
-          emisor: z.string().optional(),
-          numeroCuenta: z.string().optional(),
-          propieario: z.string().optional(),
-          numeroCheque: z.string().optional(),
-          valor: z.string().min(1, "El valor debe ser mayor a cero"),
-        })
-      ),
-      valorMora: z.number().min(0, "El valor de mora no puede ser negativo"),
-      valorCobranza: z
-        .number()
-        .min(0, "El valor de cobranza no puede ser negativo"),
-      valorCancela: z
-        .number()
-        .min(0, "El valor a cancelar no puede ser negativo"),
-      observaciones: z.string().optional(),
+      valores: z
+        .array(
+          z.object({
+            tipoPago: z.string().min(1, "El tipo de pago es requerido"),
+            numeroDocumento: z.string().nullish(),
+            fechaVencimiento: z.string().nullish(),
+            emisor: z.string().nullish(),
+            numeroCuenta: z.string().nullish(),
+            propieario: z.string().nullish(),
+            numeroCheque: z.string().nullish(),
+            valor: z
+              .number()
+              .min(1, "El valor debe ser mayor a cero")
+              .nullish(),
+          })
+        )
+        .nullish(),
+      valorMora: z.preprocess((val): number | null | undefined => {
+        console.log(val);
+
+        if (val === undefined || val === null) {
+          return val;
+        }
+        if (typeof val === "string" && val.trim() !== "") {
+          const d = val.replace(",", ".");
+          const parsedValue = Number(d);
+          return isNaN(parsedValue) ? null : parsedValue;
+        }
+        return typeof val === "number" ? val : null;
+      }, z.number().min(0, "El valor de mora no puede ser negativo").nullish()),
+
+      valorCobranza: z.preprocess((val): number | null | undefined => {
+        if (val === undefined || val === null) {
+          return val;
+        }
+        if (typeof val === "string" && val.trim() !== "") {
+          const d = val.replace(",", ".");
+          const parsedValue = Number(d);
+          return isNaN(parsedValue) ? null : parsedValue;
+        }
+        return typeof val === "number" ? val : null;
+      }, z.number().min(0, "El valor de cobranza no puede ser negativo").nullish()),
+      valorCancela: z.preprocess((val): number | null | undefined => {
+        if (val === undefined || val === null) {
+          return val;
+        }
+        if (typeof val === "string" && val.trim() !== "") {
+          const d = val.replace(",", ".");
+          const parsedValue = Number(d);
+          return isNaN(parsedValue) ? null : parsedValue;
+        }
+        return typeof val === "number" ? val : null;
+      }, z.number().min(0, "El valor a cancelar no puede ser negativo").nullish()),
+      observaciones: z.string().nullish(),
       imagenes: z
         .array(
           z.object({
@@ -48,7 +84,7 @@ const schema = z.object({
             titulo: z.string(),
           })
         )
-        .optional(),
+        .nullish(),
     })
   ),
 });
@@ -64,21 +100,11 @@ const RecibosDetalles = () => {
       const data = datos?.documentos.map<IReciboEnviar>((item) => ({
         doctran: item.doctran,
         fechaComprobante: item.fecha,
-        valores: [
-          {
-            tipoPago: "",
-            numeroDocumento: "",
-            fechaVencimiento: "",
-            emisor: "",
-            numeroCuenta: "",
-            propieario: "",
-            numeroCheque: "",
-          },
-        ],
-        imagenes: [],
-        valorMora: 0,
-        valorCobranza: 0,
-        valorCancela: 0,
+        valores: [],
+        imagenes: null,
+        valorMora: null,
+        valorCobranza: null,
+        valorCancela: null,
         observaciones: "",
       }));
       const datosEnviar: IReciboEnviarDatos = {
@@ -107,9 +133,13 @@ const RecibosDetalles = () => {
   });
 
   const children = useMemo(() => {
-    if (tabs[tab] === "Cliente") {
+    if (tabs[tab] === "Cliente" && datos) {
       return (
-        <ReciboTabCliente datosDocumentos={datosDocumentos} control={control} />
+        <ReciboTabCliente
+          datosDocumentos={datosDocumentos}
+          control={control}
+          datos={datos}
+        />
       );
     } else if (tabs[tab] === "Recibo") {
       return (
@@ -129,18 +159,90 @@ const RecibosDetalles = () => {
         />
       );
     }
-  }, [control, datosDocumentos, setValue, tab, tabs, watch]);
+  }, [control, datos, datosDocumentos, setValue, tab, tabs, watch]);
+
+  const handleCompararObjetos = useCallback((valor1: any, valor2: any) => {
+    if (
+      (valor1 === null && isEqual(valor2, [])) ||
+      (valor2 === null && isEqual(valor1, []))
+    ) {
+      return true;
+    }
+    return undefined;
+  }, []);
+
+  const onSuccess = useCallback(
+    (data: IReciboEnviarDatos) => {
+      for (let index = 0; index < data.datos.length; index++) {
+        const element = data.datos[index];
+
+        const ob = defaultValueRecibos.datos[index];
+
+        const clavesComunes = intersection(
+          Object.keys(element),
+          Object.keys(ob)
+        );
+
+        const objetoFiltrado1 = pick(element, clavesComunes);
+        const objetoFiltrado2 = pick(ob, clavesComunes);
+        const sonIguales = isEqualWith(
+          objetoFiltrado1,
+          objetoFiltrado2,
+          handleCompararObjetos
+        );
+
+        if (!sonIguales) {
+          if (
+            (element.valorCancela ?? 0) +
+              (element.valorCobranza ?? 0) +
+              (element.valorMora ?? 0) >
+            0
+          ) {
+            if (element.valores && element.valores?.length > 0) {
+              const sumaTotal =
+                (element.valorCancela ?? 0) +
+                (element.valorCobranza ?? 0) +
+                (element.valorMora ?? 0);
+
+              const sumaTiposComprobantes = sumBy(element.valores, (item) =>
+                Number(item.valor)
+              );
+              if (sumaTotal === sumaTiposComprobantes) {
+                console.log("Guardar los datos ====> ", element);
+              } else {
+                Toast.error(
+                  `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`
+                );
+              }
+            } else {
+              Toast.error("Ingrese tipos de comprobantes");
+            }
+          } else {
+            Toast.error("Ingrese los valores correspondientes");
+          }
+        }
+      }
+    },
+    [defaultValueRecibos, handleCompararObjetos]
+  );
+
+  const onError = useCallback((error: any) => {
+    console.log("Erores ==> ", error);
+    Toast.error("Ingrese todos los valores");
+  }, []);
 
   return (
     <View style={styles.containerGeneral}>
       <Header
         title="BYRON GODOY"
         iconRight={
-          <Icon
-            name="save"
-            size={convertirTamanoHorizontal(30)}
-            color={BLANCO}
-          />
+          <Pressable onPress={handleSubmit(onSuccess, onError)}>
+            <Icon
+              name="save"
+              size={convertirTamanoHorizontal(30)}
+              color={BLANCO}
+            />
+          </Pressable>
         }
       />
       <View style={styles.containerBody}>{children}</View>

@@ -42,7 +42,9 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
 
   const valorTotal = useMemo(() => {
     const valor =
-      Number(valorMora) + Number(valorCancela) + Number(valorCobranza);
+      Number(valorMora ? valorMora.replace(",", ".") : 0) +
+      Number(valorCancela ? valorCancela.replace(",", ".") : 0) +
+      Number(valorCobranza ? valorCobranza.replace(",", ".") : 0);
     return valor;
   }, [valorCancela, valorCobranza, valorMora]);
 
@@ -79,12 +81,12 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
         )}
       </View>
       <Separador />
-      <HeaderCard
+      {/* <HeaderCard
         labelLeft="# SECUENCIA"
         labelRight="REC-536-1"
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
-      />
+      /> */}
       <HeaderCard
         labelLeft="VALOR A PAGAR"
         labelRight={formatCurrency(Number(valorCancela))}

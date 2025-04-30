@@ -1,6 +1,5 @@
 import {
   NativeSyntheticEvent,
-  Pressable,
   StyleSheet,
   Text,
   TextLayoutEventData,
@@ -8,12 +7,11 @@ import {
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
-import Icon from "react-native-vector-icons/FontAwesome5";
 import ModalCustom from "../modal/ModalCustom";
 
 interface PropsHeaderCard {
   labelLeft?: string;
-  labelRight?: string;
+  labelRight?: string | null;
   styleLeft?: any;
   styleRight?: any;
   styleContainer?: any;

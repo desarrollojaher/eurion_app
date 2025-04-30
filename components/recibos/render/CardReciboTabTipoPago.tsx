@@ -25,16 +25,28 @@ import ButtonCustom from "@/components/commons/button/ButtonCustom";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
+import { formatCurrency } from "@/helper/function/numericas";
+import { sumBy } from "lodash";
 
 const schemaTiposPago = z.object({
   tipoPago: z.string().min(1, "El tipo de pago es requerido"),
-  numeroDocumento: z.string().optional(),
-  fechaVencimiento: z.string().optional(),
-  emisor: z.string().optional(),
-  numeroCuenta: z.string().optional(),
-  propieario: z.string().optional(),
-  numeroCheque: z.string().optional(),
-  valor: z.string().min(1, "Debe ingresar un valor "),
+  numeroDocumento: z.string().nullish(),
+  fechaVencimiento: z.string().nullish(),
+  emisor: z.string().nullish(),
+  numeroCuenta: z.string().nullish(),
+  propieario: z.string().nullish(),
+  numeroCheque: z.string().nullish(),
+  valor: z.preprocess((val): number | null | undefined => {
+    if (val === undefined || val === null) {
+      return val;
+    }
+    if (typeof val === "string" && val.trim() !== "") {
+      const d = val.replace(",", ".");
+      const parsedValue = Number(d);
+      return isNaN(parsedValue) ? null : parsedValue;
+    }
+    return typeof val === "number" ? val : null;
+  }, z.number().min(1, "Ingrese un numero mayor a 0").nullish()),
 });
 
 interface PropsCardReciboTabTipoPago {
@@ -50,10 +62,12 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   watch,
   control,
 }) => {
-  const { append } = useFieldArray({
+  const { append, fields } = useFieldArray({
     control,
     name: `datos.${index}.valores`,
   });
+
+  const valorIngresado = sumBy(fields, (item) => Number(item?.valor ?? "0"));
 
   const valorMora = watch(`datos.${index}.valorMora`);
   const valorCobranza = watch(`datos.${index}.valorCobranza`);
@@ -61,13 +75,24 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const valorTotal = useMemo(() => {
     const valor =
-      Number(valorMora) + Number(valorCancela) + Number(valorCobranza);
+      Number(valorMora ? valorMora.replace(",", ".") : 0) +
+      Number(valorCancela ? valorCancela.replace(",", ".") : 0) +
+      Number(valorCobranza ? valorCobranza.replace(",", ".") : 0);
     return valor;
   }, [valorCancela, valorCobranza, valorMora]);
 
   const defaultValue = useMemo<IRecibosEnviarDetalles>(
-    () => ({ tipoPago: "CONTADO", valor: valorTotal.toString() }),
-    [valorTotal]
+    () => ({
+      tipoPago: "CONTADO",
+      valor: null,
+      emisor: null,
+      fechaVencimiento: null,
+      numeroCheque: null,
+      numeroCuenta: null,
+      numeroDocumento: null,
+      propieario: null,
+    }),
+    []
   );
 
   const {
@@ -75,6 +100,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     handleSubmit: handleSubmitTipoPagos,
     formState: { errors: errorsTipoDatos },
     setError: setErrorTiposPagos,
+    reset: resetTiposPagos,
   } = useForm<IRecibosEnviarDetalles>({
     resolver: zodResolver(schemaTiposPago),
     defaultValues: defaultValue,
@@ -96,19 +122,21 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
+      console.log(data);
+
       if (data.tipoPago === "CONTADO") {
-        if (data.valor === "0") {
+        if (!data.valor || (data.valor && data.valor <= 0)) {
           setErrorTiposPagos("valor", {
-            message: "Debe ingresar un valor mayor a 0",
+            message: "Debe ingresar un valor válido",
           });
           return;
         }
       }
       if (data.tipoPago === "CHEQUE") {
         let errores = false;
-        if (data.valor === "0") {
+        if (!data.valor || data.valor <= 0) {
           setErrorTiposPagos("valor", {
-            message: "Debe ingresar un valor mayor a 0",
+            message: "Debe ingresar un valor válido",
           });
           errores = true;
         }
@@ -146,9 +174,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
       }
       if (data.tipoPago === "TARJETACREDITO") {
         let errores = false;
-        if (data.valor === "0") {
+        if (!data.valor || data.valor <= 0) {
           setErrorTiposPagos("valor", {
-            message: "Debe ingresar un valor mayor a 0",
+            message: "Debe ingresar un valor válido",
           });
           errores = true;
         }
@@ -178,14 +206,23 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
         }
         if (errores) return;
       }
+
       if (valorTotal > 0) {
+        if (valorIngresado + Number(data.valor) > valorTotal) {
+          Toast.error("El valor a pagar va a sobrepasar al valor total");
+          return;
+        }
         append(data);
+        resetTiposPagos();
+        setTipoPago({ label: "CONTADO", value: "CONTADO" });
         Toast.success("Tipo de pago agregado");
       } else {
-        Toast.error("Debe ingresar un valor a pagar en clientes");
+        Toast.error(
+          "Debe ingresar un valor a pagar en clientes para este comprobante"
+        );
       }
     },
-    [append, setErrorTiposPagos, valorTotal]
+    [append, resetTiposPagos, setErrorTiposPagos, valorIngresado, valorTotal]
   );
 
   const onError = useCallback((error: any) => {
@@ -196,6 +233,20 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     <Card style={styles.styleCard}>
       <HeaderCard labelLeft={item.doctran} labelRight={item.fechaComprobante} />
       <Separador />
+
+      <HeaderCard
+        labelLeft="Valor Total"
+        labelRight={formatCurrency(valorTotal)}
+      />
+      <HeaderCard
+        labelLeft="Valor Abondo"
+        labelRight={formatCurrency(valorIngresado)}
+      />
+      <HeaderCard
+        labelLeft="Valor faltante"
+        labelRight={formatCurrency(valorTotal - valorIngresado)}
+      />
+
       <Controller
         name="valor"
         control={controlTiposPagos}
@@ -203,12 +254,13 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           <TextInput
             text="VALOR A PAGAR"
             tipo="text"
-            placeholder="Valor"
+            placeholder="Valor a pagar"
             styleTextInput={styles.styleInput}
             onChangeText={onChange}
             defaultValueText={value?.toString() ?? ""}
             isError={!!errorsTipoDatos.valor}
             labelError={errorsTipoDatos.valor?.message}
+            inputMode="decimal"
           />
         )}
       />
@@ -241,8 +293,8 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
             <TextInput
               text="# DOCUMENTO"
               tipo="text"
-              placeholder="Valor"
-              defaultValueText={value}
+              placeholder="# documento"
+              defaultValueText={value ?? undefined}
               onChangeText={onChange}
               styleTextInput={styles.styleInput}
               isError={!!errorsTipoDatos.numeroDocumento}
@@ -260,9 +312,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
             <TextInput
               text="FECHA VENCIMIENTO"
               tipo="date"
-              placeholder="Valor"
+              placeholder="Fecha vencimiento"
               styleTextInput={styles.styleInput}
-              defaultValueText={value}
+              defaultValueText={value ?? undefined}
               onChangeText={onChange}
               isError={!!errorsTipoDatos.fechaVencimiento}
               labelError={errorsTipoDatos.fechaVencimiento?.message}
@@ -280,8 +332,8 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
               text="EMISOR"
               tipo="select"
               datos={[{ label: "todos", value: "2" }]}
-              placeholder="Valor"
-              defaultValue={value}
+              placeholder="Emisor"
+              defaultValue={value ?? undefined}
               onChangeSelect={(e) => onChange(e.value)}
               isError={!!errorsTipoDatos.emisor}
               labelError={errorsTipoDatos.emisor?.message}
@@ -298,9 +350,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
             <TextInput
               text="# CUENTA"
               tipo="text"
-              placeholder="Valor"
+              placeholder="Numero cuenta"
               styleTextInput={styles.styleInput}
-              defaultValueText={value}
+              defaultValueText={value ?? undefined}
               onChangeText={onChange}
               isError={!!errorsTipoDatos.numeroCuenta}
               labelError={errorsTipoDatos.numeroCuenta?.message}
@@ -318,7 +370,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
               tipo="text"
               placeholder="propietario"
               styleTextInput={styles.styleInput}
-              defaultValueText={value}
+              defaultValueText={value ?? undefined}
               onChangeText={onChange}
               isError={!!errorsTipoDatos.propieario}
               labelError={errorsTipoDatos.propieario?.message}
@@ -334,9 +386,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
             <TextInput
               text="# CHEQUE"
               tipo="text"
-              placeholder="propietario"
+              placeholder="numero cheque"
               styleTextInput={styles.styleInput}
-              defaultValueText={value}
+              defaultValueText={value ?? undefined}
               onChangeText={onChange}
               isError={!!errorsTipoDatos.numeroCheque}
               labelError={errorsTipoDatos.numeroCheque?.message}
@@ -360,6 +412,7 @@ const styles = StyleSheet.create({
     gap: convertirTamanoVertical(10),
     width: convertirTamanoHorizontal(345),
     alignSelf: "center",
+    minHeight: convertirTamanoVertical(400),
   },
   styleInput: {
     height: convertirTamanoVertical(50),

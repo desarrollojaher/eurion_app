@@ -1,4 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  NativeSyntheticEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInputFocusEventData,
+  View,
+} from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import InputCustom from "../input/InputCustom";
 import {
@@ -13,12 +20,12 @@ import RNDateTimePicker, {
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { format, parseISO } from "date-fns";
 import { find } from "lodash";
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 interface PropsTextInput {
   placeholder?: string;
   text: string;
   onChangeText?: (text: string) => void;
-  keyboardType?: "numeric" | "default";
   multiline?: boolean;
   defaultValueText?: string;
   datos?: IDatosSelect[];
@@ -30,12 +37,14 @@ interface PropsTextInput {
   styleHeader?: any;
   styleTextInput?: any;
   isError?: boolean;
-  labelError?: string;
+  labelError?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
+  readOnly?: boolean;
+  inputMode?: "text" | "numeric" | "decimal" | "none";
+  onBlurs?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
 }
 
 const TextInput: React.FC<PropsTextInput> = ({
   text,
-  keyboardType,
   onChangeText,
   placeholder,
   defaultValueText,
@@ -50,6 +59,9 @@ const TextInput: React.FC<PropsTextInput> = ({
   styleTextInput,
   isError,
   labelError,
+  readOnly,
+  inputMode = "text",
+  onBlurs,
 }) => {
   const [modalFecha, setModalFecha] = useState(false);
 
@@ -90,7 +102,6 @@ const TextInput: React.FC<PropsTextInput> = ({
       {tipo === "text" && (
         <InputCustom
           styleContainer={[styles.inputStyle, styleInput, styleTextInput]}
-          keyboardType={keyboardType}
           onChangeText={onChangeText}
           placeholder={placeholder}
           value={defaultValueText}
@@ -99,6 +110,9 @@ const TextInput: React.FC<PropsTextInput> = ({
           textAlignVertical="top"
           isError={isError}
           labelError={labelError}
+          readOnly={readOnly}
+          inputMode={inputMode}
+          onBlur={onBlurs}
         />
       )}
       {tipo === "date" && (

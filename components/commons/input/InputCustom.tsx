@@ -13,9 +13,14 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/Feather";
 import { BLANCO, GRIS, NEGRO, ROJO } from "@/constants/Colors";
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 
 interface PropsInputCustom extends TextInputProps {
-  labelError?: string;
+  labelError?:
+    | string
+    | FieldError
+    | Merge<FieldError, FieldErrorsImpl<any>>
+    | undefined;
   isError?: boolean;
   styleContainer?: any;
   styleInput?: any;
@@ -55,7 +60,11 @@ const InputCustom: React.FC<PropsInputCustom> = ({
           </Pressable>
         )}
       </View>
-      {isError && <Text style={styles.labelError}>{labelError}</Text>}
+      {isError && (
+        <Text style={styles.labelError}>
+          {typeof labelError === "string" ? labelError : "Obligatorio"}
+        </Text>
+      )}
     </View>
   );
 };

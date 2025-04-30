@@ -71,6 +71,7 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.doctran}
       />
       {modalCamara && (
         <Camara

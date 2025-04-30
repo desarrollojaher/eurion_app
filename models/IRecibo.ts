@@ -18,23 +18,24 @@ export interface IDocumentos {
 
 export interface IRecibosEnviarDetalles {
   tipoPago: string;
-  numeroDocumento?: string;
-  fechaVencimiento?: string;
-  emisor?: string;
-  numeroCuenta?: string;
-  propieario?: string;
-  numeroCheque?: string;
-  valor: string;
+  numeroDocumento?: string | null;
+  fechaVencimiento?: string | null;
+  emisor?: string | null;
+  numeroCuenta?: string | null;
+  propieario?: string | null;
+  numeroCheque?: string | null;
+  valor?: number | null | any;
 }
 
 export interface IReciboEnviar {
-  imagenes?: IImagenCompleta[];
+  [key: string]: any;
+  imagenes?: IImagenCompleta[] | null;
   doctran: string;
-  valores: IRecibosEnviarDetalles[];
-  valorMora: number;
-  valorCobranza: number;
-  valorCancela: number;
-  observaciones?: string;
+  valores?: IRecibosEnviarDetalles[] | null;
+  valorMora?: number | null | any;
+  valorCobranza?: number | null | any;
+  valorCancela?: number | null | any;
+  observaciones?: string | null;
   fechaComprobante?: string;
 }
 

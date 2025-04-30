@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import React, { useCallback } from "react";
 import Card from "../commons/card/Card";
 import HeaderCard from "../commons/card/HeaderCard";
@@ -10,17 +10,21 @@ import {
 import Separador from "../commons/separador/Separador";
 import TextInput from "../commons/card/TextInput";
 import { GRIS } from "@/constants/Colors";
-import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
+import { IRecibo, IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { Control, Controller, FieldArrayWithId } from "react-hook-form";
+import { formatCurrency } from "@/helper/function/numericas";
+import { find } from "lodash";
 
 interface PropsRecibiTabCliente {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
+  datos: IRecibo;
 }
 
 const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
   datosDocumentos,
   control,
+  datos,
 }) => {
   const renderItem = useCallback(
     ({ item, index }: { item: Partial<IReciboEnviar>; index: number }) => (
@@ -31,6 +35,34 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
           styleRight={styles.labelRightCard}
         />
         <Separador />
+        <HeaderCard
+          labelLeft="Deuda Total"
+          labelRight={formatCurrency(
+            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+              ?.deudaTotal ?? 0
+          )}
+        />
+        <HeaderCard
+          labelLeft="Saldo vencido"
+          labelRight={formatCurrency(
+            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+              ?.saldoVencido ?? 0
+          )}
+        />
+        <HeaderCard
+          labelLeft="Interes por mora"
+          labelRight={formatCurrency(
+            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+              ?.interesMora ?? 0
+          )}
+        />
+        <HeaderCard
+          labelLeft="Gastos cobranza"
+          labelRight={formatCurrency(
+            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+              ?.gastosPorCobranza ?? 0
+          )}
+        />
         <Controller
           name={`datos.${index}.valorMora`}
           control={control}
@@ -39,9 +71,9 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
               text="VALOR POR MORA"
               tipo="text"
               placeholder="Valor"
-              keyboardType="numeric"
+              inputMode="decimal"
               onChangeText={onChange}
-              defaultValueText={value.toString()}
+              defaultValueText={value?.toString()}
             />
           )}
         />
@@ -53,8 +85,8 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
               text="VALOR DE COBRANZA"
               tipo="text"
               placeholder="Valor"
-              keyboardType="numeric"
-              defaultValueText={value.toString()}
+              inputMode="decimal"
+              defaultValueText={value?.toString()}
               onChangeText={onChange}
             />
           )}
@@ -67,8 +99,8 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
               text="VALOR CANCELA"
               tipo="text"
               placeholder="Valor"
-              keyboardType="numeric"
-              defaultValueText={value.toString()}
+              inputMode="decimal"
+              defaultValueText={value?.toString()}
               onChangeText={onChange}
             />
           )}
@@ -83,34 +115,33 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
               placeholder="Observaciones"
               direction="column"
               multiline
-              defaultValueText={value}
+              defaultValueText={value ?? undefined}
               onChangeText={onChange}
             />
           )}
         />
       </Card>
     ),
-    [control]
+    [control, datos]
   );
 
   return (
-    <View>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <FlatList
         data={datosDocumentos}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.doctran}
+        scrollEnabled={false}
       />
-    </View>
+    </ScrollView>
   );
 };
 
 export default ReciboTabCliente;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   flatListStyle: {
     gap: convertirTamanoVertical(10),
   },

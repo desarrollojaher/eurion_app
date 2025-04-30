@@ -1,7 +1,6 @@
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet } from "react-native";
 import React, { useCallback } from "react";
 import { convertirTamanoVertical } from "@/helper/function/renderizadoImagen";
-
 import { Control, FieldArrayWithId, UseFormWatch } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import CardReciboTabTipoPago from "./render/CardReciboTabTipoPago";
@@ -30,23 +29,22 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
   );
 
   return (
-    <View>
+    <ScrollView keyboardShouldPersistTaps="handled">
       <FlatList
         data={datosDocumentos}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.doctran}
+        scrollEnabled={false}
       />
-    </View>
+    </ScrollView>
   );
 };
 
 export default ReciboTabTipoPago;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   flatListStyle: {
     gap: convertirTamanoVertical(10),
   },
