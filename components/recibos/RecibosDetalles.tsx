@@ -17,7 +17,9 @@ import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
-import { intersection, isEqual, isEqualWith, pick, sumBy } from "lodash";
+import { intersection, isEqual, isEqualWith, pick, set, sumBy } from "lodash";
+import ModalAlertBack from "./modal/ModalAlertBack";
+import useBackButtonHandle from "@/hooks/useBackButtonHandle";
 
 const schema = z.object({
   datos: z.array(
@@ -41,8 +43,6 @@ const schema = z.object({
         )
         .nullish(),
       valorMora: z.preprocess((val): number | null | undefined => {
-        console.log(val);
-
         if (val === undefined || val === null) {
           return val;
         }
@@ -91,6 +91,9 @@ const schema = z.object({
 
 const RecibosDetalles = () => {
   const [tab, setTab] = useState(0);
+
+  const [modalAlerta, setModalAlerta] = useState(false);
+
   const tabs = useMemo(() => ["Cliente", "Tipo Pago", "Recibo"], []);
 
   const { datos } = useReciboStore();
@@ -119,7 +122,7 @@ const RecibosDetalles = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    // formState: { errors },
     watch,
     setValue,
   } = useForm<IReciboEnviarDatos>({
@@ -231,22 +234,35 @@ const RecibosDetalles = () => {
     Toast.error("Ingrese todos los valores");
   }, []);
 
+  const handleTabBack = useCallback(() => {
+    setModalAlerta(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setModalAlerta(false);
+  }, []);
+
+  // esta en la escucha del boton de retroceso por eso siempre se llama al ultimo de las funciones
+  useBackButtonHandle(handleTabBack);
   return (
     <View style={styles.containerGeneral}>
       <Header
         title="BYRON GODOY"
+        handleTapIconRight={handleSubmit(onSuccess, onError)}
         iconRight={
-          <Pressable onPress={handleSubmit(onSuccess, onError)}>
-            <Icon
-              name="save"
-              size={convertirTamanoHorizontal(30)}
-              color={BLANCO}
-            />
-          </Pressable>
+          <Icon
+            name="save"
+            size={convertirTamanoHorizontal(30)}
+            color={BLANCO}
+          />
         }
+        handleTapIconLeft={handleTabBack}
       />
       <View style={styles.containerBody}>{children}</View>
       <Footer items={tabs} setTab={setTab} />
+      {modalAlerta && (
+        <ModalAlertBack onClose={handleCloseModal} visible={modalAlerta} />
+      )}
     </View>
   );
 };

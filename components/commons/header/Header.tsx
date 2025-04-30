@@ -12,18 +12,24 @@ interface PropsHeader {
   title?: string;
   iconRight?: React.ReactNode;
   handleTapIconRight?: () => void;
+  handleTapIconLeft?: () => void;
 }
 
 const Header: React.FC<PropsHeader> = ({
   title = "",
   iconRight,
   handleTapIconRight,
+  handleTapIconLeft,
 }) => {
   const router = useRouter();
 
   const handleBack = useCallback(() => {
-    router.back();
-  }, [router]);
+    if (handleTapIconLeft) {
+      handleTapIconLeft();
+    } else {
+      router.back();
+    }
+  }, [handleTapIconLeft, router]);
 
   const handleIconRight = useCallback(() => {
     handleTapIconRight && handleTapIconRight();
