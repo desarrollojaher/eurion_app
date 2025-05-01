@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -17,11 +17,26 @@ import Card from "../commons/card/Card";
 import IconFont from "react-native-vector-icons/FontAwesome5";
 import IconFont6 from "react-native-vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
+import NetInfo from "@react-native-community/netinfo";
+import ModalSincronizar from "./modal/ModalSincronizar";
 
 const Principal = () => {
+  const [modalAlerta, setModalAlerta] = useState(false);
+
   const { signOut } = useSession();
 
   const router = useRouter();
+
+  const verificarInternetSincronizacion = useCallback(async () => {
+    const valor = await NetInfo.fetch();
+    return valor.isConnected ?? false;
+    // todo: verificar si no tiene internet deja pasar caso contrario si tiene internet verifica la hora si
+    // ya paso y no a sincronizado y tiene internet salta la alerta de sicronizacion caso contrario realiza lo primero
+  }, []);
+
+  const handleModalAlerta = useCallback(() => {
+    setModalAlerta(!modalAlerta);
+  }, [modalAlerta]);
 
   const handleLogOut = useCallback(() => {
     signOut();
@@ -31,9 +46,14 @@ const Principal = () => {
     router.push("/principal/sincronizar");
   }, [router]);
 
-  const handleOpenVerificaciones = useCallback(() => {
-    router.push("/principal/verificaciones/verificaciones-principal");
-  }, [router]);
+  const handleOpenVerificaciones = useCallback(async () => {
+    const conectado = await verificarInternetSincronizacion();
+    if (!conectado) {
+      router.push("/principal/verificaciones/verificaciones-principal");
+    } else {
+      handleModalAlerta();
+    }
+  }, [verificarInternetSincronizacion, router, handleModalAlerta]);
 
   const handleOpenGestiones = useCallback(() => {
     router.push("/principal/gestiones/gestiones-principal");
@@ -50,6 +70,7 @@ const Principal = () => {
   const handleOpenInformacionSubida = useCallback(() => {
     router.push("/principal/informacion-subida");
   }, [router]);
+
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
@@ -161,6 +182,9 @@ const Principal = () => {
         </Card>
       </View>
       <Text style={styles.textVersion}>Version: 2.0.0</Text>
+      {modalAlerta && (
+        <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />
+      )}
     </View>
   );
 };
