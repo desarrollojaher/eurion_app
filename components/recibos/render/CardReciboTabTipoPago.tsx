@@ -122,8 +122,6 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
-      console.log(data);
-
       if (data.tipoPago === "CONTADO") {
         if (!data.valor || (data.valor && data.valor <= 0)) {
           setErrorTiposPagos("valor", {

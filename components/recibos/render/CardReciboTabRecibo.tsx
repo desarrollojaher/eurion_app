@@ -9,6 +9,7 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import IconFont from "react-native-vector-icons/FontAwesome";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { Control, useFieldArray, UseFormWatch } from "react-hook-form";
 import { GRIS } from "@/constants/Colors";
@@ -34,6 +35,10 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
     name: `datos.${index}.imagenes`,
   });
 
+  const { remove: removeValores, fields: comprobantes } = useFieldArray({
+    control,
+    name: `datos.${index}.valores`,
+  });
   // const imagenes = watch(`datos.${index}.imagenes`);
   const valorMora = watch(`datos.${index}.valorMora`);
   const valorCobranza = watch(`datos.${index}.valorCobranza`);
@@ -57,6 +62,13 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
       remove(index);
     },
     [remove]
+  );
+
+  const handleRemoveValores = useCallback(
+    (index: number) => {
+      removeValores(index);
+    },
+    [removeValores]
   );
 
   return (
@@ -117,6 +129,37 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
       />
+      {comprobantes &&
+        comprobantes.map((item, index) => (
+          <Card key={index} style={styles.styleCardTiposPago}>
+            <View style={styles.styleContainerTiposPago}>
+              <View
+                style={{
+                  width: convertirTamanoHorizontal(250),
+                }}
+              >
+                <HeaderCard
+                  labelLeft="Tipo de Pago"
+                  labelRight={item.tipoPago}
+                  styleLeft={styles.styleLeftTiposPagoCard}
+                  styleRight={styles.styleRightTiposPagoCard}
+                />
+                <HeaderCard
+                  labelLeft="Valor Total"
+                  labelRight={formatCurrency(item.valor)}
+                  styleLeft={styles.styleLeftTiposPagoCard}
+                  styleRight={styles.styleRightTiposPagoCard}
+                />
+              </View>
+              <Pressable
+                onPress={() => handleRemoveValores(index)}
+                style={styles.stylePressable}
+              >
+                <IconFont name="close" size={convertirTamanoHorizontal(25)} />
+              </Pressable>
+            </View>
+          </Card>
+        ))}
     </Card>
   );
 };
@@ -145,5 +188,24 @@ const styles = StyleSheet.create({
   },
   containerImagen: {
     height: convertirTamanoVertical(250),
+  },
+  styleContainerTiposPago: {
+    width: convertirTamanoHorizontal(280),
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  styleCardTiposPago: {
+    gap: convertirTamanoVertical(10),
+    width: convertirTamanoHorizontal(300),
+    alignSelf: "center",
+  },
+  styleRightTiposPagoCard: {
+    width: convertirTamanoHorizontal(120),
+    color: GRIS,
+    fontSize: convertirTamanoHorizontal(13),
+  },
+  styleLeftTiposPagoCard: {
+    width: convertirTamanoHorizontal(130),
+    fontSize: convertirTamanoHorizontal(13),
   },
 });
