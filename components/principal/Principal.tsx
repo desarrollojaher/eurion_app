@@ -47,6 +47,9 @@ const Principal = () => {
     router.push("/principal/subir-informacion");
   }, [router]);
 
+  const handleOpenInformacionSubida = useCallback(() => {
+    router.push("/principal/informacion-subida");
+  }, [router]);
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
@@ -146,7 +149,7 @@ const Principal = () => {
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleOpenInformacionSubida}>
             <IconFont
               name="info-circle"
               color={AZUL}

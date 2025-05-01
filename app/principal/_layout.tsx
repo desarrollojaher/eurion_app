@@ -9,6 +9,10 @@ export default function AppLayout() {
       <Stack.Screen name="gestiones" options={{ headerShown: false }} />
       <Stack.Screen name="recibos" options={{ headerShown: false }} />
       <Stack.Screen name="subir-informacion" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="informacion-subida"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }
