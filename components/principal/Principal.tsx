@@ -43,6 +43,10 @@ const Principal = () => {
     router.push("/principal/recibos/recibos-principal");
   }, [router]);
 
+  const handleOpenSubirInformacion = useCallback(() => {
+    router.push("/principal/subir-informacion");
+  }, [router]);
+
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
@@ -127,7 +131,7 @@ const Principal = () => {
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleOpenSubirInformacion}>
             <IconFont
               name="upload"
               color={AZUL}
