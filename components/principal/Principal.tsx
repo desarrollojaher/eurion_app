@@ -19,6 +19,10 @@ import IconFont6 from "react-native-vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
 import NetInfo from "@react-native-community/netinfo";
 import ModalSincronizar from "./modal/ModalSincronizar";
+import { useSQLiteContext } from "expo-sqlite";
+import { drizzle, useLiveQuery } from "drizzle-orm/expo-sqlite";
+import * as schema from "@/db/schema";
+import { desc } from "drizzle-orm";
 
 const Principal = () => {
   const [modalAlerta, setModalAlerta] = useState(false);
@@ -26,6 +30,41 @@ const Principal = () => {
   const { signOut } = useSession();
 
   const router = useRouter();
+
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+
+  const { data } = useLiveQuery(
+    drizzleDb
+      .select()
+      .from(schema.usuarioTable)
+      .orderBy(desc(schema.usuarioTable.id))
+      .limit(1)
+  );
+
+  console.log(data);
+
+  const insertarUsuario = useCallback(
+    async (nombre: string, correo: string) => {
+      try {
+        const r = await drizzleDb
+          .insert(schema.usuarioTable)
+          .values({
+            age: 4,
+            createdAt: 0,
+            email: correo,
+            name: nombre,
+            password: "adawwd",
+            updatedAt: 0,
+          })
+          .returning();
+        console.log(r);
+      } catch (e) {
+        console.log("error", e);
+      }
+    },
+    [drizzleDb]
+  );
 
   const verificarInternetSincronizacion = useCallback(async () => {
     const valor = await NetInfo.fetch();
@@ -43,8 +82,9 @@ const Principal = () => {
   }, [signOut]);
 
   const handleOpenSincronizador = useCallback(() => {
-    router.push("/principal/sincronizar");
-  }, [router]);
+    insertarUsuario(`usu${Math.random().toFixed(1)}`, `correo${Math.random()}`);
+    // router.push("/principal/sincronizar");
+  }, [insertarUsuario]);
 
   const handleOpenVerificaciones = useCallback(async () => {
     const conectado = await verificarInternetSincronizacion();
@@ -74,7 +114,7 @@ const Principal = () => {
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
-        <Text style={styles.textHeader}>Bienvenido Byron </Text>
+        <Text style={styles.textHeader}>Bienvenido {data[0]?.name ?? ""}</Text>
         <Pressable onPress={handleLogOut} style={styles.iconStyle}>
           <Icon
             name={"logout"}
