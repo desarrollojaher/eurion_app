@@ -6,7 +6,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -16,13 +16,29 @@ import { BLANCO } from "@/constants/Colors";
 import ImagenContainer from "../commons/imagen/ImagenContainer";
 import InputCustom from "../commons/input/InputCustom";
 import { useSession } from "@/helper/provider/Auth";
+import { useIniciarSesion } from "@/service/Auth/useIniciarSesion";
+import { Toast } from "toastify-react-native";
 const logo = require("@/assets/images/logo.png");
 const IniciarSesionComponent = () => {
-  const { signIn } = useSession();
+  const [usuario, setUsuario] = useState("");
+  const [contra, setContra] = useState("");
 
+  const { signIn } = useSession();
+  const { mutate: iniciarSesion, isPending: isLoading } = useIniciarSesion();
   const handleIniciarSesion = useCallback(() => {
-    signIn("fmsnjnjn");
-  }, [signIn]);
+    if (usuario.trim() === "" || contra.trim() === "") {
+      Toast.error("Por favor, complete todos los campos");
+      return;
+    }
+    iniciarSesion(
+      { usuAlias: usuario, usuContrasena: contra },
+      {
+        onSuccess: (res) => {
+          signIn(res.token);
+        },
+      }
+    );
+  }, [contra, iniciarSesion, signIn, usuario]);
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -35,12 +51,16 @@ const IniciarSesionComponent = () => {
           <InputCustom
             placeholder="Usuario"
             styleContainer={styles.inputStyle}
+            value={usuario}
+            onChangeText={setUsuario}
           />
           <Text style={styles.textInpusts}>Contraseña</Text>
           <InputCustom
             placeholder="Contraseña"
             styleContainer={styles.inputStyle}
             isPassword={true}
+            value={contra}
+            onChangeText={setContra}
           />
           <Pressable style={styles.containerRecover}>
             <Text style={styles.textRecover}>Recuperar contraseña</Text>
@@ -49,6 +69,8 @@ const IniciarSesionComponent = () => {
             label="Iniciar Sesión"
             style={styles.buttonStyle}
             onPress={handleIniciarSesion}
+            isLoading={isLoading}
+            disabled={isLoading}
           />
         </View>
       </View>

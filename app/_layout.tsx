@@ -37,13 +37,10 @@ export default function RootLayout() {
   const { success } = useMigrations(db, migrations);
   useDrizzleStudio(expoDB);
 
-  // console.log("success db", success);
-  // console.log("error db", error);
-
   const handleSesion = useCallback(async () => {
     try {
       setCargaInicial(true);
-      const token = await await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("token");
       setToken(token);
       setCargaInicial(false);
     } catch (e) {

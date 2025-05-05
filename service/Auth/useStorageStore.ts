@@ -29,7 +29,7 @@ export async function setStorageItemAsync(key: string, value: string | null) {
     }
   } else {
     if (value == null) {
-     // await SecureStore.deleteItemAsync(key);
+      // await SecureStore.deleteItemAsync(key);
     } else {
       //await SecureStore.setItemAsync(key, value);
     }
@@ -37,25 +37,24 @@ export async function setStorageItemAsync(key: string, value: string | null) {
 }
 
 export function useStorageState(key: string): UseStateHook<string> {
-  // Public
   const [state, setState] = useAsyncState<string>();
 
   // Get
-  useEffect(() => {
-    if (Platform.OS === "web") {
-      try {
-        if (typeof localStorage !== "undefined") {
-          setState(localStorage.getItem(key));
-        }
-      } catch (e) {
-        console.error("Local storage is unavailable:", e);
-      }
-    } else {
-      // SecureStore.getItemAsync(key).then((value) => {
-      //   setState(value);
-      // });
-    }
-  }, [key]);
+  // useEffect(() => {
+  //   if (Platform.OS === "web") {
+  //     try {
+  //       if (typeof localStorage !== "undefined") {
+  //         setState(localStorage.getItem(key));
+  //       }
+  //     } catch (e) {
+  //       console.error("Local storage is unavailable:", e);
+  //     }
+  //   } else {
+  //     // SecureStore.getItemAsync(key).then((value) => {
+  //     //   setState(value);
+  //     // });
+  //   }
+  // }, [key, setState]);
 
   // Set
   const setValue = useCallback(
@@ -63,7 +62,7 @@ export function useStorageState(key: string): UseStateHook<string> {
       setState(value);
       setStorageItemAsync(key, value);
     },
-    [key]
+    [key, setState]
   );
 
   return [state, setValue];
