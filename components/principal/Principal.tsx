@@ -23,11 +23,13 @@ import { useSQLiteContext } from "expo-sqlite";
 import { drizzle, useLiveQuery } from "drizzle-orm/expo-sqlite";
 import * as schema from "@/db/schema";
 import { desc } from "drizzle-orm";
+import ModalCerrarSesion from "./modal/ModalCerrarSesion";
 
 const Principal = () => {
   const [modalAlerta, setModalAlerta] = useState(false);
+  const [modalCerrarSesion, setModalCerrarSesion] = useState(false);
 
-  const { signOut } = useSession();
+  const { usuario } = useSession();
 
   const router = useRouter();
 
@@ -41,8 +43,6 @@ const Principal = () => {
       .orderBy(desc(schema.usuarioTable.id))
       .limit(1)
   );
-
-  console.log(data);
 
   const insertarUsuario = useCallback(
     async (nombre: string, correo: string) => {
@@ -77,23 +77,27 @@ const Principal = () => {
     setModalAlerta(!modalAlerta);
   }, [modalAlerta]);
 
-  const handleLogOut = useCallback(() => {
-    signOut();
-  }, [signOut]);
+  const handleOpenModalCerrarSesion = useCallback(() => {
+    setModalCerrarSesion(true);
+  }, []);
+
+  const handleCloseModalCerrarSesion = useCallback(() => {
+    setModalCerrarSesion(false);
+  }, []);
 
   const handleOpenSincronizador = useCallback(() => {
-    insertarUsuario(`usu${Math.random().toFixed(1)}`, `correo${Math.random()}`);
-    // router.push("/principal/sincronizar");
-  }, [insertarUsuario]);
+    // insertarUsuario(`usu${Math.random().toFixed(1)}`, `correo${Math.random()}`);
+    router.push("/principal/sincronizar");
+  }, [router]);
 
   const handleOpenVerificaciones = useCallback(async () => {
-    const conectado = await verificarInternetSincronizacion();
-    if (!conectado) {
-      router.push("/principal/verificaciones/verificaciones-principal");
-    } else {
-      handleModalAlerta();
-    }
-  }, [verificarInternetSincronizacion, router, handleModalAlerta]);
+    // const conectado = await verificarInternetSincronizacion();
+    // if (!conectado) {
+    router.push("/principal/verificaciones/verificaciones-principal");
+    // } else {
+    //   handleModalAlerta();
+    // }
+  }, [router]);
 
   const handleOpenGestiones = useCallback(() => {
     router.push("/principal/gestiones/gestiones-principal");
@@ -114,8 +118,13 @@ const Principal = () => {
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
-        <Text style={styles.textHeader}>Bienvenido {data[0]?.name ?? ""}</Text>
-        <Pressable onPress={handleLogOut} style={styles.iconStyle}>
+        <Text style={styles.textHeader}>
+          Bienvenido {usuario?.usuNombre.split(" ")[0]}
+        </Text>
+        <Pressable
+          onPress={handleOpenModalCerrarSesion}
+          style={styles.iconStyle}
+        >
           <Icon
             name={"logout"}
             size={convertirTamanoHorizontal(30)}
@@ -225,6 +234,12 @@ const Principal = () => {
       {modalAlerta && (
         <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />
       )}
+      {modalCerrarSesion && (
+        <ModalCerrarSesion
+          onClose={handleCloseModalCerrarSesion}
+          visible={modalCerrarSesion}
+        />
+      )}
     </View>
   );
 };
@@ -249,7 +264,8 @@ const styles = StyleSheet.create({
     marginTop: convertirTamanoVertical(72),
   },
   textHeader: {
-    fontSize: convertirTamanoHorizontal(32),
+    width: convertirTamanoHorizontal(290),
+    fontSize: convertirTamanoHorizontal(25),
     fontWeight: "bold",
     color: BLANCO,
   },

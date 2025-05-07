@@ -1,1 +1,4 @@
-export interface IUsuario {}
+export interface IUsuario {
+  usuNombre: string;
+  identificacion: string;
+}

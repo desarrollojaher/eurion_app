@@ -25,11 +25,13 @@ const IniciarSesionComponent = () => {
 
   const { signIn } = useSession();
   const { mutate: iniciarSesion, isPending: isLoading } = useIniciarSesion();
+
   const handleIniciarSesion = useCallback(() => {
     if (usuario.trim() === "" || contra.trim() === "") {
       Toast.error("Por favor, complete todos los campos");
       return;
     }
+
     iniciarSesion(
       { usuAlias: usuario, usuContrasena: contra },
       {

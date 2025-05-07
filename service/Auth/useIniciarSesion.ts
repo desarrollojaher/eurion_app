@@ -14,11 +14,8 @@ export const useIniciarSesion = (
 ) => {
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: () => {
-      //toast.success("Whatsapp enviado correctamente");
-    },
     onError: (error: any) => {
-      Toast.error(error.response.data.mensaje);
+      Toast.error(error.response.data.message);
     },
     ...mutationOptions,
   });

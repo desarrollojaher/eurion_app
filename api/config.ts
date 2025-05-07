@@ -1,8 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3001/",
-  timeout: 100000,
+  baseURL: "http://172.17.28.87:3001",
+  timeout: 3000,
 });
 
 type ApiMethods = {
@@ -27,6 +28,14 @@ const api: ApiMethods = {
   post: (url, data, config) => axiosInstance.post(url, data, config),
   patch: (url, data, config) => axiosInstance.patch(url, data, config),
 };
+
+axiosInstance.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem("token");
+  if (token) {
+    config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // axiosInstance.interceptors.response.use(
 //   (response) => {

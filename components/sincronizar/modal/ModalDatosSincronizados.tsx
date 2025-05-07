@@ -4,35 +4,27 @@ import LottieAnimation from "@/components/commons/lottie/LottieAnimation";
 import { StyleSheet, Text } from "react-native";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
 
-interface PropsModalDatos {
+interface PropsModalDatosSincronizados {
   visible: boolean;
   onClose: () => void;
-  tabla: string;
-  index: number;
-  cantidadDatos: number;
 }
 
-const ModalDatos: React.FC<PropsModalDatos> = ({
+const ModalDatosSincronizados: React.FC<PropsModalDatosSincronizados> = ({
   onClose,
   visible,
-  index,
-  tabla,
-  cantidadDatos,
 }) => {
   const resource = useMemo(() => {
-    return require("../../../assets/animations/download.json");
+    return require("../../../assets/animations/exito.json");
   }, []);
 
   return (
     <ModalCustom
       onClose={onClose}
       visible={visible}
-      titulo={`Descargando ${index}/5`}
+      titulo="Datos sincronizados"
     >
       <LottieAnimation resource={resource} />
-      <Text style={styles.texto}>
-        Descargando {cantidadDatos} archivos de {tabla}
-      </Text>
+      <Text style={styles.texto}>Se sincronizaron todos los datos</Text>
     </ModalCustom>
   );
 };
@@ -45,4 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ModalDatos;
+export default ModalDatosSincronizados;

@@ -4,34 +4,29 @@ import LottieAnimation from "@/components/commons/lottie/LottieAnimation";
 import { StyleSheet, Text } from "react-native";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
 
-interface PropsModalDatos {
+interface PropsModalError {
   visible: boolean;
   onClose: () => void;
   tabla: string;
-  index: number;
-  cantidadDatos: number;
+  errorMessage: string;
 }
 
-const ModalDatos: React.FC<PropsModalDatos> = ({
+const ModalError: React.FC<PropsModalError> = ({
   onClose,
   visible,
-  index,
   tabla,
-  cantidadDatos,
+  errorMessage,
 }) => {
   const resource = useMemo(() => {
-    return require("../../../assets/animations/download.json");
+    return require("../../../assets/animations/error.json");
   }, []);
 
   return (
-    <ModalCustom
-      onClose={onClose}
-      visible={visible}
-      titulo={`Descargando ${index}/5`}
-    >
+    <ModalCustom onClose={onClose} visible={visible} titulo="Error">
       <LottieAnimation resource={resource} />
       <Text style={styles.texto}>
-        Descargando {cantidadDatos} archivos de {tabla}
+        Hubo un error al descargar los datos en la tabla {tabla} con el mensaje{" "}
+        {errorMessage}
       </Text>
     </ModalCustom>
   );
@@ -45,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ModalDatos;
+export default ModalError;

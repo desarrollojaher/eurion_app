@@ -10,20 +10,42 @@ import IconFont from "react-native-vector-icons/FontAwesome5";
 import { AZUL } from "@/constants/Colors";
 import ModalDatos from "./modal/ModalDatos";
 import ModalSincronizarImagenes from "./modal/ModalSincronizarImagenes";
+import { useSincronizacion } from "@/service/Sincronizacion/useSincronizacion";
+import ModalError from "./modal/ModalError";
+import { useSQLiteContext } from "expo-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import * as schema from "@/db/schema";
+import ModalDatosSincronizados from "./modal/ModalDatosSincronizados";
 
 const SincronizarDatos = () => {
-  const [modalInformacion, setModalInformacion] = useState(false);
   const [modalImagenes, setModalImagenes] = useState(false);
 
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+  
+
+  const {
+    index,
+    loading,
+    sincronizar,
+    tabla,
+    cantidadDatos,
+    error,
+    errorMessage,
+    onCloseError,
+    onCloseSincronizado,
+    sincronizado,
+  } = useSincronizacion(drizzleDb);
+
   const handleSincronizarDatos = useCallback(() => {
-    setModalInformacion(true);
-  }, []);
+    sincronizar();
+  }, [sincronizar]);
   const handleSincronizarImagenes = useCallback(() => {
     setModalImagenes(true);
   }, []);
 
   const handleCloseModalInformacion = useCallback(() => {
-    setModalInformacion(false);
+    console.log("cerro en la sincronizcion");
   }, []);
 
   const handleCloseModalImagenes = useCallback(() => {
@@ -66,10 +88,27 @@ const SincronizarDatos = () => {
         </Card>
       </View>
 
-      {modalInformacion && (
+      {loading && (
         <ModalDatos
           onClose={handleCloseModalInformacion}
-          visible={modalInformacion}
+          visible={loading}
+          tabla={tabla}
+          index={index}
+          cantidadDatos={cantidadDatos}
+        />
+      )}
+      {error && (
+        <ModalError
+          onClose={onCloseError}
+          errorMessage={errorMessage}
+          tabla={tabla}
+          visible={error}
+        />
+      )}
+      {sincronizado && (
+        <ModalDatosSincronizados
+          onClose={onCloseSincronizado}
+          visible={sincronizado}
         />
       )}
       {modalImagenes && (

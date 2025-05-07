@@ -18,6 +18,9 @@ import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/drizzle/migrations";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { authApi } from "@/api/auth";
+import NetInfo from "@react-native-community/netinfo";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -30,6 +33,8 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  // query client de tanskquery
+  const queryClient = new QueryClient();
 
   // llamado a la base de datos sqlite
   const expoDB = openDatabaseSync(DATABASE_NAME);
@@ -37,17 +42,40 @@ export default function RootLayout() {
   const { success } = useMigrations(db, migrations);
   useDrizzleStudio(expoDB);
 
+  const verificarInternetSincronizacion = useCallback(async () => {
+    const valor = await NetInfo.fetch();
+    return valor.isConnected ?? false;
+    // todo: verificar si no tiene internet deja pasar caso contrario si tiene internet verifica la hora si
+    // ya paso y no a sincronizado y tiene internet salta la alerta de sicronizacion caso contrario realiza lo primero
+  }, []);
+
   const handleSesion = useCallback(async () => {
     try {
       setCargaInicial(true);
       const token = await AsyncStorage.getItem("token");
-      setToken(token);
+      const isConnected = await verificarInternetSincronizacion();
+      if (token) {
+        if (isConnected) {
+          const tokenValidacion = await authApi.ping();
+          if (tokenValidacion && tokenValidacion.token) {
+            setToken(tokenValidacion.token);
+          } else {
+            setToken(null);
+          }
+        } else {
+          // si no tiene internet no hace la validacion del token y le deja ingresar con el token que esa
+          setToken(token);
+        }
+      } else {
+        setToken(null);
+      }
       setCargaInicial(false);
     } catch (e) {
+      setToken(null);
       console.log(e);
       setCargaInicial(false);
     }
-  }, []);
+  }, [verificarInternetSincronizacion]);
 
   useEffect(() => {
     if (loaded) {
@@ -73,13 +101,15 @@ export default function RootLayout() {
           useSuspense
         >
           <SessionProvider token={token}>
-            <Slot />
-            <ToastManager
-              showCloseIcon={true}
-              animationStyle="fade"
-              showProgressBar={false}
-              position={"bottom"}
-            />
+            <QueryClientProvider client={queryClient}>
+              <Slot />
+              <ToastManager
+                showCloseIcon={true}
+                animationStyle="fade"
+                showProgressBar={false}
+                position={"bottom"}
+              />
+            </QueryClientProvider>
           </SessionProvider>
         </SQLiteProvider>
       </Suspense>

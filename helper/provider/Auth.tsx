@@ -1,15 +1,19 @@
 import { useContext, createContext, useEffect, useCallback } from "react";
 import { useRouter } from "expo-router"; // Para manejar la navegación
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { IUsuario } from "@/models/IUsuario";
+import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext<{
   signIn: (token: string) => void;
   signOut: () => void;
+  usuario: IUsuario | null;
   // session?: string | null;
   // isLoading: boolean;
 }>({
   signIn: () => null,
   signOut: () => null,
+  usuario: null,
   // session: null,
   // isLoading: false,
 });
@@ -65,6 +69,7 @@ export function SessionProvider({ children, token }: any) {
       value={{
         signIn,
         signOut,
+        usuario: token ? (jwtDecode(token) as IUsuario) : null,
         // session,
         // isLoading,
       }}
