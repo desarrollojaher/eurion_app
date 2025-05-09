@@ -98,7 +98,7 @@ export const fotoDomicilioTable = sqliteTable("foto_del_domicilio", {
 export const verificacionesResultadoTable = sqliteTable(
   "verificaciones_resultado",
   {
-    id: int(),
+    id: text(),
     fecha: text(),
     observaciones: text(),
     codigoTipoGestion: int(),
@@ -113,8 +113,8 @@ export const verificacionesResultadoTable = sqliteTable(
 );
 
 export const imagenVerificacionTable = sqliteTable("imagen_verificacion", {
-  id: int(),
-  idVerificacion: int(),
+  id: text(),
+  idVerificacion: text(),
   nombre: text(),
-  imagen: blob(),
+  imagen: text(),
 });

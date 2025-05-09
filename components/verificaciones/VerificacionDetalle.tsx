@@ -12,11 +12,20 @@ import Card from "../commons/card/Card";
 import Separador from "../commons/separador/Separador";
 import HeaderCard from "../commons/card/HeaderCard";
 import { useVerificacionStore } from "@/helper/store/stroreVerificacion";
+import { useObtenerVerificacionesDetalles } from "@/service/Verificaciones/useObtenerVerificacionesDetalles";
+import { formatCurrency } from "@/helper/function/numericas";
 
 const VerificacionDetalle = () => {
   const [modalVerificar, setModalVerificar] = useState(false);
 
-  const { datosDetalles, datos } = useVerificacionStore();
+  const { datos } = useVerificacionStore();
+
+  const { data, isLoading } = useObtenerVerificacionesDetalles(
+    {
+      identificacion: datos?.identificacion ?? "",
+    },
+    { enabled: !!datos }
+  );
 
   const handlePressIconRight = useCallback(() => {
     setModalVerificar(true);
@@ -29,7 +38,7 @@ const VerificacionDetalle = () => {
   return (
     <View style={styles.scrollView}>
       <Header
-        title={datos?.nombreCliente}
+        title={datos?.nombres}
         iconRight={
           <Icon
             name="plus"
@@ -46,49 +55,49 @@ const VerificacionDetalle = () => {
           <Separador />
           <HeaderCard
             labelLeft="Identificación"
-            labelRight={datosDetalles?.datosGenerales.cedulaCliente}
+            labelRight={data?.datosGenerales.cedulaCliente}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Nombre"
-            labelRight={datosDetalles?.datosGenerales.nombreCliente}
+            labelRight={data?.datosGenerales.nombreCliente}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Estado Civil"
-            labelRight={datosDetalles?.datosGenerales.estadoCivil}
+            labelRight={data?.datosGenerales.estadoCivil}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Dependientes"
-            labelRight={String(datosDetalles?.datosGenerales.dependientes)}
+            labelRight={String(data?.datosGenerales.dependientes)}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Telefono"
-            labelRight={datosDetalles?.datosGenerales.telefono}
+            labelRight={data?.datosGenerales.telefono}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Referencia"
-            labelRight={datosDetalles?.datosGenerales.referencias}
+            labelRight={data?.datosGenerales.referencias}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Observaciones"
-            labelRight={datosDetalles?.datosGenerales.observacion}
+            labelRight={data?.datosGenerales.observacion}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
@@ -99,246 +108,244 @@ const VerificacionDetalle = () => {
           <Separador />
           <HeaderCard
             labelLeft="Categoría"
-            labelRight={datosDetalles?.buro.categoria}
+            labelRight={data?.buro.categoria}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Score"
-            labelRight={String(datosDetalles?.buro.score)}
+            labelRight={String(data?.buro.score)}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="Producto"
-            labelRight={datosDetalles?.buro.producto}
+            labelRight={data?.buro.producto}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
         </Card>
-        {datosDetalles?.datosVivienda && (
+        {data?.datosVivienda && (
           <Card style={styles.cardStyle}>
             <Text style={styles.textTituloHeader}>Datos Vivienda</Text>
             <Separador />
             <HeaderCard
               labelLeft="Dirección"
-              labelRight={datosDetalles?.datosVivienda.direccion}
+              labelRight={data?.datosVivienda.direccion}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Zona"
-              labelRight={datosDetalles?.datosVivienda.zona}
+              labelRight={data?.datosVivienda.zona}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Tipo Vivienda"
-              labelRight={datosDetalles?.datosVivienda.tipoVivienda}
+              labelRight={data?.datosVivienda.tipoVivienda}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Nombre Dueño"
-              labelRight={datosDetalles?.datosVivienda.nombrePropietario}
+              labelRight={data?.datosVivienda.nombreDueno}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Telf. Dueño"
-              labelRight={datosDetalles?.datosVivienda.telefonoPropietario}
+              labelRight={data?.datosVivienda.telDueno}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Construcción"
-              labelRight={datosDetalles?.datosVivienda.construccion}
+              labelRight={data?.datosVivienda.construccon}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
           </Card>
         )}
-        {datosDetalles?.datosConyugue && (
+        {data?.datosConyugue && (
           <Card style={styles.cardStyle}>
             <Text style={styles.textTituloHeader}>Datos conyugue</Text>
             <Separador />
             <HeaderCard
               labelLeft="Identificación"
-              labelRight={datosDetalles?.datosConyugue.cedulaCliente}
+              labelRight={data?.datosConyugue.cedulaConyuge}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Nombre"
-              labelRight={datosDetalles?.datosConyugue.nombreCliente}
+              labelRight={data?.datosConyugue.nombre}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Apellido"
-              labelRight={datosDetalles?.datosConyugue.apellidoCliente}
+              labelRight={data?.datosConyugue.apellidos}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Celular"
-              labelRight={datosDetalles?.datosConyugue.telefonoCliente}
+              labelRight={data?.datosConyugue.celular}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
           </Card>
         )}
-        {datosDetalles?.actividadEconomica && (
+        {data?.actividadEconomica && (
           <Card style={styles.cardStyle}>
             <Text style={styles.textTituloHeader}>Actividad Economica</Text>
             <Separador />
             <HeaderCard
               labelLeft="Ocupacion Laboral"
-              labelRight={datosDetalles.actividadEconomica.ocupacionLaboral}
+              labelRight={data.actividadEconomica.ocupacionLaboral}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Empresa"
-              labelRight={datosDetalles.actividadEconomica.empresa}
+              labelRight={data.actividadEconomica.empresa}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Antiguedad"
-              labelRight={datosDetalles?.actividadEconomica.antiguedad}
+              labelRight={data?.actividadEconomica.antiguedad}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Cargo"
-              labelRight={datosDetalles?.actividadEconomica.cargo}
+              labelRight={data?.actividadEconomica.cargo}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Jefe"
-              labelRight={datosDetalles?.actividadEconomica.jefe}
+              labelRight={data?.actividadEconomica.jefe}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Ingresos"
-              labelRight={datosDetalles?.actividadEconomica.ingresos}
+              labelRight={formatCurrency(data?.actividadEconomica.ingresos)}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Telf. Empresa"
-              labelRight={datosDetalles?.actividadEconomica.telfonoEmpresa}
+              labelRight={data?.actividadEconomica.telEmpresa}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Cel. Jefe"
-              labelRight={datosDetalles?.actividadEconomica.celularjefe}
+              labelRight={data?.actividadEconomica.celJefe}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Dir. Empresa"
-              labelRight={datosDetalles?.actividadEconomica.dirreccionEmpresa}
+              labelRight={data?.actividadEconomica.dirEmpresa}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
           </Card>
         )}
-        {datosDetalles?.actividadEconomicaConyugue && (
+        {data?.actividadEconomicaConyugue && (
           <Card style={styles.cardStyle}>
-            <Text style={styles.textTituloHeader}>Actividad Economica</Text>
+            <Text style={styles.textTituloHeader}>
+              Actividad Economica Conyugue
+            </Text>
             <Separador />
             <HeaderCard
               labelLeft="Ocupacion Laboral"
-              labelRight={
-                datosDetalles?.actividadEconomicaConyugue.ocupacionLaboral
-              }
+              labelRight={data?.actividadEconomicaConyugue.ocupacionLaboral}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Empresa"
-              labelRight={datosDetalles?.actividadEconomicaConyugue.empresa}
+              labelRight={data?.actividadEconomicaConyugue.empresa}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Antiguedad"
-              labelRight={datosDetalles?.actividadEconomicaConyugue.antiguedad}
+              labelRight={data?.actividadEconomicaConyugue.antiguedad}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Cargo"
-              labelRight={datosDetalles?.actividadEconomicaConyugue.cargo}
+              labelRight={data?.actividadEconomicaConyugue.cargo}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Jefe"
-              labelRight={datosDetalles?.actividadEconomicaConyugue.jefe}
+              labelRight={data?.actividadEconomicaConyugue.jefe}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Ingresos"
-              labelRight={datosDetalles?.actividadEconomicaConyugue.ingresos}
+              labelRight={formatCurrency(
+                data?.actividadEconomicaConyugue.ingresos
+              )}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Telf. Empresa"
-              labelRight={
-                datosDetalles?.actividadEconomicaConyugue.telfonoEmpresa
-              }
+              labelRight={data?.actividadEconomicaConyugue.telEmpresa}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Cel. Jefe"
-              labelRight={datosDetalles?.actividadEconomicaConyugue.celularjefe}
+              labelRight={data?.actividadEconomicaConyugue.celJefe}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
             <HeaderCard
               labelLeft="Dir. Empresa"
-              labelRight={
-                datosDetalles?.actividadEconomicaConyugue.dirreccionEmpresa
-              }
+              labelRight={data?.actividadEconomicaConyugue.dirEmpresa}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
@@ -346,9 +353,9 @@ const VerificacionDetalle = () => {
           </Card>
         )}
       </ScrollView>
-      {modalVerificar && (
+      {modalVerificar && datos && (
         <ModalRealizarVerificacion
-          cliente={datos?.nombreCliente ?? ""}
+          cliente={datos}
           onClose={handleCloseModal}
           visible={modalVerificar}
         />

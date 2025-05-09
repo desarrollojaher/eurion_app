@@ -76,7 +76,7 @@ const ImagenCompleta: React.FC<PropsImagenCompleta> = ({
             <Image
               style={[styles.imagen]}
               source={{
-                uri: item.url,
+                uri: `data:image/png;base64,${item.url}`,
               }}
               resizeMode={"contain"}
             />

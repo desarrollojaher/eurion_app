@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import React, { useCallback, useMemo } from "react";
 import Animated, { SharedValue } from "react-native-reanimated";
-import { useCarousel } from "@/hooks/useCarousel";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -32,8 +31,6 @@ const CarouselItem: React.FC<PropsCarouselItem> = ({
   height,
   width = screenWidth,
 }) => {
-  const { animatedContainerStyle, imageStyle } = useCarousel(slideValue, index);
-
   const styleContaner = useMemo(() => {
     if (height) return { height: convertirTamanoVertical(height) };
     return {};
@@ -53,7 +50,7 @@ const CarouselItem: React.FC<PropsCarouselItem> = ({
           <Animated.Image
             style={[styles.imagen]}
             source={{
-              uri: item.url,
+              uri: `data:image/png;base64,${item.url}`,
             }}
             resizeMode={"contain"}
           />

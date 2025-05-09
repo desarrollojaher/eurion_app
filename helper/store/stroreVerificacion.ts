@@ -1,38 +1,16 @@
 import { create } from "zustand";
-import {
-  IVerificacionDetalle,
-  IVerificacionPruebaCabecera,
-} from "@/models/IVerificacionPrueba";
-import { find } from "lodash";
-import { detallesVerificacionPrueba } from "../json/jsonCabeceraVerificacion";
+import { IVerificacionesCabecera } from "@/models/IVerificaciones";
 
 type IVerificacionStore = {
-  datos: IVerificacionPruebaCabecera | null;
-  datosDetalles: IVerificacionDetalle | null;
+  datos: IVerificacionesCabecera | null;
   eliminar: () => void;
-  setDatos: (dato: IVerificacionPruebaCabecera) => void;
-  setDatosDetalles: () => void;
+  setDatos: (dato: IVerificacionesCabecera) => void;
 };
 
 export const useVerificacionStore = create<IVerificacionStore>()(
   (set, get) => ({
     datos: null,
-    datosDetalles: null,
     eliminar: () => set(() => ({ datos: null })),
-    setDatos: (dato: IVerificacionPruebaCabecera) =>
-      set(() => ({ datos: dato })),
-    setDatosDetalles: () => {
-      const { datos } = get();
-      if (datos) {
-        const datosDetalles = find(
-          detallesVerificacionPrueba,
-          (item) => item.datosGenerales.cedulaCliente === datos.cedulaCliente
-        );
-
-        set(() => ({
-          datosDetalles,
-        }));
-      }
-    },
+    setDatos: (dato: IVerificacionesCabecera) => set(() => ({ datos: dato })),
   })
 );

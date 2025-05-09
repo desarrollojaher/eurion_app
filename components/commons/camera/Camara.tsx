@@ -50,12 +50,12 @@ const Camara: React.FC<PropsCamara> = ({
   }, []);
 
   const handleTakePicture = useCallback(async () => {
-    const photo = await ref.current?.takePictureAsync();
+    const photo = await ref.current?.takePictureAsync({ base64: true });
     if (!photo) {
       Toast.error("No se pudo tomar la foto");
       return;
     } else {
-      setImagenes((current) => [...current, photo.uri]);
+      setImagenes((current) => [...current, photo.base64 ?? ""]);
     }
   }, [setImagenes]);
 
@@ -93,7 +93,7 @@ const Camara: React.FC<PropsCamara> = ({
       <TouchableOpacity onPress={() => handleOpenImagenCompleta(item)}>
         <View style={{ position: "relative" }}>
           <Image
-            source={{ uri: item }}
+            source={{ uri: `data:image/png;base64,${item}` }}
             resizeMode="contain"
             style={{
               width: convertirTamanoHorizontal(60),
@@ -169,56 +169,51 @@ const Camara: React.FC<PropsCamara> = ({
           facing={facing}
           responsiveOrientationWhenOrientationLocked
           ref={ref}
-        >
-          <View style={styles.containerGeneral}>
-            <View />
-            <View>
-              <View style={styles.imagenContainer}>
-                <FlatList
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  data={imagenes}
-                  ItemSeparatorComponent={() => (
-                    <View style={styles.separator} />
-                  )}
-                  renderItem={handleRenderizarImagenes}
-                />
-              </View>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleGuardarDatos}
-                >
-                  <Icon
-                    name="save"
-                    color={BLANCO}
-                    size={convertirTamanoHorizontal(50)}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleTakePicture}
-                >
-                  <Icon
-                    name="camera"
-                    color={BLANCO}
-                    size={convertirTamanoHorizontal(60)}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleToggleCamera}
-                >
-                  <Icon
-                    name="camera-reverse"
-                    color={BLANCO}
-                    size={convertirTamanoHorizontal(60)}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+        />
+        {/* <View style={styles.containerGeneral}> */}
+        {/* <View /> */}
+        <View style={styles.containerGeneral}>
+          <View style={styles.imagenContainer}>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={imagenes}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+              renderItem={handleRenderizarImagenes}
+            />
           </View>
-        </CameraView>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleGuardarDatos}
+            >
+              <Icon
+                name="save"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(50)}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleTakePicture}>
+              <Icon
+                name="camera"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(60)}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleToggleCamera}
+            >
+              <Icon
+                name="camera-reverse"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(60)}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* </View> */}
+        {/* </CameraView> */}
       </View>
       {openImagenCompleta && imagen && (
         <ImagenCompleta
@@ -280,9 +275,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   containerGeneral: {
-    flex: 1,
-    flexDirection: "column",
-    justifyContent: "space-between",
+    // flex: 1,
+    // flexDirection: "column",
+    // justifyContent: "space-between",
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
   separator: {
     height: 1,

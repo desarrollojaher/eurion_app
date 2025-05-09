@@ -21,10 +21,13 @@ import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authApi } from "@/api/auth";
 import NetInfo from "@react-native-community/netinfo";
+import { DrizzleStudioInitializer } from "@/helper/provider/DizzlieSudioInitializer";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 export const DATABASE_NAME = "cobranza";
+const expoDB = openDatabaseSync(DATABASE_NAME);
+export const db = drizzle(expoDB);
 
 export default function RootLayout() {
   const [cargaInicial, setCargaInicial] = useState(false);
@@ -37,8 +40,6 @@ export default function RootLayout() {
   const queryClient = new QueryClient();
 
   // llamado a la base de datos sqlite
-  const expoDB = openDatabaseSync(DATABASE_NAME);
-  const db = drizzle(expoDB);
   const { success } = useMigrations(db, migrations);
   useDrizzleStudio(expoDB);
 
@@ -53,14 +54,21 @@ export default function RootLayout() {
     try {
       setCargaInicial(true);
       const token = await AsyncStorage.getItem("token");
+
       const isConnected = await verificarInternetSincronizacion();
       if (token) {
         if (isConnected) {
-          const tokenValidacion = await authApi.ping();
-          if (tokenValidacion && tokenValidacion.token) {
-            setToken(tokenValidacion.token);
-          } else {
-            setToken(null);
+          try {
+            const tokenValidacion = await authApi.ping();
+            if (tokenValidacion && tokenValidacion.token) {
+              setToken(tokenValidacion.token);
+            } else {
+              setToken(null);
+            }
+          } catch (e: any) {
+            if (e.message === "Network Error") {
+              setToken(token);
+            }
           }
         } else {
           // si no tiene internet no hace la validacion del token y le deja ingresar con el token que esa
@@ -100,6 +108,7 @@ export default function RootLayout() {
           options={{ enableChangeListener: true }}
           useSuspense
         >
+          {/* <DrizzleStudioInitializer /> */}
           <SessionProvider token={token}>
             <QueryClientProvider client={queryClient}>
               <Slot />

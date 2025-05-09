@@ -2,6 +2,7 @@ import {
   FlatList,
   Linking,
   Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,7 +10,7 @@ import {
 } from "react-native";
 import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
-import Select from "../commons/select/Select";
+import Select, { IDatosSelect } from "../commons/select/Select";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
@@ -28,20 +29,36 @@ import { IImagenCompleta } from "@/models/IImagenCompleta";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarVerificacion from "./modal/ModalRealizarVerificacion";
 import { useRouter } from "expo-router";
-import { cabeceraVerificacionPrueba } from "@/helper/json/jsonCabeceraVerificacion";
-import { IVerificacionPruebaCabecera } from "@/models/IVerificacionPrueba";
 import { useVerificacionStore } from "@/helper/store/stroreVerificacion";
+import { useObtenerVerificacionesCabecera } from "@/service/Verificaciones/useObtenerVerificacionesCabecera";
+import { IVerificacionesCabecera } from "@/models/IVerificaciones";
+import { useDebounce } from "@/hooks/debounce";
+import { format } from "date-fns";
+import LoadingComponent from "../commons/FlatList/LoadingComponent";
+import EmptyList from "../commons/FlatList/EmptyList";
 
 const VeriPrincipal = () => {
   const [openImagenes, setOpenImagenes] = useState(false);
   const [openGuardar, setOpenGuardar] = useState(false);
 
-  const [nombre, setNombre] = useState("");
+  const [cliente, setCliente] = useState<IVerificacionesCabecera>();
+  const [filtro, setFiltro] = useState("");
+  const [filtroRuta, setFiltroRuta] = useState<number | null>(null);
 
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
   const router = useRouter();
-  const { setDatos, setDatosDetalles } = useVerificacionStore();
+  const { setDatos } = useVerificacionStore();
+  const debouncedInputValue = useDebounce(filtro, 1000);
+
+  const {
+    data: dataVerificacionesCabecera,
+    isLoading: isLoadingVerificacionesCabecera,
+    refetch: refetchVerificaciones,
+  } = useObtenerVerificacionesCabecera({
+    nombreCliente: debouncedInputValue,
+    tipoRuta: filtroRuta,
+  });
 
   const handleLlamarPersona = useCallback(async (telefono: string) => {
     await Linking.openURL(`tel:${telefono}`);
@@ -55,45 +72,46 @@ const VeriPrincipal = () => {
     [setImagenes]
   );
 
-  const handleOpenGuardar = useCallback((nombre: string) => {
-    setNombre(nombre);
+  const handleOpenGuardar = useCallback((cliente: IVerificacionesCabecera) => {
+    setCliente(cliente);
     setOpenGuardar(true);
   }, []);
 
   const handleChangePage = useCallback(
-    (item: IVerificacionPruebaCabecera) => {
+    (item: IVerificacionesCabecera) => {
       setDatos(item);
-      setDatosDetalles();
       router.push("/principal/verificaciones/verifcaciones-detalles");
     },
-    [router, setDatos, setDatosDetalles]
+    [router, setDatos]
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IVerificacionPruebaCabecera; index: number }) => (
+    ({ item }: { item: IVerificacionesCabecera }) => (
       <Card style={styles.cardStyle}>
         <TouchableOpacity onPress={() => handleChangePage(item)}>
           <HeaderCard
-            labelLeft={item.tipoVerificacion}
-            labelRight={item.fechaVerificacion}
+            labelLeft={
+              item.codigoTipoDeRuta === 1
+                ? "VERIFICACION DOMICILIO"
+                : "VERIFICACION TRABAJO"
+            }
+            labelRight={format(item.fecha, "dd-MM-yyyy")}
           />
           <Separador />
           <TextCard
-            titulo={item.nombreCliente}
-            subtitulo={item.cedulaCliente}
+            titulo={`${item.apellidos} ${item.nombres}`}
+            subtitulo={item.identificacion}
           />
-          <Text style={styles.textDescripcion}>{item.direccionCliente}</Text>
+          <Text style={styles.textDescripcion}>{item.direccion}</Text>
           <Separador />
           <View style={styles.containerIcons}>
-            <Pressable onPress={() => handleOpenImagenes(item.imagenes)}>
+            <Pressable onPress={() => handleOpenImagenes([])}>
               <FontAwesome5 name="images" color={NEGRO} size={30} />
             </Pressable>
-            <Pressable
-              onPress={() => handleLlamarPersona(item.telefonoCliente)}
-            >
+            <Pressable onPress={() => handleLlamarPersona(item.telefono)}>
               <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
             </Pressable>
-            <Pressable onPress={() => handleOpenGuardar(item.nombreCliente)}>
+            <Pressable onPress={() => handleOpenGuardar(item)}>
               <FontAwesome5 name="plus" color={NEGRO} size={30} />
             </Pressable>
           </View>
@@ -116,6 +134,16 @@ const VeriPrincipal = () => {
     setOpenGuardar(false);
   }, []);
 
+  const handleSelect = useCallback((value: IDatosSelect) => {
+    if (value.value === "todos") {
+      setFiltroRuta(null);
+    } else if (value.value === "domicilio") {
+      setFiltroRuta(1);
+    } else {
+      setFiltroRuta(2);
+    }
+  }, []);
+
   return (
     <View>
       <Header title="Verificaciones" />
@@ -123,6 +151,7 @@ const VeriPrincipal = () => {
         <InputCustom
           placeholder="Buscar"
           styleContainer={styles.styleInput}
+          onChangeText={setFiltro}
           leftIcon={
             <Ionicons
               name="search"
@@ -132,6 +161,7 @@ const VeriPrincipal = () => {
           }
         />
         <Select
+          onSelect={handleSelect}
           datos={[
             { label: "TODOS", value: "todos" },
             { label: "VERIFICACION DOMICILIO", value: "domicilio" },
@@ -141,9 +171,22 @@ const VeriPrincipal = () => {
         />
         <FlatList
           style={{ height: convertirTamanoVertical(600) }}
-          data={cabeceraVerificacionPrueba}
+          data={dataVerificacionesCabecera}
+          keyExtractor={(item, index) => item.identificacion + index}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<EmptyList />}
+          ListFooterComponent={
+            <LoadingComponent isLoading={isLoadingVerificacionesCabecera} />
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoadingVerificacionesCabecera}
+              onRefresh={refetchVerificaciones}
+              colors={["#007AFF"]}
+              tintColor="#007AFF"
+            />
+          }
         />
       </View>
       {openImagenes && (
@@ -153,9 +196,9 @@ const VeriPrincipal = () => {
           visible={openImagenes}
         />
       )}
-      {openGuardar && (
+      {openGuardar && cliente && (
         <ModalRealizarVerificacion
-          cliente={nombre}
+          cliente={cliente}
           onClose={handleCloseGuardar}
           visible={openGuardar}
         />
