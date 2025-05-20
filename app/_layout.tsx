@@ -21,13 +21,12 @@ import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authApi } from "@/api/auth";
 import NetInfo from "@react-native-community/netinfo";
-import { DrizzleStudioInitializer } from "@/helper/provider/DizzlieSudioInitializer";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 export const DATABASE_NAME = "cobranza";
 const expoDB = openDatabaseSync(DATABASE_NAME);
-export const db = drizzle(expoDB);
+export const db = drizzle(expoDB, { logger: true });
 
 export default function RootLayout() {
   const [cargaInicial, setCargaInicial] = useState(false);

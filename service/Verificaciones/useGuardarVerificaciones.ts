@@ -24,8 +24,7 @@ export const useGuardarVerificaciones = (
       queryClient.invalidateQueries({ queryKey: verificacionesKeys.todos() });
     },
     onError: (error: any) => {
-      console.log("Error en insertar la verificacion", error);
-      Toast.error("Error al guardar la gestion ");
+      Toast.error(error.message);
     },
     ...mutationOptios,
   });

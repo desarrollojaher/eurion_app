@@ -25,17 +25,20 @@ import { useSession } from "@/helper/provider/Auth";
 import uuid from "react-native-uuid";
 import { IImagenesVerificaciones } from "@/models/IImagenes";
 import { useGuardarVerificaciones } from "@/service/Verificaciones/useGuardarVerificaciones";
+import { router } from "expo-router";
 
 interface PropsModalRealizarVerificacion {
   visible: boolean;
   onClose: () => void;
   cliente: IVerificacionesCabecera;
+  seccion: "cabecera" | "detalles";
 }
 
 const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   onClose,
   visible,
   cliente,
+  seccion,
 }) => {
   const [visibleCamara, setVisibleCamara] = useState(false);
   const [calificacion, setCalificacion] = useState<IDatosSelect>();
@@ -92,15 +95,19 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   }, []);
 
   const handleGuardarGestion = useCallback(async () => {
-    if (imagenes.length < 3) {
-      Toast.error("Debe ingresar minimo 3 imagenes");
-      return;
-    }
-
     if (!calificacion) {
       Toast.error("Seleccione la calificación");
       return;
     }
+
+    if (
+      imagenes.length < 3 &&
+      (calificacion.value === "1" || calificacion.value === "2")
+    ) {
+      Toast.error("Debe ingresar minimo 3 imagenes");
+      return;
+    }
+
     if (observaciones.length < 5) {
       Toast.error("Ingrese una observacion");
       return;
@@ -138,8 +145,12 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       id: uuidv4,
       imagenes: imgs,
     };
+
     guardarVerificacion(datos, {
       onSuccess: () => {
+        if (seccion === "detalles") {
+          router.back();
+        }
         onClose();
         setLoadingGuardado(false);
       },
@@ -156,6 +167,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
     imagenes,
     observaciones,
     onClose,
+    seccion,
     usuario?.identificacion,
   ]);
 

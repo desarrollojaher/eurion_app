@@ -13,6 +13,9 @@ export interface IVerificacionesCabecera {
   apellidos: string;
   direccion: string;
   telefono: string;
+  direccionTrabajo: string;
+  fotoCliente: string;
+  fotoDomicilio: string;
 }
 
 export interface IVerificacionesCabeceraParams {
@@ -53,4 +56,12 @@ export interface IActualizarVerificacion {
   calificacion: number;
   codigoTipoGestion: number;
   identificacionCliente: string;
+  reversar: boolean;
+}
+
+export interface IVerificacionesEliminar {
+  id: string;
+  cedulaCliente: string;
+  calificacion: number;
+  tipoGestion: number;
 }

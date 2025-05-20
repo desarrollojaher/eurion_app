@@ -4,3 +4,13 @@ export interface IImagenesVerificaciones {
   nombre: string;
   imagen: string;
 }
+
+export interface IImagenCliente {
+  fotoCliente: string;
+  cedulaCliente: string;
+}
+
+export interface IImagenDomicilio {
+  fotoDelDomicilio: string;
+  cedulaCliente: string;
+}

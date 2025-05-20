@@ -7,6 +7,11 @@ import m0002 from './0002_regular_mad_thinker.sql';
 import m0003 from './0003_flippant_the_renegades.sql';
 import m0004 from './0004_flashy_goliath.sql';
 import m0005 from './0005_fearless_harry_osborn.sql';
+import m0006 from './0006_sour_kabuki.sql';
+import m0007 from './0007_bumpy_namora.sql';
+import m0008 from './0008_living_boomer.sql';
+import m0009 from './0009_dear_pet_avengers.sql';
+import m0010 from './0010_misty_magma.sql';
 
   export default {
     journal,
@@ -16,7 +21,12 @@ m0001,
 m0002,
 m0003,
 m0004,
-m0005
+m0005,
+m0006,
+m0007,
+m0008,
+m0009,
+m0010
     }
   }
   

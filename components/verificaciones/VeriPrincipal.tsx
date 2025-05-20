@@ -36,6 +36,8 @@ import { useDebounce } from "@/hooks/debounce";
 import { format } from "date-fns";
 import LoadingComponent from "../commons/FlatList/LoadingComponent";
 import EmptyList from "../commons/FlatList/EmptyList";
+import { dbSqliteService } from "@/service/db/db";
+import { set } from "lodash";
 
 const VeriPrincipal = () => {
   const [openImagenes, setOpenImagenes] = useState(false);
@@ -64,13 +66,24 @@ const VeriPrincipal = () => {
     await Linking.openURL(`tel:${telefono}`);
   }, []);
 
-  const handleOpenImagenes = useCallback(
-    (data: IImagenCompleta[]) => {
-      setImagenes(data);
-      setOpenImagenes(true);
-    },
-    [setImagenes]
-  );
+  const handleOpenImagenes = useCallback((item: IVerificacionesCabecera) => {
+    const imagenesLista: IImagenCompleta[] = [];
+    if (item.fotoCliente) {
+      imagenesLista.push({
+        titulo: "FOTO CLIENTE",
+        url: item.fotoCliente.split(",")[1],
+      });
+    }
+    if (item.fotoDomicilio) {
+      imagenesLista.push({
+        titulo: "FOTO DOMICILIO",
+        url: item.fotoDomicilio.split(",")[1],
+      });
+    }
+
+    setImagenes(imagenesLista);
+    setOpenImagenes(true);
+  }, []);
 
   const handleOpenGuardar = useCallback((cliente: IVerificacionesCabecera) => {
     setCliente(cliente);
@@ -102,10 +115,14 @@ const VeriPrincipal = () => {
             titulo={`${item.apellidos} ${item.nombres}`}
             subtitulo={item.identificacion}
           />
-          <Text style={styles.textDescripcion}>{item.direccion}</Text>
+          <Text style={styles.textDescripcion}>
+            {item.codigoTipoDeRuta === 1
+              ? item.direccion
+              : item.direccionTrabajo}
+          </Text>
           <Separador />
           <View style={styles.containerIcons}>
-            <Pressable onPress={() => handleOpenImagenes([])}>
+            <Pressable onPress={() => handleOpenImagenes(item)}>
               <FontAwesome5 name="images" color={NEGRO} size={30} />
             </Pressable>
             <Pressable onPress={() => handleLlamarPersona(item.telefono)}>
@@ -201,6 +218,7 @@ const VeriPrincipal = () => {
           cliente={cliente}
           onClose={handleCloseGuardar}
           visible={openGuardar}
+          seccion="cabecera"
         />
       )}
     </View>

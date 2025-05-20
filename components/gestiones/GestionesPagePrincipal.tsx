@@ -31,12 +31,17 @@ import ModalFiltros from "./modal/ModalFiltros";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import { router } from "expo-router";
+import { useObtenerGestionesCabecera } from "@/service/gestiones/useObtenerGestionesCabecera";
 
 const GestionesPagePrincipal = () => {
   const [modalFiltros, setModalFiltros] = useState(false);
   const [modalCarrucel, setModalCarrucel] = useState(false);
   const [modalGestionar, setModalGestionar] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+
+  const { data: datosGestiones } = useObtenerGestionesCabecera({});
+
+  console.log("Datos de gestiones ==> ", datosGestiones?.length);
 
   const handleOpenImagenes = useCallback((data: IImagenCompleta[]) => {
     setImagenes(data);

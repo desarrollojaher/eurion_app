@@ -62,6 +62,69 @@ export const useSincronizacion = () => {
       setCantidadDatos(zona.length);
       await dbSqliteService.deleteZona();
       await dbSqliteService.insertarZona(zona);
+
+      // //sincronizar imagenes
+      // setIndex(6);
+      // setTabla("Imagenes clientes");
+      // await dbSqliteService.deleteImagenes();
+      // let siguiente = true;
+      // let i = 0;
+      // do {
+      //   const imagenes = await sincronizacionApi.imagenCliente({
+      //     itemPagina: 30,
+      //     paginaActual: i,
+      //   });
+
+      //   setCantidadDatos(imagenes.totalPaginas * 30);
+
+      //   if (imagenes.datos.length > 0) {
+      //     await dbSqliteService.insertarImagenCliente(imagenes.datos);
+      //   }
+      //   if (imagenes.paginaSiguiente) {
+      //     i = imagenes.paginaSiguiente;
+      //   } else {
+      //     siguiente = false;
+      //   }
+      // } while (siguiente);
+
+      // //sincronizacion de mapa domicilio
+      // setIndex(7);
+      // setTabla("Imagenes domicilio");
+      // await dbSqliteService.deleteImagenes();
+      // siguiente = true;
+      // i = 0;
+      // do {
+      //   const imagenes = await sincronizacionApi.imagenDomicilio({
+      //     itemPagina: 30,
+      //     paginaActual: i,
+      //   });
+
+      //   setCantidadDatos(imagenes.totalPaginas * 30);
+
+      //   if (imagenes.datos.length > 0) {
+      //     await dbSqliteService.insertarImagenDomicilio(imagenes.datos);
+      //   }
+      //   if (imagenes.paginaSiguiente) {
+      //     i = imagenes.paginaSiguiente;
+      //   } else {
+      //     siguiente = false;
+      //   }
+      // } while (siguiente);
+
+      setIndex(8);
+      setTabla("documentos cobranza");
+      const documentos = await sincronizacionApi.documentos();
+      setCantidadDatos(documentos.length);
+      await dbSqliteService.deleteDocumentos();
+      await dbSqliteService.insertarDocumentos(documentos);
+
+      setIndex(9);
+      setTabla("Gestiones cobranza");
+      const gcobanza = await sincronizacionApi.enviarGcobranza();
+      setCantidadDatos(gcobanza.length);
+      await dbSqliteService.deleteGcobranza();
+      await dbSqliteService.insertarGCobranza(gcobanza);
+
       setLoading(false);
       setSincronizado(true);
     } catch (error: any) {
@@ -72,7 +135,7 @@ export const useSincronizacion = () => {
       }
       setError(true);
       setLoading(false);
-      console.log("Error en la sincoizacion", error);
+      console.log("Error en la sincoizacion", JSON.stringify(error));
     }
   };
 

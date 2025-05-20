@@ -12,4 +12,5 @@ export interface IUsuarioGeneral {
   observacion: string;
   referencias: string;
   telefono: string;
+  detalleAdicional: string;
 }

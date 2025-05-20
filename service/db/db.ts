@@ -6,21 +6,40 @@ import {
   ISincronizarVerificaciones,
   ISincronizarZona,
 } from "@/models/ISincronizar";
-import { and, asc, eq, gte, like, sql } from "drizzle-orm";
+import { and, asc, eq, gt, gte, like, ne, sql } from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacionDetalles,
   IVerificacionDetallesParams,
   IVerificacionesCabecera,
   IVerificacionesCabeceraParams,
+  IVerificacionesEliminar,
   IVerificacionesGuardar,
 } from "@/models/IVerificaciones";
 import { db } from "@/app/_layout";
+import {
+  ISubirInformacion,
+  ISubirInformacionEliminar,
+} from "@/models/ISubirInformacion";
+import { IImagenCliente, IImagenDomicilio } from "@/models/IImagenes";
+import { unionBy } from "lodash";
+import { IDocumentos } from "@/models/IDocumentos";
+import { IEnviarGcobranza } from "@/models/IEnviarGcobranza";
+import { format } from "date-fns";
+import { IGestiones } from "@/models/IGestiones";
 
 export const dbSqliteService = {
   insertarVerificaciones: async (datos: ISincronizarVerificaciones[]) => {
     try {
-      await db.insert(schema.verificacionesTable).values(datos);
+      await db
+        .insert(schema.verificacionesTable)
+        .values(datos)
+        .onConflictDoNothing({
+          target: [
+            schema.verificacionesTable.identificacionCliente,
+            schema.verificacionesTable.codigoTipoRuta,
+          ],
+        });
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -73,10 +92,59 @@ export const dbSqliteService = {
       throw JSON.stringify(mensajeExtraido);
     }
   },
+  insertarDocumentos: async (datos: IDocumentos[]) => {
+    try {
+      await db.insert(schema.documentosGcobranzaTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+  insertarGCobranza: async (datos: IEnviarGcobranza[]) => {
+    try {
+      await db.insert(schema.enviarGcobranzaCelularTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+  insertarImagenCliente: async (datos: IImagenCliente[]) => {
+    try {
+      await db.insert(schema.fotoClienteTable).values(datos);
+
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarImagenDomicilio: async (datos: IImagenDomicilio[]) => {
+    try {
+      await db.insert(schema.fotoDomicilioTable).values(datos);
+
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
 
   deleteVerificaciones: async () => {
     try {
-      await db.delete(schema.verificacionesTable);
+      await db
+        .delete(schema.verificacionesTable)
+        .where(eq(schema.verificacionesTable.esVerificado, 0));
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -127,6 +195,37 @@ export const dbSqliteService = {
     }
   },
 
+  deleteDocumentos: async () => {
+    try {
+      await db.delete(schema.documentosGcobranzaTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+  deleteGcobranza: async () => {
+    try {
+      await db.delete(schema.enviarGcobranzaCelularTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  deleteImagenes: async () => {
+    try {
+      await db.delete(schema.imagenVerificacionTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
   obtenerVerificacionesCabecera: async (
     params: IVerificacionesCabeceraParams
   ) => {
@@ -153,8 +252,9 @@ export const dbSqliteService = {
           nombres: schema.clientesTable.nombres,
           apellidos: schema.clientesTable.apellidos,
           direccion: schema.direccionTable.direccion,
-          // fotoCliente: fot.FOTO_CLIENTE,
-          // mapaDelDomicilio: map.MAPA_DEL_DOMICILIO,
+          direccionTrabajo: schema.clientesTable.direccionEmpresa,
+          fotoCliente: schema.fotoClienteTable.fotoCliente,
+          fotoDomicilio: schema.fotoDomicilioTable.fotoDelDomicilio,
           telefono: schema.clientesTable.telefono,
         })
         .from(schema.verificacionesTable)
@@ -169,6 +269,20 @@ export const dbSqliteService = {
           schema.direccionTable,
           eq(
             schema.direccionTable.identificacionCliente,
+            schema.verificacionesTable.identificacionCliente
+          )
+        )
+        .leftJoin(
+          schema.fotoClienteTable,
+          eq(
+            schema.fotoClienteTable.identificacionCliente,
+            schema.verificacionesTable.identificacionCliente
+          )
+        )
+        .leftJoin(
+          schema.fotoDomicilioTable,
+          eq(
+            schema.fotoDomicilioTable.identificacionCliente,
             schema.verificacionesTable.identificacionCliente
           )
         )
@@ -198,7 +312,8 @@ export const dbSqliteService = {
             dependientes: schema.clientesTable.nroDependientes,
             telefono: schema.clientesTable.telefono,
             observacion: schema.clientesTable.observacion,
-            referencias: schema.direccionTable.observacionesAdicionales,
+            referencias: schema.clientesTable.referencias,
+            detalleAdicional: schema.direccionTable.observacionesAdicionales,
           },
           buro: {
             categoria: schema.clientesTable.categoria,
@@ -227,7 +342,7 @@ export const dbSqliteService = {
             jefe: schema.clientesTable.nombreJefe,
             ingresos: schema.clientesTable.ingresos,
             telEmpresa: schema.clientesTable.telefonoEmpresa,
-            celJefe: schema.clientesTable.telefonoEmpresa,
+            celJefe: schema.clientesTable.celularJefe,
             dirEmpresa: schema.clientesTable.direccionEmpresa,
           },
           actividadEconomicaConyugue: {
@@ -280,13 +395,13 @@ export const dbSqliteService = {
     }
   },
 
+  /// se maneja los errores de esta forma ya que el hook de tanskquery puede obtener un objeto
   actualizarVerificaciones: async (data: IActualizarVerificacion) => {
     try {
-      await db
+      const query = await db
         .update(schema.verificacionesTable)
         .set({
-          esVerificado:
-            data.calificacion === 3 ? 2 : data.calificacion === 4 ? 9 : 1,
+          esVerificado: data.calificacion,
         })
         .where(
           and(
@@ -298,49 +413,261 @@ export const dbSqliteService = {
               schema.verificacionesTable.identificacionCliente,
               data.identificacionCliente
             ),
-            eq(schema.verificacionesTable.esVerificado, 0)
+            !data.reversar
+              ? eq(schema.verificacionesTable.esVerificado, 0)
+              : gt(schema.verificacionesTable.esVerificado, 0)
           )
         );
-    } catch (error: any) {
-      const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido =
-        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
-      console.log(error);
-      throw JSON.stringify(mensajeExtraido);
-    }
-  },
-
-  guardarGestionesVerificacion: async (data: IVerificacionesGuardar) => {
-    try {
-      await dbSqliteService.actualizarVerificaciones({
-        calificacion: data.calificacion,
-        codigoTipoGestion: data.codigoTipoGestion,
-        identificacionCliente: data.identificacionAgente,
-      });
-      if (data.calificacion === 1 || data.calificacion === 2) {
-        await db.insert(schema.verificacionesResultadoTable).values({
-          observaciones: data.observaciones,
-          codigoDireccion: data.codigoDireccion,
-          codigoTipoGestion: data.codigoTipoRuta,
-          codigoTipoRuta: data.codigoTipoRuta,
-          fecha: data.fecha,
-          identificacionAgente: data.identificacionAgente,
-          identificacionCliente: data.identificacionCliente,
-          latitud: data.latitud,
-          longitud: data.longitud,
-          verificacion: data.calificacion,
-          id: data.id, // es un uuid
-        });
-
-        await db.insert(schema.imagenVerificacionTable).values(data.imagenes);
-        return true;
+      if (query.changes === 0) {
+        throw {
+          message: "No se ejecuto ninguna actualizacion en verificaciones",
+        };
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
-      console.log(error);
-      throw JSON.stringify(mensajeExtraido);
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  guardarGestionesVerificacion: async (data: IVerificacionesGuardar) => {
+    try {
+      await db.run("BEGIN TRANSACTION");
+      await dbSqliteService.actualizarVerificaciones({
+        calificacion:
+          data.calificacion === 3 ? 2 : data.calificacion === 4 ? 9 : 1,
+        codigoTipoGestion: data.codigoTipoGestion,
+        identificacionCliente: data.identificacionCliente,
+        reversar: false,
+      });
+
+      if (data.calificacion === 1 || data.calificacion === 2) {
+        const insertVeri = await db
+          .insert(schema.verificacionesResultadoTable)
+          .values({
+            observaciones: data.observaciones,
+            codigoDireccion: data.codigoDireccion,
+            codigoTipoGestion: data.codigoTipoRuta,
+            codigoTipoRuta: data.codigoTipoRuta,
+            fecha: data.fecha,
+            identificacionAgente: data.identificacionAgente,
+            identificacionCliente: data.identificacionCliente,
+            latitud: data.latitud,
+            longitud: data.longitud,
+            verificacion: data.calificacion,
+            id: data.id, // es un uuid
+          });
+
+        const insertImg = await db
+          .insert(schema.imagenVerificacionTable)
+          .values(data.imagenes);
+
+        if (insertImg.changes === 0 || insertVeri.changes === 0) {
+          // tx.rollback();
+          throw { message: "No se pudo guardar la verificacion" };
+        }
+      }
+      await db.run("COMMIT");
+      return true;
+    } catch (error: any) {
+      await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerDatosSubirVerificacion: async () => {
+    try {
+      const verificaciones = await db
+        .select({
+          id: schema.verificacionesResultadoTable.id,
+          tipoGestion: sql`CASE WHEN ${schema.verificacionesResultadoTable.codigoTipoGestion} = 1 THEN 'VERIFICACION DOMICILIO' WHEN ${schema.verificacionesResultadoTable.codigoTipoGestion} = 2 THEN 'VERIFICACION TRABAJO' END`,
+          fecha: schema.verificacionesResultadoTable.fecha,
+          cliente: sql`(${schema.clientesTable.apellidos} || ' ' || ${schema.clientesTable.nombres})`,
+          calificacion: sql`CASE WHEN ${schema.verificacionesResultadoTable.verificacion} = 1 THEN 'POSITIVA' WHEN ${schema.verificacionesResultadoTable.verificacion} = 2 THEN 'NEGATIVA' END`,
+          factura: sql`'VERIFICACION'`,
+          identificacionCliente: schema.clientesTable.identificacion,
+        })
+        .from(schema.verificacionesResultadoTable)
+        .leftJoin(
+          schema.clientesTable,
+          eq(
+            schema.verificacionesResultadoTable.identificacionCliente,
+            schema.clientesTable.identificacion
+          )
+        );
+
+      const verificaciones2 = await db
+        .select({
+          id: schema.verificacionesTable.identificacionCliente,
+          tipoGestion: sql`CASE WHEN ${schema.verificacionesTable.codigoTipoRuta} = 1 THEN 'VERIFICACION DOMICILIO' WHEN ${schema.verificacionesTable.codigoTipoRuta} = 2 THEN 'VERIFICACION TRABAJO' END`,
+          fecha: schema.verificacionesTable.fecha,
+          cliente: sql`(${schema.clientesTable.apellidos} || ' ' || ${schema.clientesTable.nombres})`,
+          calificacion: sql`CASE WHEN ${schema.verificacionesTable.esVerificado} = 2 THEN 'REASIGNAR' WHEN ${schema.verificacionesTable.esVerificado} = 9 THEN 'ANULAR' END`,
+          factura: sql`'VERIFICACION'`,
+          identificacionCliente:
+            schema.verificacionesTable.identificacionCliente,
+        })
+        .from(schema.verificacionesTable)
+        .innerJoin(
+          schema.clientesTable,
+          eq(
+            schema.verificacionesTable.identificacionCliente,
+            schema.clientesTable.identificacion
+          )
+        )
+        .where(
+          and(
+            ne(schema.verificacionesTable.esVerificado, 0),
+            eq(schema.verificacionesTable.sincronizado, 0)
+          )
+        );
+
+      //une los datos de verificaciones y verificaciones2
+      const unionData = unionBy(
+        verificaciones,
+        verificaciones2,
+        (item) =>
+          `${item.cliente}-${item.factura}-${item.identificacionCliente}-${item.tipoGestion}`
+      );
+
+      const verificacionesSubir: ISubirInformacion[] = unionData;
+
+      return verificacionesSubir;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerInfoSubir: async () => {
+    try {
+      const verificaciones =
+        await dbSqliteService.obtenerDatosSubirVerificacion();
+
+      return verificaciones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarVerificaciones: async (datos: IVerificacionesEliminar) => {
+    try {
+      const res = await db
+        .delete(schema.verificacionesResultadoTable)
+        .where(
+          and(
+            eq(
+              schema.verificacionesResultadoTable.codigoTipoGestion,
+              datos.tipoGestion
+            ),
+            eq(
+              schema.verificacionesResultadoTable.verificacion,
+              datos.calificacion
+            ),
+            eq(
+              schema.verificacionesResultadoTable.identificacionCliente,
+              datos.cedulaCliente
+            )
+          )
+        );
+
+      const deleteImagen = await db
+        .delete(schema.imagenVerificacionTable)
+        .where(eq(schema.imagenVerificacionTable.idVerificacion, datos.id));
+
+      if (res.changes === 0 || deleteImagen.changes === 0) {
+        throw { message: "Error al eliminar la gestion" };
+      }
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarInformacionGestionada: async (datos: ISubirInformacionEliminar) => {
+    try {
+      const tipoGestion =
+        datos.tipoGestion === "VERIFICACION DOMICILIO" ? 1 : 2;
+
+      const calificacion = datos.calificacion === "POSITIVA" ? 1 : 2;
+      if (datos.modulo === "verificacion") {
+        await dbSqliteService.eliminarVerificaciones({
+          calificacion: calificacion,
+          cedulaCliente: datos.identificacionCliente,
+          tipoGestion: tipoGestion,
+          id: datos.id,
+        });
+
+        await dbSqliteService.actualizarVerificaciones({
+          calificacion: 0,
+          codigoTipoGestion: tipoGestion,
+          identificacionCliente: datos.identificacionCliente,
+          reversar: true,
+        });
+      }
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerCabeceraGestiones: async () => {
+    try {
+      const cabeceraGestiones: IGestiones[] = await db
+        .selectDistinct({
+          nroDocumento: schema.enviarGcobranzaCelularTable.nroDocumento,
+          identificacionCliente:
+            schema.enviarGcobranzaCelularTable.identificacionCliente,
+          fechaAdicion: schema.enviarGcobranzaCelularTable.fecha,
+          deudaTotal: schema.documentosGcobranzaTable.deudaTotal,
+          saldoVencido: schema.documentosGcobranzaTable.saldoVencido,
+          tramo: schema.documentosGcobranzaTable.tramo,
+          apellidos: schema.enviarGcobranzaCelularTable.apellidoCliente,
+          nombres: schema.enviarGcobranzaCelularTable.nombreCliente,
+          direccion: schema.enviarGcobranzaCelularTable.direccion,
+          latitud: schema.enviarGcobranzaCelularTable.latitud,
+          longitud: schema.enviarGcobranzaCelularTable.logitud,
+          zonaNombre: schema.zonaTable.nombres,
+        })
+        .from(schema.enviarGcobranzaCelularTable)
+        .innerJoin(
+          schema.documentosGcobranzaTable,
+          eq(
+            schema.enviarGcobranzaCelularTable.identificacionCliente,
+            schema.documentosGcobranzaTable.identificacionCliente
+          )
+        )
+        .leftJoin(
+          schema.zonaTable,
+          eq(
+            schema.zonaTable.codigo,
+            schema.enviarGcobranzaCelularTable.codigoZona
+          )
+        )
+        .where(
+          eq(
+            schema.enviarGcobranzaCelularTable.periodo,
+            Number(format(new Date(), "yyyyMM"))
+          )
+        );
+      return cabeceraGestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
     }
   },
 };

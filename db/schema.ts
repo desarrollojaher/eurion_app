@@ -1,4 +1,4 @@
-import { blob } from "drizzle-orm/sqlite-core";
+import { unique } from "drizzle-orm/sqlite-core";
 import { integer } from "drizzle-orm/sqlite-core";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 export const usuarioTable = sqliteTable("usuario", {
@@ -11,15 +11,27 @@ export const usuarioTable = sqliteTable("usuario", {
   updatedAt: int().notNull(),
 });
 
-export const verificacionesTable = sqliteTable("verificaciones", {
-  fecha: text(),
-  identificacionCliente: text(),
-  codigoDireccion: text(),
-  codigoZona: text(),
-  identificacionAgente: text(),
-  codigoTipoRuta: int(),
-  esVerificado: int(),
-});
+export const verificacionesTable = sqliteTable(
+  "verificaciones",
+  {
+    fecha: text(),
+    identificacionCliente: text(),
+    codigoDireccion: text(),
+    codigoZona: text(),
+    identificacionAgente: text(),
+    codigoTipoRuta: int(),
+    esVerificado: int(),
+    sincronizado: int().default(0),
+  },
+  (table) => {
+    return {
+      uniqueConstraint: unique().on(
+        table.identificacionCliente,
+        table.codigoTipoRuta
+      ),
+    };
+  }
+);
 
 export const clientesTable = sqliteTable("clientes", {
   identificacion: text().unique(),
@@ -87,12 +99,12 @@ export const zonaTable = sqliteTable("zona", {
 
 export const fotoClienteTable = sqliteTable("foto_cliente", {
   identificacionCliente: text(),
-  fotoCliente: blob(),
+  fotoCliente: text(),
 });
 
 export const fotoDomicilioTable = sqliteTable("foto_del_domicilio", {
   identificacionCliente: text(),
-  fotoDelDomicilio: blob(),
+  fotoDelDomicilio: text(),
 });
 
 export const verificacionesResultadoTable = sqliteTable(
@@ -109,6 +121,7 @@ export const verificacionesResultadoTable = sqliteTable(
     latitud: integer({ mode: "number" }),
     longitud: integer({ mode: "number" }),
     codigoTipoRuta: int(),
+    sincronizado: int().default(0),
   }
 );
 
@@ -117,4 +130,48 @@ export const imagenVerificacionTable = sqliteTable("imagen_verificacion", {
   idVerificacion: text(),
   nombre: text(),
   imagen: text(),
+  sincronizado: int().default(0),
 });
+
+// tablas para la parte de gcobranza
+export const documentosGcobranzaTable = sqliteTable("documentos_gcobranza", {
+  identificacionCliente: text(),
+  numeroDePagos: int(),
+  monto: integer({ mode: "number" }),
+  montoCancelado: integer({ mode: "number" }),
+  fechaEmision: text(),
+  fechaVencimiento: text(),
+  nroDocumento: text(),
+  interesMora: integer({ mode: "number" }),
+  tramo: text(),
+  gastosDeCobranza: integer({ mode: "number" }),
+  valorTotalVencido: integer({ mode: "number" }),
+  deudaTotal: integer({ mode: "number" }),
+  cuotasPagadas: text(),
+  cuotasPendientes: text(),
+  fechaUltimoPago: text(),
+  totalPendiente: integer({ mode: "number" }),
+  saldoVencido: integer({ mode: "number" }),
+  estado: int(),
+  saldoDelCredito: integer({ mode: "number" }),
+  valorCuota: integer({ mode: "number" }),
+});
+
+export const enviarGcobranzaCelularTable = sqliteTable(
+  "enviar_gcobranza_celular",
+  {
+    nroDocumento: text(),
+    identificacionCliente: text(),
+    codigoCargo: int(),
+    fecha: text(),
+    periodo: int(),
+    codigoZona: text(),
+    esGestionado: int(),
+    nombreCliente: text(),
+    apellidoCliente: text(),
+    observaciones: text(),
+    latitud: integer({ mode: "number" }),
+    logitud: integer({ mode: "number" }),
+    direccion: text(),
+  }
+);

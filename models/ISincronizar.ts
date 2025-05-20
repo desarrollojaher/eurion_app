@@ -1,3 +1,5 @@
+import { IImagenCliente, IImagenDomicilio } from "./IImagenes";
+
 export interface ISincronizarVerificaciones {
   fecha: string;
   identificacionCliente: string;
@@ -72,3 +74,25 @@ export interface ISincronizarZona {
   codigo: string;
   nombres: string;
 }
+
+export interface ISincronizarImagenCliente {
+  totalPaginas: number;
+  paginaActual: number;
+  itemsPorPagina: number;
+  paginaSiguiente: number | null;
+  datos: IImagenCliente[];
+}
+
+export interface ISincronizarimagenesDomicilio {
+  totalPaginas: number;
+  paginaActual: number;
+  itemsPorPagina: number;
+  paginaSiguiente: number | null;
+  datos: IImagenDomicilio[];
+}
+
+export interface ISincronizarImagenesParams {
+  paginaActual: number;
+  itemPagina: number;
+}
+

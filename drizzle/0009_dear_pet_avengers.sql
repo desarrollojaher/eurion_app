@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `verificaciones_identificacionCliente_codigoTipoRuta_unique` ON `verificaciones` (`identificacionCliente`,`codigoTipoRuta`);

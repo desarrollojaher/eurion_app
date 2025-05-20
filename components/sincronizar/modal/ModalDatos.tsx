@@ -27,7 +27,7 @@ const ModalDatos: React.FC<PropsModalDatos> = ({
     <ModalCustom
       onClose={onClose}
       visible={visible}
-      titulo={`Descargando ${index}/5`}
+      titulo={`Descargando ${index}/9`}
     >
       <LottieAnimation resource={resource} />
       <Text style={styles.texto}>

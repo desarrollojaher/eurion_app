@@ -3,7 +3,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "http://172.17.28.87:3001",
-  timeout: 3000,
+  timeout: 30000,
 });
 
 type ApiMethods = {

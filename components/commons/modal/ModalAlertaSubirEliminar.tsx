@@ -16,6 +16,7 @@ interface PropsModalAlertaSubirEliminar {
   handleSubir?: () => void;
   handleEliminar?: () => void;
   subidaGeneral?: boolean;
+  isLoading: boolean;
 }
 
 const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
@@ -25,6 +26,7 @@ const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
   handleEliminar,
   handleSubir,
   subidaGeneral,
+  isLoading,
 }) => {
   const animation = useMemo(() => {
     if (tipo === "subir") {
@@ -33,21 +35,23 @@ const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
       return require("../../../assets/animations/delete.json");
     }
   }, [tipo]);
+  const onCloseModal = useCallback(() => {
+    if (!isLoading) onClose();
+  }, [isLoading, onClose]);
   const handleAccion = useCallback(() => {
     if (tipo === "subir") {
       handleSubir && handleSubir();
     } else {
       handleEliminar && handleEliminar();
     }
-    onClose();
-  }, [handleEliminar, handleSubir, onClose, tipo]);
+  }, [handleEliminar, handleSubir, tipo]);
 
   return (
-    <ModalCustom onClose={onClose} visible={visible} titulo="Alerta">
+    <ModalCustom onClose={onCloseModal} visible={visible} titulo="Alerta">
       <LottieAnimation resource={animation} />
       {!subidaGeneral ? (
         <Text style={styles.tituloStyle}>
-          El archivo se {tipo === "subir" ? "subira" : "eliminara"}
+          El archivo se {tipo === "subir" ? "subirá" : "eliminará"}
           {tipo === "subir" ? " al sistema" : " de forma permanente"}
         </Text>
       ) : (
@@ -64,11 +68,15 @@ const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
           label="Salir"
           style={styles.styleButtonSalir}
           onPress={onClose}
+          isLoading={isLoading}
+          disabled={isLoading}
         />
         <ButtonCustom
           label={tipo === "subir" ? "Subir" : "Eliminar"}
           style={styles.styleButtonMantener}
           onPress={handleAccion}
+          isLoading={isLoading}
+          disabled={isLoading}
         />
       </View>
     </ModalCustom>

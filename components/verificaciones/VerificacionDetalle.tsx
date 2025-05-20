@@ -62,7 +62,7 @@ const VerificacionDetalle = () => {
           />
           <HeaderCard
             labelLeft="Nombre"
-            labelRight={data?.datosGenerales.nombreCliente}
+            labelRight={`${data?.datosGenerales.apellidoCliente} ${data?.datosGenerales.nombreCliente}`}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
@@ -98,6 +98,13 @@ const VerificacionDetalle = () => {
           <HeaderCard
             labelLeft="Observaciones"
             labelRight={data?.datosGenerales.observacion}
+            styleContainer={styles.rowCardStyle}
+            styleLeft={styles.labelCardLeft}
+            styleRight={styles.labelCardRight}
+          />
+          <HeaderCard
+            labelLeft="Detalle Dirección"
+            labelRight={data?.datosGenerales.detalleAdicional}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
@@ -358,6 +365,7 @@ const VerificacionDetalle = () => {
           cliente={datos}
           onClose={handleCloseModal}
           visible={modalVerificar}
+          seccion="detalles"
         />
       )}
     </View>
