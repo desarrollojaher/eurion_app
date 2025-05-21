@@ -97,15 +97,31 @@ export const zonaTable = sqliteTable("zona", {
   nombres: text(),
 });
 
-export const fotoClienteTable = sqliteTable("foto_cliente", {
-  identificacionCliente: text(),
-  fotoCliente: text(),
-});
+export const fotoClienteTable = sqliteTable(
+  "foto_cliente",
+  {
+    identificacionCliente: text(),
+    fotoCliente: text(),
+  },
+  (table) => {
+    return {
+      uniqueConstraint: unique().on(table.identificacionCliente),
+    };
+  }
+);
 
-export const fotoDomicilioTable = sqliteTable("foto_del_domicilio", {
-  identificacionCliente: text(),
-  fotoDelDomicilio: text(),
-});
+export const fotoDomicilioTable = sqliteTable(
+  "foto_del_domicilio",
+  {
+    identificacionCliente: text(),
+    fotoDelDomicilio: text(),
+  },
+  (table) => {
+    return {
+      uniqueConstraint: unique().on(table.identificacionCliente),
+    };
+  }
+);
 
 export const verificacionesResultadoTable = sqliteTable(
   "verificaciones_resultado",
@@ -171,7 +187,7 @@ export const enviarGcobranzaCelularTable = sqliteTable(
     apellidoCliente: text(),
     observaciones: text(),
     latitud: integer({ mode: "number" }),
-    logitud: integer({ mode: "number" }),
+    longitud: integer({ mode: "number" }),
     direccion: text(),
   }
 );

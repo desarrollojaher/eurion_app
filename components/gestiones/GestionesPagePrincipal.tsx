@@ -2,6 +2,7 @@ import {
   FlatList,
   Linking,
   Pressable,
+  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -25,13 +26,15 @@ import TextCard from "../commons/card/TextCard";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
-import { jsonGestiones } from "@/helper/json/jsonGestiones";
-import { IGstionesPrueba } from "@/models/IGestionesPrueba";
 import ModalFiltros from "./modal/ModalFiltros";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import { router } from "expo-router";
 import { useObtenerGestionesCabecera } from "@/service/gestiones/useObtenerGestionesCabecera";
+import { IGestiones } from "@/models/IGestiones";
+import EmptyList from "../commons/FlatList/EmptyList";
+import LoadingComponent from "../commons/FlatList/LoadingComponent";
+import { formatCurrency } from "@/helper/function/numericas";
 
 const GestionesPagePrincipal = () => {
   const [modalFiltros, setModalFiltros] = useState(false);
@@ -39,15 +42,31 @@ const GestionesPagePrincipal = () => {
   const [modalGestionar, setModalGestionar] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
-  const { data: datosGestiones } = useObtenerGestionesCabecera({});
+  const {
+    data: datosGestiones,
+    isLoading: isLoadingGestiones,
+    refetch: refechGestiones,
+  } = useObtenerGestionesCabecera({});
 
-  console.log("Datos de gestiones ==> ", datosGestiones?.length);
+  const handleOpenImagenes = useCallback((data: IGestiones) => {
+    const imagenesLista: IImagenCompleta[] = [];
+    if (data.imagenCliente) {
+      imagenesLista.push({
+        titulo: "FOTO CLIENTE",
+        url: data.imagenCliente.split(",")[1],
+      });
+    }
+    if (data.imagenDomicilio) {
+      imagenesLista.push({
+        titulo: "FOTO DOMICILIO",
+        url: data.imagenDomicilio.split(",")[1],
+      });
+    }
 
-  const handleOpenImagenes = useCallback((data: IImagenCompleta[]) => {
-    setImagenes(data);
+    setImagenes(imagenesLista);
     setModalCarrucel(true);
   }, []);
-  const handleAbrirGps = useCallback((data: any) => {
+  const handleAbrirGps = useCallback((data: IGestiones) => {
     Linking.openURL(
       `geo:${data.latitud},${data.longitud}?q=${data.latitud},${data.longitud}`
     );
@@ -78,29 +97,27 @@ const GestionesPagePrincipal = () => {
   }, []);
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IGstionesPrueba; index: number }) => (
+    ({ item, index }: { item: IGestiones; index: number }) => (
       <Card style={styles.cardStyle}>
         <TouchableOpacity onPress={handleCambiarPagina}>
           <HeaderCard labelRight="Ruta" />
           <Separador />
           <TextCard
-            titulo={item.nombreCliente}
-            subtitulo={item.cedulaCliente}
+            titulo={`${item.apellidos} ${item.nombres}`}
+            subtitulo={item.identificacionCliente}
           />
-          <Text style={styles.styleText}>
-            DOM CRISTOBAL COLON 1 DOCE DE OCTUBRE CASA DE 3 PISOS
-          </Text>
+          <Text style={styles.styleText}>{item.direccion}</Text>
           <Separador />
           <HeaderCard
             labelLeft="DEUDA TOTAL"
-            labelRight={`$ ${item.deudaTotal}`}
+            labelRight={formatCurrency(Number(item?.deudaTotal ?? "0")) ?? ""}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <HeaderCard
             labelLeft="VENCIDO"
-            labelRight={`$ ${item.vencimineto}`}
+            labelRight={formatCurrency(Number(item?.saldoVencido ?? "0")) ?? ""}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
@@ -114,16 +131,16 @@ const GestionesPagePrincipal = () => {
           />
           <HeaderCard
             labelLeft="ZONA"
-            labelRight="CUENCA ZONA 7 GAYARA (CORR)"
+            labelRight={item.zonaNombre}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
           <View style={styles.containerIcons}>
-            <Pressable onPress={() => handleOpenImagenes(item.imagenes)}>
+            <Pressable onPress={() => handleOpenImagenes(item)}>
               <FontAwesome5 name="images" color={NEGRO} size={30} />
             </Pressable>
-            <Pressable onPress={() => handleAbrirGps(item.posicion)}>
+            <Pressable onPress={() => handleAbrirGps(item)}>
               <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
             </Pressable>
             <Pressable onPress={handleOpenModalGestion}>
@@ -165,10 +182,22 @@ const GestionesPagePrincipal = () => {
       </View>
       <View style={styles.styleContainerCard}>
         <FlatList
-          data={jsonGestiones}
+          data={datosGestiones}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(datos) => datos.cedulaCliente}
+          keyExtractor={(datos) => datos.identificacionCliente}
+          ListEmptyComponent={<EmptyList isLoading={isLoadingGestiones} />}
+          ListFooterComponent={
+            <LoadingComponent isLoading={isLoadingGestiones} />
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoadingGestiones}
+              onRefresh={refechGestiones}
+              colors={["#007AFF"]}
+              tintColor="#007AFF"
+            />
+          }
         />
       </View>
       {modalFiltros && (

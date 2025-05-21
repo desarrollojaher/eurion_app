@@ -44,9 +44,24 @@ export const sincronizacionApi = {
     );
     return res.data;
   },
+
+  imagenClienteGcobranza: async (params: ISincronizarImagenesParams) => {
+    const res = await get<ISincronizarImagenCliente>(
+      "sincronizacion/foto-cliente-gestion",
+      { params: params, timeout: 120000 }
+    );
+    return res.data;
+  },
   imagenDomicilio: async (params: ISincronizarImagenesParams) => {
     const res = await get<ISincronizarimagenesDomicilio>(
       "sincronizacion/mapa-domicilio",
+      { params: params, timeout: 120000 }
+    );
+    return res.data;
+  },
+  imagenDomicilioGcobranza: async (params: ISincronizarImagenesParams) => {
+    const res = await get<ISincronizarimagenesDomicilio>(
+      "sincronizacion/mapa-domicilio-gcobranza",
       { params: params, timeout: 120000 }
     );
     return res.data;

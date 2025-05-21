@@ -63,53 +63,93 @@ export const useSincronizacion = () => {
       await dbSqliteService.deleteZona();
       await dbSqliteService.insertarZona(zona);
 
-      // //sincronizar imagenes
-      // setIndex(6);
-      // setTabla("Imagenes clientes");
-      // await dbSqliteService.deleteImagenes();
-      // let siguiente = true;
-      // let i = 0;
-      // do {
-      //   const imagenes = await sincronizacionApi.imagenCliente({
-      //     itemPagina: 30,
-      //     paginaActual: i,
-      //   });
+      //sincronizar imagenes
+      setIndex(6);
+      setTabla("Imagenes clientes");
+      await dbSqliteService.deleteImagenesClientes();
+      let siguiente = true;
+      let i = 0;
+      do {
+        const imagenes = await sincronizacionApi.imagenCliente({
+          itemPagina: 30,
+          paginaActual: i,
+        });
 
-      //   setCantidadDatos(imagenes.totalPaginas * 30);
+        setCantidadDatos(imagenes.totalPaginas * 30);
 
-      //   if (imagenes.datos.length > 0) {
-      //     await dbSqliteService.insertarImagenCliente(imagenes.datos);
-      //   }
-      //   if (imagenes.paginaSiguiente) {
-      //     i = imagenes.paginaSiguiente;
-      //   } else {
-      //     siguiente = false;
-      //   }
-      // } while (siguiente);
+        if (imagenes.datos.length > 0) {
+          await dbSqliteService.insertarImagenCliente(imagenes.datos);
+        }
+        if (imagenes.paginaSiguiente) {
+          i = imagenes.paginaSiguiente;
+        } else {
+          siguiente = false;
+        }
+      } while (siguiente);
 
-      // //sincronizacion de mapa domicilio
-      // setIndex(7);
-      // setTabla("Imagenes domicilio");
-      // await dbSqliteService.deleteImagenes();
-      // siguiente = true;
-      // i = 0;
-      // do {
-      //   const imagenes = await sincronizacionApi.imagenDomicilio({
-      //     itemPagina: 30,
-      //     paginaActual: i,
-      //   });
+      siguiente = true;
+      i = 0;
+      do {
+        const imagenes = await sincronizacionApi.imagenClienteGcobranza({
+          itemPagina: 30,
+          paginaActual: i,
+        });
 
-      //   setCantidadDatos(imagenes.totalPaginas * 30);
+        setCantidadDatos(imagenes.totalPaginas * 30);
 
-      //   if (imagenes.datos.length > 0) {
-      //     await dbSqliteService.insertarImagenDomicilio(imagenes.datos);
-      //   }
-      //   if (imagenes.paginaSiguiente) {
-      //     i = imagenes.paginaSiguiente;
-      //   } else {
-      //     siguiente = false;
-      //   }
-      // } while (siguiente);
+        if (imagenes.datos.length > 0) {
+          await dbSqliteService.insertarImagenCliente(imagenes.datos);
+        }
+        if (imagenes.paginaSiguiente) {
+          i = imagenes.paginaSiguiente;
+        } else {
+          siguiente = false;
+        }
+      } while (siguiente);
+
+      //sincronizacion de mapa domicilio
+      setIndex(7);
+      setTabla("Imagenes domicilio");
+      await dbSqliteService.deleteImagenesDomicilio();
+      siguiente = true;
+      i = 0;
+      do {
+        const imagenes = await sincronizacionApi.imagenDomicilio({
+          itemPagina: 30,
+          paginaActual: i,
+        });
+
+        setCantidadDatos(imagenes.totalPaginas * 30);
+
+        if (imagenes.datos.length > 0) {
+          await dbSqliteService.insertarImagenDomicilio(imagenes.datos);
+        }
+        if (imagenes.paginaSiguiente) {
+          i = imagenes.paginaSiguiente;
+        } else {
+          siguiente = false;
+        }
+      } while (siguiente);
+
+      siguiente = true;
+      i = 0;
+      do {
+        const imagenes = await sincronizacionApi.imagenDomicilioGcobranza({
+          itemPagina: 30,
+          paginaActual: i,
+        });
+
+        setCantidadDatos(imagenes.totalPaginas * 30);
+
+        if (imagenes.datos.length > 0) {
+          await dbSqliteService.insertarImagenDomicilio(imagenes.datos);
+        }
+        if (imagenes.paginaSiguiente) {
+          i = imagenes.paginaSiguiente;
+        } else {
+          siguiente = false;
+        }
+      } while (siguiente);
 
       setIndex(8);
       setTabla("documentos cobranza");

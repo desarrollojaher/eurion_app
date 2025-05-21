@@ -7,16 +7,21 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 
-const EmptyList = () => {
+interface PropsEmptyList {
+  isLoading: boolean;
+}
+const EmptyList: React.FC<PropsEmptyList> = ({ isLoading }) => {
   const animation = useMemo(() => {
     return require("../../../assets/animations/empty.json");
   }, []);
 
-  return (
+  return !isLoading ? (
     <View style={styles.container}>
       <LottieAnimation resource={animation} />
       <Text style={styles.text}>No hay resultados</Text>
     </View>
+  ) : (
+    <></>
   );
 };
 

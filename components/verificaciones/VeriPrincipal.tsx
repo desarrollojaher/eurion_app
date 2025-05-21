@@ -192,7 +192,9 @@ const VeriPrincipal = () => {
           keyExtractor={(item, index) => item.identificacion + index}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<EmptyList />}
+          ListEmptyComponent={
+            <EmptyList isLoading={isLoadingVerificacionesCabecera} />
+          }
           ListFooterComponent={
             <LoadingComponent isLoading={isLoadingVerificacionesCabecera} />
           }

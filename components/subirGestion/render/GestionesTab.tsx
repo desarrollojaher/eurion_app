@@ -163,7 +163,7 @@ const GestionesTab = () => {
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         keyExtractor={(item, index) => `${item.id}-${index}`}
-        ListEmptyComponent={<EmptyList />}
+        ListEmptyComponent={<EmptyList isLoading={isLodingSubirInformacion} />}
         ListFooterComponent={
           <LoadingComponent isLoading={isLodingSubirInformacion} />
         }

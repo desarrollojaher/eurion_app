@@ -1,5 +1,5 @@
 export interface IGestiones {
-  nroDocumento: string;
+  //nroDocumento: string;
   identificacionCliente: string;
   fechaAdicion: Date;
   deudaTotal: number;
@@ -11,4 +11,6 @@ export interface IGestiones {
   latitud: number;
   longitud: number;
   zonaNombre: string;
+  imagenCliente: string;
+  imagenDomicilio: string;
 }

@@ -6,7 +6,7 @@ import {
   ISincronizarVerificaciones,
   ISincronizarZona,
 } from "@/models/ISincronizar";
-import { and, asc, eq, gt, gte, like, ne, sql } from "drizzle-orm";
+import { and, asc, count, eq, gt, gte, like, ne, sql, sum } from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacionDetalles,
@@ -22,7 +22,7 @@ import {
   ISubirInformacionEliminar,
 } from "@/models/ISubirInformacion";
 import { IImagenCliente, IImagenDomicilio } from "@/models/IImagenes";
-import { unionBy } from "lodash";
+import { groupBy, mapValues, sumBy, unionBy } from "lodash";
 import { IDocumentos } from "@/models/IDocumentos";
 import { IEnviarGcobranza } from "@/models/IEnviarGcobranza";
 import { format } from "date-fns";
@@ -116,7 +116,12 @@ export const dbSqliteService = {
   },
   insertarImagenCliente: async (datos: IImagenCliente[]) => {
     try {
-      await db.insert(schema.fotoClienteTable).values(datos);
+      await db
+        .insert(schema.fotoClienteTable)
+        .values(datos)
+        .onConflictDoNothing({
+          target: [schema.fotoClienteTable.identificacionCliente],
+        });
 
       return true;
     } catch (error: any) {
@@ -129,7 +134,12 @@ export const dbSqliteService = {
 
   insertarImagenDomicilio: async (datos: IImagenDomicilio[]) => {
     try {
-      await db.insert(schema.fotoDomicilioTable).values(datos);
+      await db
+        .insert(schema.fotoDomicilioTable)
+        .values(datos)
+        .onConflictDoNothing({
+          target: [schema.fotoDomicilioTable.identificacionCliente],
+        });
 
       return true;
     } catch (error: any) {
@@ -216,9 +226,19 @@ export const dbSqliteService = {
     }
   },
 
-  deleteImagenes: async () => {
+  deleteImagenesClientes: async () => {
     try {
-      await db.delete(schema.imagenVerificacionTable);
+      await db.delete(schema.fotoClienteTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+  deleteImagenesDomicilio: async () => {
+    try {
+      await db.delete(schema.fotoDomicilioTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -625,9 +645,14 @@ export const dbSqliteService = {
   },
   obtenerCabeceraGestiones: async () => {
     try {
+      const maxValue = await db
+        .select({
+          max: sql`DATE(MAX(${schema.enviarGcobranzaCelularTable.fecha}))`,
+        })
+        .from(schema.enviarGcobranzaCelularTable);
+
       const cabeceraGestiones: IGestiones[] = await db
         .selectDistinct({
-          nroDocumento: schema.enviarGcobranzaCelularTable.nroDocumento,
           identificacionCliente:
             schema.enviarGcobranzaCelularTable.identificacionCliente,
           fechaAdicion: schema.enviarGcobranzaCelularTable.fecha,
@@ -638,8 +663,10 @@ export const dbSqliteService = {
           nombres: schema.enviarGcobranzaCelularTable.nombreCliente,
           direccion: schema.enviarGcobranzaCelularTable.direccion,
           latitud: schema.enviarGcobranzaCelularTable.latitud,
-          longitud: schema.enviarGcobranzaCelularTable.logitud,
+          longitud: schema.enviarGcobranzaCelularTable.longitud,
           zonaNombre: schema.zonaTable.nombres,
+          imagenCliente: schema.fotoClienteTable.fotoCliente,
+          imagenDomicilio: schema.fotoDomicilioTable.fotoDelDomicilio,
         })
         .from(schema.enviarGcobranzaCelularTable)
         .innerJoin(
@@ -656,13 +683,55 @@ export const dbSqliteService = {
             schema.enviarGcobranzaCelularTable.codigoZona
           )
         )
-        .where(
+        .leftJoin(
+          schema.fotoClienteTable,
           eq(
-            schema.enviarGcobranzaCelularTable.periodo,
-            Number(format(new Date(), "yyyyMM"))
+            schema.fotoClienteTable.identificacionCliente,
+            schema.enviarGcobranzaCelularTable.identificacionCliente
           )
-        );
-      return cabeceraGestiones;
+        )
+        .leftJoin(
+          schema.fotoDomicilioTable,
+          eq(
+            schema.fotoDomicilioTable.identificacionCliente,
+            schema.enviarGcobranzaCelularTable.identificacionCliente
+          )
+        )
+        .where(
+          and(
+            eq(
+              schema.enviarGcobranzaCelularTable.periodo,
+              Number(format(new Date(), "yyyyMM"))
+            ),
+            eq(schema.enviarGcobranzaCelularTable.esGestionado, 0),
+            eq(
+              sql`DATE(${schema.enviarGcobranzaCelularTable.fecha})`,
+              maxValue[0]?.max
+            )
+          )
+        )
+        .orderBy(schema.enviarGcobranzaCelularTable.apellidoCliente);
+      const resultado = mapValues(
+        groupBy(cabeceraGestiones, "identificacionCliente"),
+        (items) => ({
+          imagenCliente: items[0].imagenCliente,
+          imagenDomicilio: items[0].imagenDomicilio,
+          identificacionCliente: items[0].identificacionCliente,
+          apellidos: items[0].apellidos,
+          nombres: items[0].nombres,
+          direccion: items[0].direccion,
+          fechaAdicion: items[0].fechaAdicion,
+          latitud: items[0].latitud,
+          longitud: items[0].longitud,
+          tramo: items[0].tramo,
+          zonaNombre: items[0].zonaNombre,
+          deudaTotal: sumBy(items, "deudaTotal"),
+          saldoVencido: sumBy(items, "saldoVencido"),
+        })
+      );
+      const res: IGestiones[] = Object.values(resultado);
+
+      return res;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
