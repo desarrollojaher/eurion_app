@@ -10,10 +10,13 @@ import GestionPageDetallesCliente from "./GestionPageDetallesCliente";
 import GestionesPageDetallesDocumenos from "./GestionesPageDetallesDocumenos";
 import GestionesPageDetallesDireccion from "./GestionesPageDetallesDireccion";
 import { Toast } from "toastify-react-native";
+import { useGestionStore } from "@/helper/store/storeGestiones";
 
 const GestionPageDetalles = () => {
   const [modalGestionar, setModalGestionar] = useState(false);
   const [tab, setTab] = useState(0);
+
+  const { datos } = useGestionStore();
 
   const tabs = useMemo(() => ["Cliente", "Documentos", "Dirección"], []);
 
@@ -49,7 +52,7 @@ const GestionPageDetalles = () => {
   return (
     <View style={styles.containerGeneral}>
       <Header
-        title="Byron godoy"
+        title={datos?.apellidos + " " + datos?.nombres}
         iconRight={
           <TouchableOpacity onPress={handleOpenModalGestion}>
             <Icon

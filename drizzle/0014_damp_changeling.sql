@@ -1,0 +1,1 @@
+DROP INDEX `clientes_identificacion_unique`;

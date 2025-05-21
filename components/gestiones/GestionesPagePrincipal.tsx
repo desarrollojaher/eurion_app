@@ -35,18 +35,31 @@ import { IGestiones } from "@/models/IGestiones";
 import EmptyList from "../commons/FlatList/EmptyList";
 import LoadingComponent from "../commons/FlatList/LoadingComponent";
 import { formatCurrency } from "@/helper/function/numericas";
+import { useDebounce } from "@/hooks/debounce";
+import { useGestionStore } from "@/helper/store/storeGestiones";
 
 const GestionesPagePrincipal = () => {
   const [modalFiltros, setModalFiltros] = useState(false);
   const [modalCarrucel, setModalCarrucel] = useState(false);
   const [modalGestionar, setModalGestionar] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+  const [buscador, setBuscador] = useState("");
+  const [zona, setZona] = useState("todos");
+  const [tipo, setTipo] = useState("todos");
+
+  const debouncedInputValue = useDebounce(buscador, 1000);
 
   const {
     data: datosGestiones,
     isLoading: isLoadingGestiones,
     refetch: refechGestiones,
-  } = useObtenerGestionesCabecera({});
+  } = useObtenerGestionesCabecera({
+    buscador: debouncedInputValue,
+    tipo: tipo,
+    zona: zona,
+  });
+
+  const { setDatos } = useGestionStore();
 
   const handleOpenImagenes = useCallback((data: IGestiones) => {
     const imagenesLista: IImagenCompleta[] = [];
@@ -92,14 +105,18 @@ const GestionesPagePrincipal = () => {
     setModalGestionar(false);
   }, []);
 
-  const handleCambiarPagina = useCallback(() => {
-    router.push("/principal/gestiones/gestiones-detalles");
-  }, []);
+  const handleCambiarPagina = useCallback(
+    (item: IGestiones) => {
+      setDatos(item);
+      router.push("/principal/gestiones/gestiones-detalles");
+    },
+    [setDatos]
+  );
 
   const renderItem = useCallback(
     ({ item, index }: { item: IGestiones; index: number }) => (
       <Card style={styles.cardStyle}>
-        <TouchableOpacity onPress={handleCambiarPagina}>
+        <TouchableOpacity onPress={() => handleCambiarPagina(item)}>
           <HeaderCard labelRight="Ruta" />
           <Separador />
           <TextCard
@@ -165,6 +182,8 @@ const GestionesPagePrincipal = () => {
         <InputCustom
           placeholder="Buscar"
           styleContainer={styles.styleInput}
+          onChangeText={setBuscador}
+          value={buscador}
           leftIcon={
             <Ionicons
               name="search"
@@ -204,6 +223,10 @@ const GestionesPagePrincipal = () => {
         <ModalFiltros
           onClose={handleCloseModalFiltros}
           visible={modalFiltros}
+          setZona={setZona}
+          zona={zona}
+          setTipo={setTipo}
+          tipo={tipo}
         />
       )}
       {modalCarrucel && (

@@ -14,3 +14,9 @@ export interface IGestiones {
   imagenCliente: string;
   imagenDomicilio: string;
 }
+
+export interface IGestionesFiltro {
+  buscador: string;
+  zona: string;
+  tipo: string
+}

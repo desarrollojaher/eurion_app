@@ -14,7 +14,7 @@ export interface IDatosSelect {
 }
 
 interface PropsSelect {
-  datos: IDatosSelect[];
+  datos: IDatosSelect[] | [];
   placeholder?: string;
   onSelect?: (value: IDatosSelect) => void;
   search?: boolean;

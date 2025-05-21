@@ -11,6 +11,10 @@ import {
 import { get } from "./config";
 import { IDocumentos } from "@/models/IDocumentos";
 import { IEnviarGcobranza } from "@/models/IEnviarGcobranza";
+import { ITiposGestiones } from "@/models/ITiposGestiones";
+import { IGestionesCelular } from "@/models/IGestionesCelular";
+import { IClienteGarante } from "@/models/IClienteGarante";
+import { IDetalleFactura } from "@/models/IDetalleFactura";
 
 export const sincronizacionApi = {
   verificaciones: async () => {
@@ -74,6 +78,25 @@ export const sincronizacionApi = {
     const res = await get<IEnviarGcobranza[]>(
       "sincronizacion/enviar-gcobranza"
     );
+    return res.data;
+  },
+  tipoGestiones: async () => {
+    const res = await get<ITiposGestiones[]>("sincronizacion/tipo-gestiones");
+    return res.data;
+  },
+
+  gestionesCelular: async () => {
+    const res = await get<IGestionesCelular[]>(
+      "sincronizacion/gestiones-celular"
+    );
+    return res.data;
+  },
+  clienteGarante: async () => {
+    const res = await get<IClienteGarante[]>("sincronizacion/cliente-garante");
+    return res.data;
+  },
+  detalleFacturas: async () => {
+    const res = await get<IDetalleFactura[]>("sincronizacion/detalle-facturas");
     return res.data;
   },
 };

@@ -1,10 +1,10 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { dbSqliteService } from "../db/db";
 import { gestionesKeys } from "./gestionesKeys";
-import { IGestiones } from "@/models/IGestiones";
+import { IGestiones, IGestionesFiltro } from "@/models/IGestiones";
 
 export const useObtenerGestionesCabecera = (
-  params: any,
+  params: IGestionesFiltro,
   queryOptions?: UseQueryOptions<
     IGestiones[],
     unknown,
@@ -13,7 +13,7 @@ export const useObtenerGestionesCabecera = (
   >
 ) => {
   const obtenerGestionesCabecera = async () => {
-    return await dbSqliteService.obtenerCabeceraGestiones();
+    return await dbSqliteService.obtenerCabeceraGestiones(params);
   };
 
   return useQuery({

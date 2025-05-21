@@ -34,7 +34,7 @@ export const verificacionesTable = sqliteTable(
 );
 
 export const clientesTable = sqliteTable("clientes", {
-  identificacion: text().unique(),
+  identificacion: text(),
   nombres: text(),
   apellidos: text(),
   telefono: text(),
@@ -59,6 +59,7 @@ export const clientesTable = sqliteTable("clientes", {
   score: int(),
   categoria: text(),
   telefonoDuenoCasa: text(),
+  tipo: int(),
 });
 
 export const clienteConyugueTable = sqliteTable("cliente_conyuge", {
@@ -90,6 +91,7 @@ export const direccionTable = sqliteTable("direccion", {
   observacionesAdicionales: text(),
   tipoResidencia: text(),
   tipoConstruccion: text(),
+  tipo: int(),
 });
 
 export const zonaTable = sqliteTable("zona", {
@@ -191,3 +193,57 @@ export const enviarGcobranzaCelularTable = sqliteTable(
     direccion: text(),
   }
 );
+///////
+export const gestionesCelularGcobranzaTable = sqliteTable(
+  "gestiones_celular_gcobranza",
+  {
+    nroDocumento: text(),
+    fechaGestion: text(),
+    observaciones: text(),
+    codigoTipoGestion: text(),
+    identificacionCliente: text(),
+    fechaProximaGestion: text(),
+    observacionesProximaGestion: text(),
+    codigoTipoGestionProxima: text(),
+    latitud: integer({ mode: "number" }),
+    longitud: integer({ mode: "number" }),
+    sincronizado: int().default(0),
+  }
+);
+
+export const tipoGestionesTable = sqliteTable("tipo_de_gestion_gcobranza", {
+  codigo: text(),
+  descripcion: text(),
+  pideFoto: int(),
+  pideFecha: int(),
+});
+
+export const clienteGaranteGcobranzaTable = sqliteTable(
+  "cliente_garante_gcobranza",
+  {
+    identificacion: text(),
+    identificacionCliente: text(),
+    nombre: text(),
+    telefono: text(),
+    direccion: text(),
+    detalleDireccion: text(),
+    trabajaEn: text(),
+    direccionTrabajo: text(),
+    telefonoTrabajo: text(),
+    celular: text(),
+  }
+);
+
+export const detalleFacturaGcobranzaTable = sqliteTable(
+  "detalle_garante_gcobranza",
+  {
+    identificacionCliente: text(),
+    nroDocumento: text(),
+    producto: text(),
+  }
+);
+
+export const bitacoraSincronizadoTable = sqliteTable("bitacora_sincronizado", {
+  codigo: int().primaryKey({ autoIncrement: true }),
+  fecha: text(),
+});

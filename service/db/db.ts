@@ -6,7 +6,19 @@ import {
   ISincronizarVerificaciones,
   ISincronizarZona,
 } from "@/models/ISincronizar";
-import { and, asc, count, eq, gt, gte, like, ne, sql, sum } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  eq,
+  gt,
+  gte,
+  like,
+  ne,
+  or,
+  sql,
+  sum,
+} from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacionDetalles,
@@ -26,7 +38,13 @@ import { groupBy, mapValues, sumBy, unionBy } from "lodash";
 import { IDocumentos } from "@/models/IDocumentos";
 import { IEnviarGcobranza } from "@/models/IEnviarGcobranza";
 import { format } from "date-fns";
-import { IGestiones } from "@/models/IGestiones";
+import { IGestiones, IGestionesFiltro } from "@/models/IGestiones";
+import { IZona } from "@/models/IZona";
+import { ITiposGestiones } from "@/models/ITiposGestiones";
+import { IGestionesCelular } from "@/models/IGestionesCelular";
+import { IClienteGarante } from "@/models/IClienteGarante";
+import { IDetalleFactura } from "@/models/IDetalleFactura";
+import { ISincronizado } from "@/models/ISincronizado";
 
 export const dbSqliteService = {
   insertarVerificaciones: async (datos: ISincronizarVerificaciones[]) => {
@@ -114,6 +132,54 @@ export const dbSqliteService = {
       throw JSON.stringify(mensajeExtraido);
     }
   },
+  insertarTipoGestiones: async (datos: ITiposGestiones[]) => {
+    try {
+      await db.insert(schema.tipoGestionesTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarGestionesCelular: async (datos: IGestionesCelular[]) => {
+    try {
+      await db.insert(schema.gestionesCelularGcobranzaTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarClienteGarante: async (datos: IClienteGarante[]) => {
+    try {
+      await db.insert(schema.clienteGaranteGcobranzaTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarDetalleFactura: async (datos: IDetalleFactura[]) => {
+    try {
+      await db.insert(schema.detalleFacturaGcobranzaTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
   insertarImagenCliente: async (datos: IImagenCliente[]) => {
     try {
       await db
@@ -141,6 +207,18 @@ export const dbSqliteService = {
           target: [schema.fotoDomicilioTable.identificacionCliente],
         });
 
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarBitacoraSincronizacion: async (datos: ISincronizado) => {
+    try {
+      await db.insert(schema.bitacoraSincronizadoTable).values(datos);
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -218,6 +296,48 @@ export const dbSqliteService = {
   deleteGcobranza: async () => {
     try {
       await db.delete(schema.enviarGcobranzaCelularTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+  deleteTipoGestiones: async () => {
+    try {
+      await db.delete(schema.tipoGestionesTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+  deleteGestionesCelular: async () => {
+    try {
+      await db.delete(schema.gestionesCelularGcobranzaTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  deleteClientesGarante: async () => {
+    try {
+      await db.delete(schema.clienteGaranteGcobranzaTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  deleteDetalleFactura: async () => {
+    try {
+      await db.delete(schema.detalleFacturaGcobranzaTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -643,8 +763,26 @@ export const dbSqliteService = {
       throw { message: mensajeExtraido };
     }
   },
-  obtenerCabeceraGestiones: async () => {
+  obtenerCabeceraGestiones: async (filtro: IGestionesFiltro) => {
     try {
+      const filtros = [
+        filtro.buscador
+          ? or(
+              like(
+                schema.enviarGcobranzaCelularTable.nombreCliente,
+                `%${filtro.buscador}%`
+              ),
+              like(
+                schema.enviarGcobranzaCelularTable.apellidoCliente,
+                `%${filtro.buscador}%`
+              )
+            )
+          : undefined,
+        filtro.zona === "todos"
+          ? undefined
+          : eq(schema.zonaTable.codigo, filtro.zona),
+      ].filter(Boolean);
+
       const maxValue = await db
         .select({
           max: sql`DATE(MAX(${schema.enviarGcobranzaCelularTable.fecha}))`,
@@ -707,7 +845,9 @@ export const dbSqliteService = {
             eq(
               sql`DATE(${schema.enviarGcobranzaCelularTable.fecha})`,
               maxValue[0]?.max
-            )
+            ),
+            // eq(schema., 1),
+            ...filtros
           )
         )
         .orderBy(schema.enviarGcobranzaCelularTable.apellidoCliente);
@@ -732,6 +872,18 @@ export const dbSqliteService = {
       const res: IGestiones[] = Object.values(resultado);
 
       return res;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerZonas: async () => {
+    try {
+      const zonas: IZona[] = await db.select().from(schema.zonaTable);
+      return zonas;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
