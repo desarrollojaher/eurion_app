@@ -43,6 +43,7 @@ const GestionesPagePrincipal = () => {
   const [modalCarrucel, setModalCarrucel] = useState(false);
   const [modalGestionar, setModalGestionar] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+  const [gestion, setGestion] = useState<IGestiones | null>(null);
   const [buscador, setBuscador] = useState("");
   const [zona, setZona] = useState("todos");
   const [tipo, setTipo] = useState("todos");
@@ -113,6 +114,14 @@ const GestionesPagePrincipal = () => {
     [setDatos]
   );
 
+  const handleSelecionar = useCallback(
+    (item: IGestiones) => {
+      setGestion(item);
+      handleOpenModalGestion();
+    },
+    [handleOpenModalGestion]
+  );
+
   const renderItem = useCallback(
     ({ item, index }: { item: IGestiones; index: number }) => (
       <Card style={styles.cardStyle}>
@@ -160,19 +169,14 @@ const GestionesPagePrincipal = () => {
             <Pressable onPress={() => handleAbrirGps(item)}>
               <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
             </Pressable>
-            <Pressable onPress={handleOpenModalGestion}>
+            <Pressable onPress={() => handleSelecionar(item)}>
               <FontAwesome5 name="plus" color={NEGRO} size={30} />
             </Pressable>
           </View>
         </TouchableOpacity>
       </Card>
     ),
-    [
-      handleAbrirGps,
-      handleCambiarPagina,
-      handleOpenImagenes,
-      handleOpenModalGestion,
-    ]
+    [handleAbrirGps, handleCambiarPagina, handleOpenImagenes, handleSelecionar]
   );
 
   return (
@@ -236,10 +240,12 @@ const GestionesPagePrincipal = () => {
           visible={modalCarrucel}
         />
       )}
-      {modalGestionar && (
+      {modalGestionar && gestion && (
         <ModalRealizarGestion
           onClose={handleCloseModalGestion}
           visible={modalGestionar}
+          datos={gestion}
+          seccion="cabecera"
         />
       )}
     </View>

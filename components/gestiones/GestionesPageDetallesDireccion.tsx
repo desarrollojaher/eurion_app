@@ -5,7 +5,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from "react";
 import Card from "../commons/card/Card";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -21,13 +27,76 @@ import CarouselImagenes from "../commons/carousel/CarouselImagenes";
 import Camara from "../commons/camera/Camara";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
 import { remove } from "lodash";
+import z from "zod";
+import { Controller, useForm, UseFormHandleSubmit } from "react-hook-form";
+import { IDireccionCelularGcobranza } from "@/models/IDireccionCelularGcobranza";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { IGestiones } from "@/models/IGestiones";
+import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
+import { useGuardarGestionesActualizacionDireccion } from "@/service/gestiones/useGuardarGestionesActualizacionDireccion";
 
-const GestionesPageDetallesDireccion = () => {
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
+const schema = z.object({
+  latitud: z.number({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+  longitud: z.number({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+  identificacionCliente: z.string({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+  direccionIngresada: z.string({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+  indicacionesAdicionales: z.string({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+  nroDocumento: z.string({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+});
+
+interface PropsGestionesPageDetallesDireccion {
+  datos: IGestiones;
+}
+
+export type PropsGestionesPageDetallesDireccionRef = {
+  handleSubmit: () => void;
+};
+const GestionesPageDetallesDireccion = forwardRef<
+  PropsGestionesPageDetallesDireccionRef,
+  PropsGestionesPageDetallesDireccion
+>(({ datos }, ref) => {
+  const {
+    control,
+    setValue,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<IDireccionCelularGcobranza>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      latitud: datos.latitud,
+      longitud: datos.longitud,
+      identificacionCliente: datos.identificacionCliente,
+    },
+  });
+
   const [modalCamara, setModalCamara] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+
+  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
+    identificacion: datos.identificacionCliente,
+  });
+
+  const { mutate: guardarDireccion } =
+    useGuardarGestionesActualizacionDireccion();
 
   const handleOpenCamara = useCallback(() => {
     setModalCamara(true);
@@ -62,8 +131,41 @@ const GestionesPageDetallesDireccion = () => {
       return;
     }
     let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
+    if (location) {
+      setValue("latitud", location.coords.latitude);
+      setValue("longitud", location.coords.longitude);
+    }
+  }, [setValue]);
+
+  const onSucess = useCallback(
+    (data: IDireccionCelularGcobranza) => {
+      console.log(data);
+      guardarDireccion(data, {
+        onSuccess: () => {
+          reset({
+            direccionIngresada: "",
+            indicacionesAdicionales: "",
+            latitud: datos.latitud,
+            longitud: datos.longitud,
+          });
+        },
+      });
+    },
+    [datos.latitud, datos.longitud, guardarDireccion, reset]
+  );
+  const onError = useCallback((error: any) => {
+    console.log(error);
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    handleSubmit: handleSubmit(onSucess, onError),
+  }));
+
+  useEffect(() => {
+    if (datosDocumentos && datosDocumentos.length > 0) {
+      setValue("nroDocumento", datosDocumentos[0].nroDocumento);
+    }
+  }, [datosDocumentos, setValue]);
 
   return (
     <View style={styles.containerGeneral}>
@@ -98,45 +200,69 @@ const GestionesPageDetallesDireccion = () => {
         </Card>
 
         <Card style={styles.cardMargin}>
-          <TextInput
-            tipo="text"
-            text="Dirección"
-            direction="column"
-            multiline={true}
-            placeholder="Direccion"
-            styleHeader={styles.styleTextHeader}
+          <Controller
+            control={control}
+            name="direccionIngresada"
+            render={({ field: { value, onChange } }) => (
+              <TextInput
+                tipo="text"
+                text="Dirección"
+                direction="column"
+                multiline={true}
+                placeholder="Direccion"
+                styleHeader={styles.styleTextHeader}
+                defaultValueText={value}
+                onChangeText={onChange}
+                isError={!!errors.direccionIngresada}
+                labelError={errors.direccionIngresada?.message}
+              />
+            )}
           />
-          <TextInput
-            tipo="text"
-            text="Detalles Adicionales"
-            direction="column"
-            multiline={true}
-            placeholder="Detalles Adicionales"
-            styleHeader={styles.styleTextHeader}
+          <Controller
+            control={control}
+            name="indicacionesAdicionales"
+            render={({ field: { value, onChange } }) => (
+              <TextInput
+                tipo="text"
+                text="Detalles Adicionales"
+                direction="column"
+                multiline={true}
+                placeholder="Detalles Adicionales"
+                styleHeader={styles.styleTextHeader}
+                defaultValueText={value}
+                onChangeText={onChange}
+                isError={!!errors.indicacionesAdicionales}
+                labelError={errors.indicacionesAdicionales?.message}
+              />
+            )}
           />
         </Card>
 
         <Card style={styles.cardMargin}>
           <HeaderCard labelLeft="Coordinadas" />
-          <HeaderCard
-            labelLeft="Latitud"
-            labelRight={
-              location?.coords.latitude
-                ? String(location?.coords.latitude)
-                : "No hay ubicacion"
-            }
-            styleLeft={styles.styleLabelLeft}
-            styleRight={styles.styleLabelRigth}
+          <Controller
+            control={control}
+            name="latitud"
+            render={({ field: { value } }) => (
+              <HeaderCard
+                labelLeft="Latitud"
+                labelRight={value ? String(value) : "No hay ubicacion"}
+                styleLeft={styles.styleLabelLeft}
+                styleRight={styles.styleLabelRigth}
+              />
+            )}
           />
-          <HeaderCard
-            labelLeft="Longitud"
-            labelRight={
-              location?.coords.longitude
-                ? String(location?.coords.longitude)
-                : "No hay ubicacion"
-            }
-            styleLeft={styles.styleLabelLeft}
-            styleRight={styles.styleLabelRigth}
+          <Controller
+            control={control}
+            name="longitud"
+            render={({ field: { value } }) => (
+              <HeaderCard
+                labelLeft="Longitud"
+                labelRight={value ? String(value) : "No hay ubicacion"}
+                styleLeft={styles.styleLabelLeft}
+                styleRight={styles.styleLabelRigth}
+              />
+            )}
           />
           <View style={styles.containerBotones}>
             <TouchableOpacity
@@ -153,7 +279,9 @@ const GestionesPageDetallesDireccion = () => {
       </ScrollView>
     </View>
   );
-};
+});
+
+GestionesPageDetallesDireccion.displayName = "GestionesPageDetallesDireccion";
 
 export default GestionesPageDetallesDireccion;
 

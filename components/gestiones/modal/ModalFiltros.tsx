@@ -2,7 +2,6 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Select, { IDatosSelect } from "@/components/commons/select/Select";
-import { zonas } from "@/helper/json/jsonGestiones";
 import { convertirTamanoVertical } from "@/helper/function/renderizadoImagen";
 import { find, map } from "lodash";
 import { useObtenerZonas } from "@/service/Zona/useObtenerZonas";

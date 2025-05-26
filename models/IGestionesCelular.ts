@@ -11,3 +11,24 @@ export interface IGestionesCelular {
   longitud: number;
   sincronizado: number;
 }
+
+export type IGestionesCelularCrear = {
+  nroDocumento: string;
+  fechaGestion?: string | null;
+  observaciones: string;
+  fechaProximaGestion?: string | null;
+  codigoTipoGestion: string;
+  identificacionCliente: string;
+  observacionesProximaGestion?: string | null;
+  codigoTipoGestionProxima: string;
+  latitud: number;
+  longitud: number;
+  sincronizado: number;
+};
+
+export type IGestionesCelularPasadas = {
+  observacion: string;
+  fechaGestion: Date;
+  tipoGestion: string;
+  // gestor: string;
+};

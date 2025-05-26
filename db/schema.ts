@@ -243,6 +243,18 @@ export const detalleFacturaGcobranzaTable = sqliteTable(
   }
 );
 
+export const direccionCelularGcobranzaTable = sqliteTable(
+  "direccion_celular_gcobranza",
+  {
+    identificacionCliente: text(),
+    direccionIngresada: text(),
+    indicacionesAdicionales: text(),
+    latitud: integer({ mode: "number" }),
+    longitud: integer({ mode: "number" }),
+    nroDocumento: text(),
+  }
+);
+
 export const bitacoraSincronizadoTable = sqliteTable("bitacora_sincronizado", {
   codigo: int().primaryKey({ autoIncrement: true }),
   fecha: text(),

@@ -6,19 +6,7 @@ import {
   ISincronizarVerificaciones,
   ISincronizarZona,
 } from "@/models/ISincronizar";
-import {
-  and,
-  asc,
-  count,
-  eq,
-  gt,
-  gte,
-  like,
-  ne,
-  or,
-  sql,
-  sum,
-} from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, like, ne, or, sql } from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacionDetalles,
@@ -35,16 +23,35 @@ import {
 } from "@/models/ISubirInformacion";
 import { IImagenCliente, IImagenDomicilio } from "@/models/IImagenes";
 import { groupBy, mapValues, sumBy, unionBy } from "lodash";
-import { IDocumentos } from "@/models/IDocumentos";
+import {
+  IDocumentoPasadoParams,
+  IDocumentos,
+  IDocumentosCabecera,
+} from "@/models/IDocumentos";
 import { IEnviarGcobranza } from "@/models/IEnviarGcobranza";
 import { format } from "date-fns";
 import { IGestiones, IGestionesFiltro } from "@/models/IGestiones";
 import { IZona } from "@/models/IZona";
-import { ITiposGestiones } from "@/models/ITiposGestiones";
-import { IGestionesCelular } from "@/models/IGestionesCelular";
+import {
+  ITiposGestiones,
+  ITiposGestionesObtener,
+} from "@/models/ITiposGestiones";
+import {
+  IGestionesCelular,
+  IGestionesCelularCrear,
+  IGestionesCelularPasadas,
+} from "@/models/IGestionesCelular";
 import { IClienteGarante } from "@/models/IClienteGarante";
 import { IDetalleFactura } from "@/models/IDetalleFactura";
 import { ISincronizado } from "@/models/ISincronizado";
+import {
+  ICliente,
+  IClienteGaranteCobranza,
+  IClienteParams,
+} from "@/models/ICliente";
+import { IClienteConyugue } from "@/models/IConyugue";
+import { IDireccionGcobranza } from "@/models/IDireccion";
+import { IDireccionCelularGcobranza } from "@/models/IDireccionCelularGcobranza";
 
 export const dbSqliteService = {
   insertarVerificaciones: async (datos: ISincronizarVerificaciones[]) => {
@@ -800,11 +807,12 @@ export const dbSqliteService = {
           apellidos: schema.enviarGcobranzaCelularTable.apellidoCliente,
           nombres: schema.enviarGcobranzaCelularTable.nombreCliente,
           direccion: schema.enviarGcobranzaCelularTable.direccion,
-          latitud: schema.enviarGcobranzaCelularTable.latitud,
-          longitud: schema.enviarGcobranzaCelularTable.longitud,
+          latitud: schema.direccionTable.latitud,
+          longitud: schema.direccionTable.longitud,
           zonaNombre: schema.zonaTable.nombres,
           imagenCliente: schema.fotoClienteTable.fotoCliente,
           imagenDomicilio: schema.fotoDomicilioTable.fotoDelDomicilio,
+          telefono: schema.clientesTable.telefono,
         })
         .from(schema.enviarGcobranzaCelularTable)
         .innerJoin(
@@ -819,6 +827,23 @@ export const dbSqliteService = {
           eq(
             schema.zonaTable.codigo,
             schema.enviarGcobranzaCelularTable.codigoZona
+          )
+        )
+        .leftJoin(
+          schema.clientesTable,
+          and(
+            eq(schema.clientesTable.tipo, 2),
+            eq(
+              schema.clientesTable.identificacion,
+              schema.enviarGcobranzaCelularTable.identificacionCliente
+            )
+          )
+        )
+        .leftJoin(
+          schema.direccionTable,
+          eq(
+            schema.direccionTable.identificacionCliente,
+            schema.enviarGcobranzaCelularTable.identificacionCliente
           )
         )
         .leftJoin(
@@ -842,11 +867,11 @@ export const dbSqliteService = {
               Number(format(new Date(), "yyyyMM"))
             ),
             eq(schema.enviarGcobranzaCelularTable.esGestionado, 0),
+            eq(schema.direccionTable.tipo, 2),
             eq(
               sql`DATE(${schema.enviarGcobranzaCelularTable.fecha})`,
               maxValue[0]?.max
             ),
-            // eq(schema., 1),
             ...filtros
           )
         )
@@ -867,6 +892,7 @@ export const dbSqliteService = {
           zonaNombre: items[0].zonaNombre,
           deudaTotal: sumBy(items, "deudaTotal"),
           saldoVencido: sumBy(items, "saldoVencido"),
+          telefono: items[0].telefono,
         })
       );
       const res: IGestiones[] = Object.values(resultado);
@@ -885,6 +911,274 @@ export const dbSqliteService = {
       const zonas: IZona[] = await db.select().from(schema.zonaTable);
       return zonas;
     } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerClienteCobranza: async (params: IClienteParams) => {
+    try {
+      const clientes: ICliente[] = await db
+        .select({
+          identificacion: schema.clientesTable.identificacion,
+          nombres: schema.clientesTable.nombres,
+          apellido: schema.clientesTable.apellidos,
+          estadoCivil: schema.clientesTable.estadoCivil,
+          dependientes: schema.clientesTable.nroDependientes,
+          telefono: schema.clientesTable.telefono,
+          referencias: schema.clientesTable.referencias,
+          observacion: schema.clientesTable.observacion,
+        })
+        .from(schema.clientesTable)
+        .where(
+          and(
+            eq(schema.clientesTable.tipo, 2),
+            eq(schema.clientesTable.identificacion, params.identificacion)
+          )
+        );
+      return clientes;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerClienteConyugue: async (params: IClienteParams) => {
+    try {
+      const clientesConyugue: IClienteConyugue[] = await db
+        .select({
+          identificacion: schema.clienteConyugueTable.identificacion,
+          nombres: schema.clienteConyugueTable.nombres,
+          apellido: schema.clienteConyugueTable.apellidos,
+          ocupacionLaboral: schema.clienteConyugueTable.ocupacionLaboral,
+          referencias: schema.clienteConyugueTable.referencias,
+          antiguedad: schema.clienteConyugueTable.antiguedad,
+        })
+        .from(schema.clienteConyugueTable)
+        .where(
+          eq(
+            schema.clienteConyugueTable.identificacionCliente,
+            params.identificacion
+          )
+        );
+      return clientesConyugue;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerClienteGarante: async (params: IClienteParams) => {
+    try {
+      const clientesGarante: IClienteGaranteCobranza[] = await db
+        .select({
+          identificacion: schema.clienteGaranteGcobranzaTable.identificacion,
+          nombres: schema.clienteGaranteGcobranzaTable.nombre,
+          telefono: schema.clienteGaranteGcobranzaTable.telefono,
+          direccion: schema.clienteGaranteGcobranzaTable.direccion,
+          detalleDireccion:
+            schema.clienteGaranteGcobranzaTable.detalleDireccion,
+          trabajaEn: schema.clienteGaranteGcobranzaTable.trabajaEn,
+          direccionTrabajo:
+            schema.clienteGaranteGcobranzaTable.direccionTrabajo,
+          telefonoTrabajo: schema.clienteGaranteGcobranzaTable.telefonoTrabajo,
+          celular: schema.clienteGaranteGcobranzaTable.celular,
+        })
+        .from(schema.clienteGaranteGcobranzaTable)
+        .where(
+          eq(
+            schema.clienteGaranteGcobranzaTable.identificacionCliente,
+            params.identificacion
+          )
+        );
+      return clientesGarante;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerDirecconViviendaGcobranza: async (params: IClienteParams) => {
+    try {
+      const direccionesGcobranza: IDireccionGcobranza[] = await db
+        .select({
+          direccion: schema.direccionTable.direccion,
+          tipoVivienda: schema.direccionTable.tipoVivienda,
+          nombrePropietario: schema.direccionTable.nombreDueno,
+        })
+        .from(schema.direccionTable)
+        .where(
+          and(
+            eq(schema.direccionTable.tipo, 2),
+            eq(
+              schema.direccionTable.identificacionCliente,
+              params.identificacion
+            )
+          )
+        );
+      return direccionesGcobranza;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerDocumentosCabeceraGcobranza: async (params: IClienteParams) => {
+    try {
+      const documentos: IDocumentosCabecera[] = await db
+        .selectDistinct({
+          nroDocumento: schema.enviarGcobranzaCelularTable.nroDocumento,
+          cuotasPagadas: schema.documentosGcobranzaTable.cuotasPagadas,
+          deudaTotal: schema.documentosGcobranzaTable.deudaTotal,
+          saldoVencido: schema.documentosGcobranzaTable.saldoVencido,
+          producto: schema.detalleFacturaGcobranzaTable.producto,
+          fecha: schema.documentosGcobranzaTable.fechaEmision,
+        })
+        .from(schema.enviarGcobranzaCelularTable)
+        .innerJoin(
+          schema.documentosGcobranzaTable,
+          and(
+            eq(
+              schema.documentosGcobranzaTable.identificacionCliente,
+              schema.enviarGcobranzaCelularTable.identificacionCliente
+            ),
+            eq(
+              schema.documentosGcobranzaTable.nroDocumento,
+              schema.enviarGcobranzaCelularTable.nroDocumento
+            )
+          )
+        )
+        .leftJoin(
+          schema.detalleFacturaGcobranzaTable,
+          eq(
+            schema.detalleFacturaGcobranzaTable.nroDocumento,
+            schema.enviarGcobranzaCelularTable.nroDocumento
+          )
+        )
+        .where(
+          eq(
+            schema.enviarGcobranzaCelularTable.identificacionCliente,
+            params.identificacion
+          )
+        );
+      return documentos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerGestionesPasadas: async (params: IDocumentoPasadoParams) => {
+    try {
+      const gestionesPasadas: IGestionesCelularPasadas[] = await db
+        .selectDistinct({
+          observacion: schema.gestionesCelularGcobranzaTable.observaciones,
+          fechaGestion: schema.gestionesCelularGcobranzaTable.fechaGestion,
+          tipoGestion: schema.tipoGestionesTable.descripcion,
+          // gestor: schema.agen,
+        })
+        .from(schema.gestionesCelularGcobranzaTable)
+        .leftJoin(
+          schema.tipoGestionesTable,
+          eq(
+            schema.gestionesCelularGcobranzaTable.codigoTipoGestion,
+            schema.tipoGestionesTable.codigo
+          )
+        )
+        .where(
+          eq(
+            schema.gestionesCelularGcobranzaTable.nroDocumento,
+            params.nroDocumento
+          )
+        )
+        .orderBy(desc(schema.gestionesCelularGcobranzaTable.fechaGestion));
+      return gestionesPasadas;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerDocumentoCompleto: async (params: IDocumentoPasadoParams) => {
+    try {
+      const documentos: IDocumentos[] = await db
+        .select()
+        .from(schema.documentosGcobranzaTable)
+        .where(
+          eq(schema.documentosGcobranzaTable.nroDocumento, params.nroDocumento)
+        );
+      return documentos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  guardarActualizacionDireccion: async (datos: IDireccionCelularGcobranza) => {
+    try {
+      await db.insert(schema.direccionCelularGcobranzaTable).values(datos);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerTiposGestiones: async () => {
+    try {
+      const tiposGestiones: ITiposGestionesObtener[] = await db
+        .select()
+        .from(schema.tipoGestionesTable);
+      return tiposGestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  guargarGestionesCelular: async (data: IGestionesCelularCrear) => {
+    try {
+      db.run("BEGIN TRANSACTION");
+      await db.insert(schema.gestionesCelularGcobranzaTable).values(data);
+      const cantidad = await db
+        .update(schema.enviarGcobranzaCelularTable)
+        .set({ esGestionado: 1 })
+        .where(
+          and(
+            eq(
+              schema.enviarGcobranzaCelularTable.nroDocumento,
+              data.nroDocumento
+            ),
+            eq(
+              schema.enviarGcobranzaCelularTable.identificacionCliente,
+              data.identificacionCliente
+            )
+          )
+        );
+      if (cantidad.changes === 0) {
+        db.run("ROLLBACK");
+        throw { message: "No se pudo actualizar el documento" };
+      }
+      db.run("COMMIT");
+    } catch (error: any) {
+      db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;

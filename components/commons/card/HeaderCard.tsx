@@ -50,23 +50,24 @@ const HeaderCard: React.FC<PropsHeaderCard> = ({
   return (
     <View style={[styles.container, styleContainer]}>
       <Text style={[styles.textLeft, styleLeft]}>{labelLeft}</Text>
-      <Text
-        style={[styles.textRight, styleRight]}
-        numberOfLines={numberOfLine}
-        onTextLayout={handleTextLaayout}
-        onPress={handleOpenModalDatos}
-        disabled={!expanded}
-      >
-        {labelRight}
-      </Text>
-      {/* {expanded && (
-        <Pressable
-          onPress={handleOpenModalDatos}
-          style={{ alignSelf: "center" }}
+
+      <View>
+        <Text
+          style={[styles.textRight, styleRight]}
+          numberOfLines={numberOfLine}
+          onTextLayout={handleTextLaayout}
+          // onPress={handleOpenModalDatos}
+          disabled={!expanded}
+          ellipsizeMode="clip"
         >
-          <Icon name="expand-arrows-alt" />
-        </Pressable>
-      )} */}
+          {labelRight}
+        </Text>
+        {expanded && (
+          <Text style={styles.verMas} onPress={handleOpenModalDatos}>
+            Ver mas
+          </Text>
+        )}
+      </View>
 
       {modalDatos && (
         <ModalCustom onClose={handleCloseModalDatos} visible={modalDatos}>
@@ -93,5 +94,7 @@ const styles = StyleSheet.create({
     fontSize: convertirTamanoHorizontal(13),
     fontWeight: "regular",
   },
-  // StyleProp
+  verMas: {
+    fontWeight: "bold",
+  },
 });

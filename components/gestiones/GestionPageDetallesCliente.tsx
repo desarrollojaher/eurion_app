@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, View } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Card from "../commons/card/Card";
 import {
   convertirTamanoHorizontal,
@@ -8,79 +8,104 @@ import {
 import TextCardIcon from "../commons/card/TextCardIcon";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import HeaderCard from "../commons/card/HeaderCard";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import ModalClientes from "./modal/ModalClientes";
-import {
-  IVerificacionDatosVivienda,
-  IVerificacionDetalleGeneral,
-} from "@/models/IVerificacionPrueba";
 import ModalVivienda from "./modal/ModalVivienda";
+import { useClienteObtener } from "@/service/Cliente/useClienteObtener";
+import { useClienteConyugueObtener } from "@/service/Cliente/useClienteConyugueObtener";
+import { useClienteGaranteObtener } from "@/service/Cliente/useClienteGaranteObtener";
+import { ICliente, IClienteGaranteCobranza } from "@/models/ICliente";
+import { IClienteConyugue } from "@/models/IConyugue";
+import { useClienteViviendaObtener } from "@/service/Cliente/useClienteViviendaObtener";
+import { IDireccionGcobranza } from "@/models/IDireccion";
+import Select, { IDatosSelect } from "../commons/select/Select";
+import { find } from "lodash";
+import { useObtenerGestionesPasadas } from "@/service/gestiones/useObtenerGestionesPasadas";
+import { IGestionesCelularPasadas } from "@/models/IGestionesCelular";
+import { format } from "date-fns";
+import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
+import Separador from "../commons/separador/Separador";
 
-const GestionPageDetallesCliente = () => {
+interface PropsGestionPageDetallesCliente {
+  identificacionCliente: string;
+}
+const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
+  identificacionCliente,
+}) => {
   const [modalClientes, setModalClientes] = useState(false);
   const [modalVivienda, setModalVivienda] = useState(false);
+  const [documetoSeleccionado, setDocumentoSeleccionado] = useState<string>("");
 
-  const [cliente, setCliente] = useState<IVerificacionDetalleGeneral | null>(
-    null
-  );
+  const [cliente, setCliente] = useState<Partial<ICliente> | null>(null);
 
-  const [vivienda, setVivienda] = useState<IVerificacionDatosVivienda | null>(
-    null
-  );
-  const handleOpenCliente = useCallback((dato: any) => {
+  const [vivienda, setVivienda] = useState<IDireccionGcobranza | null>(null);
+
+  const { data: datosCliente } = useClienteObtener({
+    identificacion: identificacionCliente,
+  });
+
+  const { data: datosClienteConyugue } = useClienteConyugueObtener({
+    identificacion: identificacionCliente,
+  });
+
+  const { data: datosClienteGarante } = useClienteGaranteObtener({
+    identificacion: identificacionCliente,
+  });
+
+  const { data: datosClienteVivienda } = useClienteViviendaObtener({
+    identificacion: identificacionCliente,
+  });
+
+  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
+    identificacion: identificacionCliente,
+  });
+
+  const { data: dataGestionesPasadas } = useObtenerGestionesPasadas({
+    nroDocumento: documetoSeleccionado,
+  });
+
+  const datosDocumentosCabecera = useMemo<IDatosSelect[]>(() => {
+    if (datosDocumentos && datosDocumentos.length > 0) {
+      setDocumentoSeleccionado(datosDocumentos[0].nroDocumento);
+      return datosDocumentos.map((item) => {
+        return {
+          label: item.nroDocumento,
+          value: item.nroDocumento,
+        };
+      });
+    } else {
+      return [];
+    }
+  }, [datosDocumentos]);
+
+  const handleOpenCliente = useCallback((datos: ICliente | null) => {
+    setCliente(datos);
+    setModalClientes(true);
+  }, []);
+  const handleOpenConyugue = useCallback((dato: IClienteConyugue) => {
     setCliente({
-      cedulaCliente: "092037160-6",
-      nombreCliente: "GUTAMA PEÑALOZA MARIA MERCEDES PT UA-011569",
-      estadoCivil: "SOLTERO",
-      dependientes: 0,
-      telefono: "099880412",
-      observacion:
-        "COMERCINATE / PAGOS PUNTUTALES POR SALIR DE UN CREDITO / DOMICILIO CON ESTABILIDAD FAMILIAR ",
-      referencias:
-        "GUTAMA MARIO 0998801412 072420298 SAN CARLOS GUTAMA EVA 0958993962 072420298 SAB CARLOS / SUSTENTO AGRICULTOR",
+      apellido: dato.apellido,
+      identificacion: dato.identificacion,
+      nombres: dato.nombres,
+      observacion: dato.ocupacionLaboral,
+      referencias: dato.referencias,
     });
     setModalClientes(true);
   }, []);
-  const handleOpenConyugue = useCallback((dato: any) => {
+
+  const handleOpenGarante = useCallback((dato: IClienteGaranteCobranza) => {
     setCliente({
-      cedulaCliente: "092037160-6",
-      nombreCliente: "GUTAMA PEÑALOZA MARIA MERCEDES PT UA-011569",
-      estadoCivil: "SOLTERO",
-      dependientes: 0,
-      telefono: "099880412",
-      observacion:
-        "COMERCINATE / PAGOS PUNTUTALES POR SALIR DE UN CREDITO / DOMICILIO CON ESTABILIDAD FAMILIAR ",
-      referencias:
-        "GUTAMA MARIO 0998801412 072420298 SAN CARLOS GUTAMA EVA 0958993962 072420298 SAB CARLOS / SUSTENTO AGRICULTOR",
+      identificacion: dato.identificacion,
+      nombres: dato.nombres,
+      telefono: dato.telefono,
+      observacion: dato.trabajaEn,
+      referencias: dato.detalleDireccion,
     });
     setModalClientes(true);
   }, []);
 
-  const handleOpenGarante = useCallback((dato: any) => {
-    setCliente({
-      cedulaCliente: "092037160-6",
-      nombreCliente: "GUTAMA PEÑALOZA MARIA MERCEDES PT UA-011569",
-      estadoCivil: "SOLTERO",
-      dependientes: 0,
-      telefono: "099880412",
-      observacion:
-        "COMERCINATE / PAGOS PUNTUTALES POR SALIR DE UN CREDITO / DOMICILIO CON ESTABILIDAD FAMILIAR nsvsan lkmn lkmfasfde sfms efns fsmef semfioe msfme oisef oesofsofnmsefn  ",
-      referencias:
-        "GUTAMA MARIO 0998801412 072420298 SAN CARLOS GUTAMA EVA 0958993962 072420298 SAB CARLOS / SUSTENTO AGRICULTOR",
-    });
-    setModalClientes(true);
-  }, []);
-
-  const handleOpenVivienda = useCallback((dato: any) => {
-    setVivienda({
-      construccion: "",
-      direccion:
-        "TRONCAL RCTO SAN CARLOS 01 AV PRINCIPAL LA INDIANA ANTES DE LA T A L DERECHA CASA DE DOS PISOS  DE LADRILLO",
-      nombrePropietario: "ROSENDO DAVID GUTAMA GUTAMA",
-      telefonoPropietario: "",
-      tipoVivienda: "FAMILIAR",
-      zona: "TRONCAL ZONA 1",
-    });
+  const handleOpenVivienda = useCallback((dato: IDireccionGcobranza) => {
+    setVivienda(dato);
     setModalVivienda(true);
   }, []);
 
@@ -92,25 +117,31 @@ const GestionPageDetallesCliente = () => {
     setModalVivienda(false);
   }, []);
 
+  const handleSeleccionarDocumento = useCallback((dato: IDatosSelect) => {
+    setDocumentoSeleccionado(dato.value);
+  }, []);
+
   const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => (
+    ({ item, index }: { item: IGestionesCelularPasadas; index: number }) => (
       <Card width={convertirTamanoHorizontal(370)}>
         <HeaderCard
-          labelRight="25-01-2025"
+          labelRight={format(item.fechaGestion, "dd-MM-yyyy HH:mm:ss")}
           styleRight={styles.styleHeaderCardRigth}
         />
         <HeaderCard
           labelLeft="Observación"
-          labelRight="Se le deja al ex compañero de trabajo"
+          labelRight={item.observacion}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Tipo Gestión"
-          labelRight="Cob-presion en lugar de trabajo"
+          labelRight={item.tipoGestion}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Gestor"
           labelRight="ARBITO DIAS ROLANDO MARTIN"
@@ -125,54 +156,81 @@ const GestionPageDetallesCliente = () => {
   return (
     <View style={styles.containerDetalles}>
       <Card width={convertirTamanoHorizontal(370)}>
-        <TextCardIcon
-          icon={
-            <Icon
-              name="expand-arrows-alt"
-              size={convertirTamanoHorizontal(20)}
+        {datosCliente && datosCliente.length > 0 && (
+          <TextCardIcon
+            icon={
+              <Icon
+                name="expand-arrows-alt"
+                size={convertirTamanoHorizontal(20)}
+              />
+            }
+            textDetalle={
+              datosCliente[0].apellido + " " + datosCliente[0].nombres
+            }
+            textCabecera="Cliente"
+            onPress={() => handleOpenCliente(datosCliente[0])}
+          />
+        )}
+        {datosClienteConyugue &&
+          datosClienteConyugue.length > 0 &&
+          datosClienteConyugue[0].nombres !== " " && (
+            <TextCardIcon
+              icon={
+                <Icon
+                  name="expand-arrows-alt"
+                  size={convertirTamanoHorizontal(20)}
+                />
+              }
+              textDetalle={datosClienteConyugue[0].nombres ?? ""}
+              textCabecera="Conyugue"
+              onPress={() => handleOpenConyugue(datosClienteConyugue[0])}
             />
-          }
-          textDetalle="AREVALO RIVAS FAUSTO GEOVANY"
-          textCabecera="Cliente"
-          onPress={() => handleOpenCliente({ dato: "dd" })}
-        />
-        <TextCardIcon
-          icon={
-            <Icon
-              name="expand-arrows-alt"
-              size={convertirTamanoHorizontal(20)}
-            />
-          }
-          textDetalle="AREVALO RIVAS FAUSTO GEOVANY"
-          textCabecera="Conyugue"
-          onPress={() => handleOpenConyugue("conyuge")}
-        />
-        <TextCardIcon
-          icon={
-            <Icon
-              name="expand-arrows-alt"
-              size={convertirTamanoHorizontal(20)}
-            />
-          }
-          textDetalle="AREVALO RIVAS FAUSTO GEOVANY"
-          textCabecera="Garante"
-          onPress={() => handleOpenGarante("garante")}
-        />
-        <TextCardIcon
-          icon={
-            <Icon
-              name="expand-arrows-alt"
-              size={convertirTamanoHorizontal(20)}
-            />
-          }
-          textDetalle="AREVALO RIVAS FAUSTO GEOVANY"
-          textCabecera="Vivienda"
-          onPress={() => handleOpenVivienda("vivienda")}
-        />
+          )}
+
+        {datosClienteGarante && datosClienteGarante.length > 0 && (
+          <TextCardIcon
+            icon={
+              <Icon
+                name="expand-arrows-alt"
+                size={convertirTamanoHorizontal(20)}
+              />
+            }
+            textDetalle={datosClienteGarante[0].nombres ?? ""}
+            textCabecera="Garante"
+            onPress={() => handleOpenGarante(datosClienteGarante[0])}
+          />
+        )}
+
+        {datosClienteVivienda && datosClienteVivienda.length > 0 && (
+          <TextCardIcon
+            icon={
+              <Icon
+                name="expand-arrows-alt"
+                size={convertirTamanoHorizontal(20)}
+              />
+            }
+            textDetalle={datosClienteVivienda[0].direccion ?? ""}
+            textCabecera="Vivienda"
+            onPress={() => handleOpenVivienda(datosClienteVivienda[0])}
+          />
+        )}
       </Card>
+      {datosDocumentosCabecera && datosDocumentosCabecera.length > 1 && (
+        <Card>
+          <Select
+            datos={datosDocumentosCabecera}
+            styleContainer={styles.styleContainer}
+            defaultValue={find(
+              datosDocumentosCabecera,
+              (item) => item.label === documetoSeleccionado
+            )}
+            onSelect={handleSeleccionarDocumento}
+          />
+        </Card>
+      )}
 
       <FlatList
-        data={[1, 2, 3, 4]}
+        data={dataGestionesPasadas}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
@@ -221,5 +279,9 @@ const styles = StyleSheet.create({
     width: convertirTamanoHorizontal(240),
     color: GRIS,
     fontSize: convertirTamanoHorizontal(15),
+  },
+  styleContainer: {
+    height: convertirTamanoVertical(40),
+    width: convertirTamanoHorizontal(350),
   },
 });

@@ -16,6 +16,7 @@ import m0011 from './0011_groovy_odin.sql';
 import m0012 from './0012_common_prodigy.sql';
 import m0013 from './0013_complete_hardball.sql';
 import m0014 from './0014_damp_changeling.sql';
+import m0015 from './0015_regular_mach_iv.sql';
 
   export default {
     journal,
@@ -34,7 +35,8 @@ m0010,
 m0011,
 m0012,
 m0013,
-m0014
+m0014,
+m0015
     }
   }
   

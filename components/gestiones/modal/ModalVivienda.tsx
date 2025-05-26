@@ -4,13 +4,13 @@ import ModalCustom from "@/components/commons/modal/ModalCustom";
 import HeaderCard from "@/components/commons/card/HeaderCard";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
 import { GRIS, GRIS_CLARO } from "@/constants/Colors";
-import { IVerificacionDatosVivienda } from "@/models/IVerificacionPrueba";
 import Separador from "@/components/commons/separador/Separador";
+import { IDireccionGcobranza } from "@/models/IDireccion";
 
 interface PropsModalVivienda {
   visible: boolean;
   onClose: () => void;
-  datos: IVerificacionDatosVivienda;
+  datos: IDireccionGcobranza;
 }
 
 const ModalVivienda: React.FC<PropsModalVivienda> = ({
@@ -44,7 +44,7 @@ const ModalVivienda: React.FC<PropsModalVivienda> = ({
         styleRight={styles.labelCardRight}
       />
       <Separador color={GRIS_CLARO} />
-      <HeaderCard
+      {/* <HeaderCard
         labelLeft="telefono del dueño"
         labelRight={datos.telefonoPropietario}
         styleContainer={styles.rowCardStyle}
@@ -58,7 +58,7 @@ const ModalVivienda: React.FC<PropsModalVivienda> = ({
         styleContainer={styles.rowCardStyle}
         styleLeft={styles.labelCardLeft}
         styleRight={styles.labelCardRight}
-      />
+      /> */}
     </ModalCustom>
   );
 };

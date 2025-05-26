@@ -8,8 +8,9 @@ import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import GestionPageDetallesCliente from "./GestionPageDetallesCliente";
 import GestionesPageDetallesDocumenos from "./GestionesPageDetallesDocumenos";
-import GestionesPageDetallesDireccion from "./GestionesPageDetallesDireccion";
-import { Toast } from "toastify-react-native";
+import GestionesPageDetallesDireccion, {
+  PropsGestionesPageDetallesDireccionRef,
+} from "./GestionesPageDetallesDireccion";
 import { useGestionStore } from "@/helper/store/storeGestiones";
 
 const GestionPageDetalles = () => {
@@ -18,17 +19,26 @@ const GestionPageDetalles = () => {
 
   const { datos } = useGestionStore();
 
+  const gestionDireccion =
+    React.useRef<PropsGestionesPageDetallesDireccionRef>(null);
+
   const tabs = useMemo(() => ["Cliente", "Documentos", "Dirección"], []);
 
   const tabCorrespondiente = useMemo(() => {
     if (tabs[tab] === "Cliente") {
-      return <GestionPageDetallesCliente />;
-    } else if (tabs[tab] === "Documentos") {
-      return <GestionesPageDetallesDocumenos />;
-    } else {
-      return <GestionesPageDetallesDireccion />;
+      return (
+        <GestionPageDetallesCliente
+          identificacionCliente={datos?.identificacionCliente ?? ""}
+        />
+      );
+    } else if (tabs[tab] === "Documentos" && datos) {
+      return <GestionesPageDetallesDocumenos datos={datos} />;
+    } else if (tabs[tab] === "Dirección" && datos) {
+      return (
+        <GestionesPageDetallesDireccion datos={datos} ref={gestionDireccion} />
+      );
     }
-  }, [tab, tabs]);
+  }, [datos, tab, tabs]);
 
   const tabIcon = useMemo(() => {
     if (tabs[tab] === "Dirección") {
@@ -37,13 +47,19 @@ const GestionPageDetalles = () => {
     return "plus";
   }, [tab, tabs]);
 
+  const handleGuardarDireccion = useCallback(() => {
+    if (gestionDireccion.current) {
+      gestionDireccion.current.handleSubmit();
+    }
+  }, []);
+
   const handleOpenModalGestion = useCallback(() => {
     if (tabs[tab] === "Dirección") {
-      Toast.success("Datos actualizados");
+      handleGuardarDireccion();
       return;
     }
     setModalGestionar(true);
-  }, [tab, tabs]);
+  }, [handleGuardarDireccion, tab, tabs]);
 
   const handleCloseModalGestion = useCallback(() => {
     setModalGestionar(false);
@@ -66,10 +82,11 @@ const GestionPageDetalles = () => {
       {tabCorrespondiente}
       <Footer items={tabs} setTab={setTab} />
 
-      {modalGestionar && (
+      {modalGestionar && datos && (
         <ModalRealizarGestion
           onClose={handleCloseModalGestion}
           visible={modalGestionar}
+          datos={datos}
         />
       )}
     </View>

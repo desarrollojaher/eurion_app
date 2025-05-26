@@ -8,27 +8,29 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import { GRIS } from "@/constants/Colors";
 import ModalDocumentos from "./modal/ModalDocumentos";
-import { IDocumento } from "@/models/IGestionesPrueba";
 
-const GestionesPageDetallesDocumenos = () => {
-  const [documento, setDocumento] = useState<IDocumento | null>(null);
+import { IGestiones } from "@/models/IGestiones";
+import { formatCurrency } from "@/helper/function/numericas";
+import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
+import { IDocumentosCabecera } from "@/models/IDocumentos";
+import { format } from "date-fns";
+
+interface PropsGestionesPageDetallesDocumenos {
+  datos: IGestiones;
+}
+const GestionesPageDetallesDocumenos: React.FC<
+  PropsGestionesPageDetallesDocumenos
+> = ({ datos }) => {
   const [modalDocumentos, setModalDocumentos] = useState(false);
+  const [documentoSeleccionado, setDocumentoSeleccionado] =
+    useState<string>("");
 
-  const handleOpenDocumeno = useCallback(() => {
-    setDocumento({
-      doctran: "12345",
-      tramo: "A",
-      cuotasPagadas: "10",
-      cuotasPendientes: "5",
-      fechaVencimiento: "2025-05-01",
-      fechaUltPago: "2025-04-01",
-      valorCuota: "100.00",
-      saldoVencido: "50.00",
-      interesesMora: "5.00",
-      gastosCobranza: "10.00",
-      saldoCapital: "500.00",
-      deudaTotal: "565.00",
-    });
+  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
+    identificacion: datos.identificacionCliente,
+  });
+
+  const handleOpenDocumeno = useCallback((nroDocumento: string) => {
+    setDocumentoSeleccionado(nroDocumento);
     setModalDocumentos(true);
   }, []);
 
@@ -37,36 +39,36 @@ const GestionesPageDetallesDocumenos = () => {
   }, []);
 
   const renderItem = useCallback(
-    ({ item, index }: { item: any; index: number }) => (
+    ({ item, index }: { item: IDocumentosCabecera; index: number }) => (
       <Card width={convertirTamanoHorizontal(370)} style={styles.styleCard}>
-        <TouchableOpacity onPress={handleOpenDocumeno}>
+        <TouchableOpacity onPress={() => handleOpenDocumeno(item.nroDocumento)}>
           <HeaderCard
-            labelLeft="A0AGX0093"
-            labelRight="25-02-2025"
+            labelLeft={item.nroDocumento}
+            labelRight={format(item.fecha, "dd-MM-yyyy HH:mm:ss")}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigthCabecera}
           />
           <HeaderCard
             labelLeft="Pago"
-            labelRight="4/19"
+            labelRight={item.cuotasPagadas}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
           />
           <HeaderCard
             labelLeft="Deuda Total"
-            labelRight="$ 597.05"
+            labelRight={formatCurrency(item.deudaTotal)}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
           />
           <HeaderCard
             labelLeft="Saldo Vencido"
-            labelRight="$ 402.00"
+            labelRight={formatCurrency(item.saldoVencido)}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
           />
           <HeaderCard
             labelLeft="Producto"
-            labelRight="Motocicleta shineray"
+            labelRight={item.producto}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
           />
@@ -84,28 +86,28 @@ const GestionesPageDetallesDocumenos = () => {
       >
         <HeaderCard
           labelLeft="Saldo Vencido"
-          labelRight="$ 30.6"
+          labelRight={formatCurrency(datos.saldoVencido)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
         <HeaderCard
           labelLeft="Deuda Total"
-          labelRight="$ 2340.52"
+          labelRight={formatCurrency(datos.deudaTotal)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
       </Card>
       <FlatList
-        data={[1, 2, 3, 4, 5, 6, 7]}
+        data={datosDocumentos}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
       />
-      {modalDocumentos && documento && (
+      {modalDocumentos && documentoSeleccionado !== "" && (
         <ModalDocumentos
           visible={modalDocumentos}
           onClose={handleCloseModalDocumenos}
-          data={documento}
+          data={documentoSeleccionado}
         />
       )}
     </View>
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
     width: convertirTamanoHorizontal(130),
   },
   styleLabelRigth: {
-    width: convertirTamanoHorizontal(240),
+    width: convertirTamanoHorizontal(235),
     color: GRIS,
     fontSize: convertirTamanoHorizontal(15),
   },

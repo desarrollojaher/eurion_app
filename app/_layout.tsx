@@ -21,6 +21,7 @@ import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authApi } from "@/api/auth";
 import NetInfo from "@react-native-community/netinfo";
+import { StatusBar } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -107,7 +108,6 @@ export default function RootLayout() {
           options={{ enableChangeListener: true }}
           useSuspense
         >
-          {/* <DrizzleStudioInitializer /> */}
           <SessionProvider token={token}>
             <QueryClientProvider client={queryClient}>
               <Slot />
@@ -121,7 +121,7 @@ export default function RootLayout() {
           </SessionProvider>
         </SQLiteProvider>
       </Suspense>
-      {/* <StatusBar style="auto" /> */}
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
     </ThemeProvider>
   );
 }

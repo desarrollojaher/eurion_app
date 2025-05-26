@@ -13,10 +13,11 @@ export interface IGestiones {
   zonaNombre: string;
   imagenCliente: string;
   imagenDomicilio: string;
+  telefono: string;
 }
 
 export interface IGestionesFiltro {
   buscador: string;
   zona: string;
-  tipo: string
+  tipo: string;
 }

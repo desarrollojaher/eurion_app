@@ -41,6 +41,7 @@ interface PropsTextInput {
   readOnly?: boolean;
   inputMode?: "text" | "numeric" | "decimal" | "none";
   onBlurs?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
+  onPressText?: () => void;
 }
 
 const TextInput: React.FC<PropsTextInput> = ({
@@ -62,6 +63,7 @@ const TextInput: React.FC<PropsTextInput> = ({
   readOnly,
   inputMode = "text",
   onBlurs,
+  onPressText,
 }) => {
   const [modalFecha, setModalFecha] = useState(false);
 
@@ -113,6 +115,7 @@ const TextInput: React.FC<PropsTextInput> = ({
           readOnly={readOnly}
           inputMode={inputMode}
           onBlur={onBlurs}
+          onPress={onPressText}
         />
       )}
       {tipo === "date" && (
@@ -144,7 +147,7 @@ const TextInput: React.FC<PropsTextInput> = ({
           onSelect={onChangeSelect}
           styleContainer={styles.containerSelect}
           isError={isError}
-          labelError={labelError}
+          labelError={typeof labelError === "string" ? labelError : ""}
         />
       )}
       {modalFecha && (
