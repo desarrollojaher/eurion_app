@@ -1,1 +1,0 @@
-ALTER TABLE `verificaciones_resultado` ADD `sincronizado` integer DEFAULT 0;

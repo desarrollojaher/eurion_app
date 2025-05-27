@@ -19,10 +19,12 @@ import {
 import { db } from "@/app/_layout";
 import {
   ISubirInformacion,
+  ISubirInformacionActualizaciones,
+  ISubirInformacionActualizacionesGeneral,
   ISubirInformacionEliminar,
 } from "@/models/ISubirInformacion";
 import { IImagenCliente, IImagenDomicilio } from "@/models/IImagenes";
-import { groupBy, mapValues, sumBy, unionBy } from "lodash";
+import _, { groupBy, mapValues, sumBy, union, unionBy } from "lodash";
 import {
   IDocumentoPasadoParams,
   IDocumentos,
@@ -51,7 +53,11 @@ import {
 } from "@/models/ICliente";
 import { IClienteConyugue } from "@/models/IConyugue";
 import { IDireccionGcobranza } from "@/models/IDireccion";
-import { IDireccionCelularGcobranza } from "@/models/IDireccionCelularGcobranza";
+import {
+  IDireccionCelularGcobranza,
+  imagenActualizacion,
+} from "@/models/IDireccionCelularGcobranza";
+import { IImagenCompleta } from "@/models/IImagenCompleta";
 
 export const dbSqliteService = {
   insertarVerificaciones: async (datos: ISincronizarVerificaciones[]) => {
@@ -637,6 +643,7 @@ export const dbSqliteService = {
           calificacion: sql`CASE WHEN ${schema.verificacionesResultadoTable.verificacion} = 1 THEN 'POSITIVA' WHEN ${schema.verificacionesResultadoTable.verificacion} = 2 THEN 'NEGATIVA' END`,
           factura: sql`'VERIFICACION'`,
           identificacionCliente: schema.clientesTable.identificacion,
+          observacion: schema.verificacionesResultadoTable.observaciones,
         })
         .from(schema.verificacionesResultadoTable)
         .leftJoin(
@@ -657,6 +664,7 @@ export const dbSqliteService = {
           factura: sql`'VERIFICACION'`,
           identificacionCliente:
             schema.verificacionesTable.identificacionCliente,
+          observacion: sql`'SIN OBSERVACION'`,
         })
         .from(schema.verificacionesTable)
         .innerJoin(
@@ -672,7 +680,6 @@ export const dbSqliteService = {
             eq(schema.verificacionesTable.sincronizado, 0)
           )
         );
-
       //une los datos de verificaciones y verificaciones2
       const unionData = unionBy(
         verificaciones,
@@ -692,12 +699,57 @@ export const dbSqliteService = {
     }
   },
 
+  obtenerGestionesRealizadas: async () => {
+    try {
+      const gestionesRealizadas: ISubirInformacion[] = await db
+        .select({
+          id: schema.gestionesCelularGcobranzaTable.identificacionCliente,
+          tipoGestion: schema.tipoGestionesTable.descripcion,
+          fecha: schema.gestionesCelularGcobranzaTable.fechaGestion,
+          cliente: schema.clientesTable.nombres,
+          factura: schema.gestionesCelularGcobranzaTable.nroDocumento,
+          identificacionCliente:
+            schema.gestionesCelularGcobranzaTable.identificacionCliente,
+          observacion: schema.gestionesCelularGcobranzaTable.observaciones,
+        })
+        .from(schema.gestionesCelularGcobranzaTable)
+        .leftJoin(
+          schema.clientesTable,
+          eq(
+            schema.clientesTable.identificacion,
+            schema.gestionesCelularGcobranzaTable.identificacionCliente
+          )
+        )
+        .leftJoin(
+          schema.tipoGestionesTable,
+          eq(
+            schema.tipoGestionesTable.codigo,
+            schema.gestionesCelularGcobranzaTable.codigoTipoGestion
+          )
+        )
+        .where(and(eq(schema.gestionesCelularGcobranzaTable.sincronizado, 0)));
+      return gestionesRealizadas;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
   obtenerInfoSubir: async () => {
     try {
       const verificaciones =
         await dbSqliteService.obtenerDatosSubirVerificacion();
 
-      return verificaciones;
+      const gestionesRealizadas =
+        await dbSqliteService.obtenerGestionesRealizadas();
+
+      const gestionesRealizadasUnion: ISubirInformacion[] = union(
+        verificaciones,
+        gestionesRealizadas
+      );
+      return gestionesRealizadasUnion;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -742,6 +794,74 @@ export const dbSqliteService = {
     }
   },
 
+  eliminarGestionesCelular: async (datos: ISubirInformacionEliminar) => {
+    try {
+      await db.run("BEGIN TRANSACTION");
+      const tipoGestiones = await db
+        .select()
+        .from(schema.tipoGestionesTable)
+        .where(eq(schema.tipoGestionesTable.descripcion, datos.tipoGestion));
+      const res = await db
+        .delete(schema.gestionesCelularGcobranzaTable)
+        .where(
+          and(
+            eq(schema.gestionesCelularGcobranzaTable.sincronizado, 0),
+            eq(
+              schema.gestionesCelularGcobranzaTable.identificacionCliente,
+              datos.identificacionCliente
+            ),
+            eq(
+              schema.gestionesCelularGcobranzaTable.codigoTipoGestion,
+              tipoGestiones[0].codigo ?? ""
+            ),
+            eq(
+              schema.gestionesCelularGcobranzaTable.nroDocumento,
+              datos.factura ?? ""
+            )
+          )
+        );
+
+      if (res.changes === 0) {
+        await db.run("ROLLBACK");
+        throw { message: "Error al eliminar la gestion" };
+      }
+
+      const res2 = await db
+        .update(schema.enviarGcobranzaCelularTable)
+        .set({
+          esGestionado: 0,
+        })
+        .where(
+          and(
+            eq(
+              schema.enviarGcobranzaCelularTable.identificacionCliente,
+              datos.identificacionCliente
+            ),
+            eq(
+              schema.enviarGcobranzaCelularTable.nroDocumento,
+              datos.factura ?? ""
+            ),
+            eq(
+              schema.enviarGcobranzaCelularTable.periodo,
+              Number(format(new Date(), "yyyyMM"))
+            )
+          )
+        );
+      if (res2.changes === 0) {
+        await db.run("ROLLBACK");
+        throw { message: "Error al eliminar la gestion" };
+      }
+
+      await db.run("COMMIT");
+    } catch (error: any) {
+      await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
   eliminarInformacionGestionada: async (datos: ISubirInformacionEliminar) => {
     try {
       const tipoGestion =
@@ -749,6 +869,7 @@ export const dbSqliteService = {
 
       const calificacion = datos.calificacion === "POSITIVA" ? 1 : 2;
       if (datos.modulo === "verificacion") {
+        await db.run("BEGIN TRANSACTION");
         await dbSqliteService.eliminarVerificaciones({
           calificacion: calificacion,
           cedulaCliente: datos.identificacionCliente,
@@ -762,8 +883,14 @@ export const dbSqliteService = {
           identificacionCliente: datos.identificacionCliente,
           reversar: true,
         });
+
+        await db.run("COMMIT");
+      }
+      if (datos.modulo === "gestion") {
+        await dbSqliteService.eliminarGestionesCelular(datos);
       }
     } catch (error: any) {
+      await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
@@ -1131,8 +1258,22 @@ export const dbSqliteService = {
   },
   guardarActualizacionDireccion: async (datos: IDireccionCelularGcobranza) => {
     try {
+      await db.run("BEGIN TRANSACTION");
       await db.insert(schema.direccionCelularGcobranzaTable).values(datos);
+      const datosImagen: imagenActualizacion[] = [];
+      datos.imagenes?.map((item) => {
+        datosImagen.push({
+          identiticacionCliente: datos.identificacionCliente,
+          imagen: item.url,
+          titulo: item.titulo,
+        });
+      });
+      await db
+        .insert(schema.imagenesActualizarDireccionTable)
+        .values(datosImagen);
+      await db.run("COMMIT TRANSACTION");
     } catch (error: any) {
+      await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
@@ -1155,8 +1296,20 @@ export const dbSqliteService = {
 
   guargarGestionesCelular: async (data: IGestionesCelularCrear) => {
     try {
-      db.run("BEGIN TRANSACTION");
-      await db.insert(schema.gestionesCelularGcobranzaTable).values(data);
+      await db.run("BEGIN TRANSACTION");
+      await db.insert(schema.gestionesCelularGcobranzaTable).values({
+        codigoTipoGestion: data.codigoTipoGestion,
+        nroDocumento: data.nroDocumento,
+        identificacionCliente: data.identificacionCliente,
+        observaciones: data.observaciones,
+        fechaGestion: data.fechaGestion,
+        latitud: data.latitud,
+        longitud: data.longitud,
+        codigoTipoGestionProxima: data.codigoTipoGestionProxima,
+        fechaProximaGestion: data.fechaProximaGestion,
+        observacionesProximaGestion: data.observacionesProximaGestion,
+      });
+
       const cantidad = await db
         .update(schema.enviarGcobranzaCelularTable)
         .set({ esGestionado: 1 })
@@ -1169,16 +1322,127 @@ export const dbSqliteService = {
             eq(
               schema.enviarGcobranzaCelularTable.identificacionCliente,
               data.identificacionCliente
-            )
+            ),
+            eq(schema.gestionesCelularGcobranzaTable.sincronizado, 0)
           )
         );
       if (cantidad.changes === 0) {
-        db.run("ROLLBACK");
+        await db.run("ROLLBACK");
         throw { message: "No se pudo actualizar el documento" };
       }
       db.run("COMMIT");
     } catch (error: any) {
-      db.run("ROLLBACK");
+      console.log(error);
+      await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerActualizacionesDireccion: async () => {
+    try {
+      const actualizaciones: ISubirInformacionActualizacionesGeneral[] =
+        await db
+          .select({
+            identificacionCliente:
+              schema.direccionCelularGcobranzaTable.identificacionCliente,
+            direccion: schema.direccionCelularGcobranzaTable.direccionIngresada,
+            nombre: schema.clientesTable.nombres,
+            fecha: schema.direccionCelularGcobranzaTable.fecha,
+            direccionAdicional:
+              schema.direccionCelularGcobranzaTable.indicacionesAdicionales,
+            latitud: schema.direccionCelularGcobranzaTable.latitud,
+            longitud: schema.direccionCelularGcobranzaTable.longitud,
+            titulo: schema.imagenesActualizarDireccionTable.titulo,
+            url: schema.imagenesActualizarDireccionTable.imagen,
+          })
+          .from(schema.direccionCelularGcobranzaTable)
+          .leftJoin(
+            schema.clientesTable,
+            and(
+              eq(
+                schema.clientesTable.identificacion,
+                schema.direccionCelularGcobranzaTable.identificacionCliente
+              ),
+              eq(schema.clientesTable.tipo, 2)
+            )
+          )
+          .leftJoin(
+            schema.imagenesActualizarDireccionTable,
+            and(
+              eq(
+                schema.imagenesActualizarDireccionTable.identiticacionCliente,
+                schema.direccionCelularGcobranzaTable.identificacionCliente
+              ),
+              eq(schema.imagenesActualizarDireccionTable.sincronizado, 0)
+            )
+          );
+
+      const informacionActualizaciones: ISubirInformacionActualizaciones[] = _(
+        actualizaciones
+      )
+        .groupBy("identificacionCliente")
+        .map((items, identificacionCliente) => ({
+          identificacionCliente,
+          nombre: items[0].nombre,
+          direccion: items[0].direccion,
+          fecha: items[0].fecha,
+          direccionAdicional: items[0].direccionAdicional,
+          latitud: items[0].latitud,
+          longitud: items[0].longitud,
+          imagenes: items.map((item) => ({
+            url: item.url,
+            titulo: item.titulo,
+          })),
+        }))
+        .value() as ISubirInformacionActualizaciones[];
+
+      return informacionActualizaciones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarActualizacionesDireccion: async (
+    datos: ISubirInformacionActualizaciones
+  ) => {
+    try {
+      await db.run("BEGIN TRANSACTION");
+      await db
+        .delete(schema.direccionCelularGcobranzaTable)
+        .where(
+          and(
+            eq(
+              schema.direccionCelularGcobranzaTable.identificacionCliente,
+              datos.identificacionCliente ?? ""
+            ),
+            eq(
+              schema.direccionCelularGcobranzaTable.direccionIngresada,
+              datos.direccion ?? ""
+            )
+          )
+        );
+
+      await db
+        .delete(schema.imagenesActualizarDireccionTable)
+        .where(
+          and(
+            eq(
+              schema.imagenesActualizarDireccionTable.identiticacionCliente,
+              datos.identificacionCliente ?? ""
+            ),
+            eq(schema.imagenesActualizarDireccionTable.sincronizado, 0)
+          )
+        );
+
+      await db.run("COMMIT");
+    } catch (error: any) {
+      await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;

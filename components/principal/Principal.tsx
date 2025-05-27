@@ -24,6 +24,7 @@ import { drizzle, useLiveQuery } from "drizzle-orm/expo-sqlite";
 import * as schema from "@/db/schema";
 import { desc } from "drizzle-orm";
 import ModalCerrarSesion from "./modal/ModalCerrarSesion";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 const Principal = () => {
   const [modalAlerta, setModalAlerta] = useState(false);
@@ -35,6 +36,7 @@ const Principal = () => {
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
+  useDrizzleStudio(db);
 
   const { data } = useLiveQuery(
     drizzleDb

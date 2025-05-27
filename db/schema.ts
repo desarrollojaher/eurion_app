@@ -1,6 +1,7 @@
 import { unique } from "drizzle-orm/sqlite-core";
 import { integer } from "drizzle-orm/sqlite-core";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { identity } from "lodash";
 export const usuarioTable = sqliteTable("usuario", {
   id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
@@ -252,6 +253,18 @@ export const direccionCelularGcobranzaTable = sqliteTable(
     latitud: integer({ mode: "number" }),
     longitud: integer({ mode: "number" }),
     nroDocumento: text(),
+    fecha: text(),
+    sincronizado: int().default(0),
+  }
+);
+
+export const imagenesActualizarDireccionTable = sqliteTable(
+  "imagenes_actualizar_direccion",
+  {
+    identiticacionCliente: text(),
+    imagen: text(),
+    titulo: text(),
+    sincronizado: int().default(0),
   }
 );
 

@@ -1,1 +1,0 @@
-DROP INDEX `clientes_email_unique`;

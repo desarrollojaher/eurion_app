@@ -1,4 +1,10 @@
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from "react-native";
 import React, { useCallback, useState } from "react";
 import Card from "@/components/commons/card/Card";
 import HeaderCard from "@/components/commons/card/HeaderCard";
@@ -8,15 +14,42 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO, NEGRO } from "@/constants/Colors";
+import { useSubirInformacionActualizacionesObtener } from "@/service/SubirInformacion/useSubirInformacionActualizacionesObtener";
+import EmptyList from "@/components/commons/FlatList/EmptyList";
+import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
+import { ISubirInformacionActualizaciones } from "@/models/ISubirInformacion";
+import { useSubirGestionEliminarActualizaciones } from "@/service/SubirInformacion/useSubirGestionEliminarActualizaciones";
 import ModalAlertaSubirEliminar from "@/components/commons/modal/ModalAlertaSubirEliminar";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { IImagenCompleta } from "@/models/IImagenCompleta";
+import ModalCarrucelImagenes from "@/components/commons/carousel/ModalCarrucelImagenes";
 
 const ActualizacionesTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
+  const [actualizacion, setActualizacion] =
+    useState<ISubirInformacionActualizaciones | null>(null);
   const [tipoAlerta, setTipoAlerta] = useState<"subir" | "eliminar">("subir");
-  const handleTabDelete = useCallback(() => {
-    console.log("handleTabDelete");
-  }, []);
+  const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+  const [modalCarrucel, setModalCarrucel] = useState(false);
+
+  const {
+    data: dataActualizaciones,
+    isLoading,
+    refetch,
+  } = useSubirInformacionActualizacionesObtener();
+
+  const { mutate: eliminarActualizacion, isPending: isLoadingElimina } =
+    useSubirGestionEliminarActualizaciones();
+
+  const handleTabDelete = useCallback(
+    (item: ISubirInformacionActualizaciones) => {
+      setModalAlertaSubida(true);
+      setTipoAlerta("eliminar");
+      setActualizacion(item);
+    },
+    []
+  );
 
   const handleTabUpload = useCallback(() => {
     console.log("handleTabUpload");
@@ -26,24 +59,68 @@ const ActualizacionesTab = () => {
     setModalAlertaSubida(false);
   }, []);
 
-  const handleEliminar = useCallback(() => {}, []);
+  const handleEliminar = useCallback(() => {
+    if (actualizacion) {
+      eliminarActualizacion(actualizacion);
+    }
+    setModalAlertaSubida(false);
+  }, [actualizacion, eliminarActualizacion]);
+
+  const handleCloseModalCarrucel = useCallback(() => {
+    setModalCarrucel(false);
+  }, []);
+
+  const handleOpenImagenes = useCallback(
+    (data: ISubirInformacionActualizaciones) => {
+      setImagenes(data.imagenes ?? []);
+      setModalCarrucel(true);
+    },
+    []
+  );
 
   const handleSubir = useCallback(() => {}, []);
 
   const renderItem = useCallback(
-    () => (
+    ({ item }: { item: ISubirInformacionActualizaciones }) => (
       <Card>
-        <HeaderCard labelLeft="AREVALO FAUSTO" labelRight="28-03-2025 12: 30" />
+        <HeaderCard labelLeft={item.nombre ?? ""} labelRight={item.fecha} />
         <Separador />
         <HeaderCard
-          labelLeft="Direccion"
-          labelRight="DOM cristobal colon 1 doce de octubre y la que cruza"
+          labelLeft="Dirección"
+          labelRight={item.direccion}
+          styleLeft={styles.styleLabelLeft}
+          styleRight={styles.styleLabelRigth}
+        />
+        <Separador color={GRIS_CLARO} />
+        <HeaderCard
+          labelLeft="Dirección Adicional"
+          labelRight={item.direccionAdicional}
+          styleLeft={styles.styleLabelLeft}
+          styleRight={styles.styleLabelRigth}
+        />
+        <Separador color={GRIS_CLARO} />
+        <HeaderCard
+          labelLeft="Latitud"
+          labelRight={item.latitud?.toString() ?? ""}
+          styleLeft={styles.styleLabelLeft}
+          styleRight={styles.styleLabelRigth}
+        />
+        <Separador color={GRIS_CLARO} />
+        <HeaderCard
+          labelLeft="Longitud"
+          labelRight={item.longitud?.toString() ?? ""}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
         <Separador />
         <View style={styles.containerBotones}>
-          <Pressable style={styles.pressableStyle} onPress={handleTabDelete}>
+          <Pressable onPress={() => handleOpenImagenes(item)}>
+            <FontAwesome5 name="images" color={NEGRO} size={30} />
+          </Pressable>
+          <Pressable
+            style={styles.pressableStyle}
+            onPress={() => handleTabDelete(item)}
+          >
             <Icon name="trash" size={convertirTamanoHorizontal(30)} />
           </Pressable>
           <Pressable style={styles.pressableStyle} onPress={handleTabUpload}>
@@ -52,14 +129,26 @@ const ActualizacionesTab = () => {
         </View>
       </Card>
     ),
-    [handleTabDelete, handleTabUpload]
+    [handleOpenImagenes, handleTabDelete, handleTabUpload]
   );
   return (
     <View>
       <FlatList
-        data={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+        data={dataActualizaciones}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(datos) => datos.identificacionCliente ?? ""}
+        ListEmptyComponent={<EmptyList isLoading={isLoading} />}
+        ListFooterComponent={<LoadingComponent isLoading={isLoading} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            colors={["#007AFF"]}
+            tintColor="#007AFF"
+          />
+        }
       />
       {modalAlertaSubida && (
         <ModalAlertaSubirEliminar
@@ -68,6 +157,14 @@ const ActualizacionesTab = () => {
           tipo={tipoAlerta}
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
+          isLoading={isLoadingElimina}
+        />
+      )}
+      {modalCarrucel && (
+        <ModalCarrucelImagenes
+          data={imagenes}
+          onClose={handleCloseModalCarrucel}
+          visible={modalCarrucel}
         />
       )}
     </View>
@@ -93,6 +190,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: GRIS,
     fontSize: convertirTamanoHorizontal(13),
+    width: convertirTamanoHorizontal(210),
   },
   pressableStyle: {
     width: convertirTamanoHorizontal(40),

@@ -14,7 +14,7 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Separador from "@/components/commons/separador/Separador";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import ModalAlertaSubirEliminar from "../../commons/modal/ModalAlertaSubirEliminar";
 import { useSubirInformacionObtener } from "@/service/SubirInformacion/useSubirInformacionObtener";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
@@ -61,7 +61,7 @@ const GestionesTab = () => {
   }, []);
 
   const handleEliminar = useCallback(() => {
-    if (gestion)
+    if (gestion) {
       if (
         gestion.factura === "VERIFICACION" &&
         (gestion.calificacion === "POSITIVA" ||
@@ -103,6 +103,24 @@ const GestionesTab = () => {
           }
         );
       }
+      if (gestion.factura !== "VERIFICACION") {
+        eliminarGestion(
+          {
+            calificacion: "",
+            factura: gestion.factura,
+            identificacionCliente: gestion.identificacionCliente,
+            modulo: "gestion",
+            tipoGestion: gestion.tipoGestion,
+            id: gestion.id,
+          },
+          {
+            onSuccess: () => {
+              handleCloseModal();
+            },
+          }
+        );
+      }
+    }
   }, [eliminarGestion, eliminarGestionVerificacion, gestion, handleCloseModal]);
 
   const handleSubir = useCallback(() => {}, []);
@@ -111,8 +129,8 @@ const GestionesTab = () => {
     ({ item, index }: { item: ISubirInformacion; index: number }) => (
       <Card>
         <HeaderCard
-          labelLeft={item.cliente}
-          labelRight={format(parseISO(item.fecha), "dd-MM-yyyy hh:mm:ss")}
+          labelLeft={item.cliente ?? ""}
+          labelRight={format(parseISO(item.fecha ?? ""), "dd-MM-yyyy hh:mm:ss")}
           styleLeft={styles.styleLableLeft}
         />
         <Separador />
@@ -122,19 +140,30 @@ const GestionesTab = () => {
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Factura"
           labelRight={item.factura}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
+        <HeaderCard
+          labelLeft="Observación"
+          labelRight={item.observacion}
+          styleLeft={styles.styleLabelLeft}
+          styleRight={styles.styleLabelRigth}
+        />
         {item.factura === "VERIFICACION" && (
-          <HeaderCard
-            labelLeft="Calificacion"
-            labelRight={item.calificacion}
-            styleLeft={styles.styleLabelLeft}
-            styleRight={styles.styleLabelRigth}
-          />
+          <>
+            <Separador color={GRIS_CLARO} />
+            <HeaderCard
+              labelLeft="Calificacion"
+              labelRight={item.calificacion}
+              styleLeft={styles.styleLabelLeft}
+              styleRight={styles.styleLabelRigth}
+            />
+          </>
         )}
         <Separador />
         <View style={styles.containerBotones}>
@@ -209,6 +238,7 @@ const styles = StyleSheet.create({
   },
   styleLabelRigth: {
     flex: 1,
+    width: convertirTamanoHorizontal(140),
     color: GRIS,
     fontSize: convertirTamanoHorizontal(13),
   },

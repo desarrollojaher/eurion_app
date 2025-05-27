@@ -41,7 +41,7 @@ export default function RootLayout() {
 
   // llamado a la base de datos sqlite
   const { success } = useMigrations(db, migrations);
-  useDrizzleStudio(expoDB);
+  // useDrizzleStudio(expoDB);
 
   const verificarInternetSincronizacion = useCallback(async () => {
     const valor = await NetInfo.fetch();
@@ -121,7 +121,12 @@ export default function RootLayout() {
           </SessionProvider>
         </SQLiteProvider>
       </Suspense>
-      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="white"
+        hidden={false}
+        translucent={false}
+      />
     </ThemeProvider>
   );
 }

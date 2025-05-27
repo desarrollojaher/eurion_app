@@ -5,113 +5,22 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1746136547694,
-      "tag": "0000_skinny_loa",
+      "when": 1748354208774,
+      "tag": "0000_lovely_zaran",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1746482619085,
-      "tag": "0001_same_sleepwalker",
+      "when": 1748355268489,
+      "tag": "0001_fixed_namora",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "6",
-      "when": 1746554041274,
-      "tag": "0002_regular_mad_thinker",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1746628148055,
-      "tag": "0003_flippant_the_renegades",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1746739509303,
-      "tag": "0004_flashy_goliath",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1746746235840,
-      "tag": "0005_fearless_harry_osborn",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1746802845058,
-      "tag": "0006_sour_kabuki",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1747673651083,
-      "tag": "0007_bumpy_namora",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1747685701042,
-      "tag": "0008_living_boomer",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1747687248030,
-      "tag": "0009_dear_pet_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "6",
-      "when": 1747758819026,
-      "tag": "0010_misty_magma",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "6",
-      "when": 1747777219961,
-      "tag": "0011_groovy_odin",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "6",
-      "when": 1747836421798,
-      "tag": "0012_common_prodigy",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "6",
-      "when": 1747862710696,
-      "tag": "0013_complete_hardball",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "6",
-      "when": 1747863339928,
-      "tag": "0014_damp_changeling",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "6",
-      "when": 1748277201661,
-      "tag": "0015_regular_mach_iv",
+      "when": 1748360278290,
+      "tag": "0002_clear_blazing_skull",
       "breakpoints": true
     }
   ]

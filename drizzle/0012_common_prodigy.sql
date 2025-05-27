@@ -1,2 +1,0 @@
-CREATE UNIQUE INDEX `foto_cliente_identificacionCliente_unique` ON `foto_cliente` (`identificacionCliente`);--> statement-breakpoint
-CREATE UNIQUE INDEX `foto_del_domicilio_identificacionCliente_unique` ON `foto_del_domicilio` (`identificacionCliente`);

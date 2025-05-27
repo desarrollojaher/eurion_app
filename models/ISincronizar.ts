@@ -36,6 +36,7 @@ export interface ISincronizarClientes {
   score: number;
   categoria: string;
   telefonoDuenoCasa: string;
+  tipo: number;
 }
 
 export interface ISincronizarConyugue {

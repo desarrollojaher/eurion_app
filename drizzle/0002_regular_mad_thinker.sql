@@ -1,1 +1,0 @@
-ALTER TABLE `direccion` RENAME COLUMN "tipoRecidencia" TO "tipoResidencia";

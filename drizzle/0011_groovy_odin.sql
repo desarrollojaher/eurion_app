@@ -1,1 +1,0 @@
-ALTER TABLE `enviar_gcobranza_celular` RENAME COLUMN "logitud" TO "longitud";

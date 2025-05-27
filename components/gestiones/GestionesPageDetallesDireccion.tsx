@@ -26,14 +26,15 @@ import { Toast } from "toastify-react-native";
 import CarouselImagenes from "../commons/carousel/CarouselImagenes";
 import Camara from "../commons/camera/Camara";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
-import { remove } from "lodash";
+import { cloneDeep } from "lodash";
 import z from "zod";
-import { Controller, useForm, UseFormHandleSubmit } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { IDireccionCelularGcobranza } from "@/models/IDireccionCelularGcobranza";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IGestiones } from "@/models/IGestiones";
 import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
 import { useGuardarGestionesActualizacionDireccion } from "@/service/gestiones/useGuardarGestionesActualizacionDireccion";
+import { format } from "date-fns";
 
 const schema = z.object({
   latitud: z.number({
@@ -60,6 +61,21 @@ const schema = z.object({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
+  fecha: z
+    .string({
+      required_error: "Obligatorio",
+      invalid_type_error: "Obligatorio",
+    })
+    .nullish(),
+  sincronizado: z.number().nullish(),
+  imagenes: z
+    .array(
+      z.object({
+        titulo: z.string(),
+        url: z.string(),
+      })
+    )
+    .nullish(),
 });
 
 interface PropsGestionesPageDetallesDireccion {
@@ -88,8 +104,17 @@ const GestionesPageDetallesDireccion = forwardRef<
     },
   });
 
+  const {
+    append,
+    fields: imagenes,
+    remove,
+  } = useFieldArray({
+    control,
+    name: "imagenes",
+  });
+
   const [modalCamara, setModalCamara] = useState(false);
-  const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+  // const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
   const { data: datosDocumentos } = useDocumentosCabeceraObtener({
     identificacion: datos.identificacionCliente,
@@ -107,21 +132,24 @@ const GestionesPageDetallesDireccion = forwardRef<
 
   const handleCaptureCamara = useCallback(
     (data: IImagenCompleta[]) => {
-      const union = imagenes.concat(data);
-      setImagenes(union);
+      append(data);
+
+      // const union = imagenes.concat(data);
+      // setImagenes(union);
     },
-    [imagenes]
+    [append]
   );
 
   const handleRemoveImage = useCallback(
     (indexElemento: number) => {
-      const images = remove(
-        imagenes,
-        (item) => item !== imagenes[indexElemento]
-      );
-      setImagenes(images);
+      remove(indexElemento);
+      // const images = remove(
+      //   imagenes,
+      //   (item) => item !== imagenes[indexElemento]
+      // );
+      // setImagenes(images);
     },
-    [imagenes]
+    [remove]
   );
 
   const handleObtenerDireccionGps = useCallback(async () => {
@@ -139,14 +167,16 @@ const GestionesPageDetallesDireccion = forwardRef<
 
   const onSucess = useCallback(
     (data: IDireccionCelularGcobranza) => {
-      console.log(data);
-      guardarDireccion(data, {
+      const dataAux = cloneDeep(data);
+      dataAux.fecha = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      guardarDireccion(dataAux, {
         onSuccess: () => {
           reset({
             direccionIngresada: "",
             indicacionesAdicionales: "",
             latitud: datos.latitud,
             longitud: datos.longitud,
+            imagenes: [],
           });
         },
       });

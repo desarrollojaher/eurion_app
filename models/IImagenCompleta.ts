@@ -1,4 +1,4 @@
 export interface IImagenCompleta {
-    titulo: string;
-    url: string;
+  titulo: string;
+  url: string;
 }
