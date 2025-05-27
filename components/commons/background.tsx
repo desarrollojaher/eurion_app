@@ -5,6 +5,7 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Props {
   children: React.ReactNode;
@@ -12,10 +13,12 @@ interface Props {
 
 const Background: React.FC<Props> = ({ children }) => {
   return (
-    <View style={styles.fondo}>
-      <Text style={styles.text}>Eurion</Text>
-      {children}
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.fondo}>
+        <Text style={styles.text}>Eurion</Text>
+        {children}
+      </View>
+    </SafeAreaView>
   );
 };
 

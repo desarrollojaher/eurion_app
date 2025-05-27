@@ -4,7 +4,6 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import "react-native-reanimated";
@@ -17,10 +16,10 @@ import { openDatabaseSync, SQLiteProvider } from "expo-sqlite";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/drizzle/migrations";
-import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { authApi } from "@/api/auth";
 import NetInfo from "@react-native-community/netinfo";
+import { Slot } from "expo-router";
 import { StatusBar } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -36,6 +35,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  
   // query client de tanskquery
   const queryClient = new QueryClient();
 
@@ -124,7 +124,6 @@ export default function RootLayout() {
       <StatusBar
         barStyle="dark-content"
         backgroundColor="white"
-        hidden={false}
         translucent={false}
       />
     </ThemeProvider>
