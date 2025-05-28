@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `enviar_gcobranza_celular_identificacionCliente_nroDocumento_periodo_unique` ON `enviar_gcobranza_celular` (`identificacionCliente`,`nroDocumento`,`periodo`);

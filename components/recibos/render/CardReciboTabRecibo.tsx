@@ -14,6 +14,8 @@ import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { Control, useFieldArray, UseFormWatch } from "react-hook-form";
 import { GRIS } from "@/constants/Colors";
 import { formatCurrency } from "@/helper/function/numericas";
+import { IFormaPago } from "@/models/IFormaPago";
+import { find } from "lodash";
 
 interface PropsCardReciboTabRecibo {
   item: Partial<IReciboEnviar>;
@@ -21,6 +23,7 @@ interface PropsCardReciboTabRecibo {
   watch: UseFormWatch<IReciboEnviarDatos>;
   handleOpenModalCamara: (index: number) => void;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
+  dataFormasPagos: IFormaPago[] | undefined;
 }
 
 const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
@@ -29,6 +32,7 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
   watch,
   handleOpenModalCamara,
   control,
+  dataFormasPagos,
 }) => {
   const { fields, remove } = useFieldArray({
     control,
@@ -140,7 +144,12 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
               >
                 <HeaderCard
                   labelLeft="Tipo de Pago"
-                  labelRight={item.tipoPago}
+                  labelRight={
+                    find(
+                      dataFormasPagos,
+                      (valor) => valor.codFormaPago === item.tipoPago
+                    )?.nombre ?? ""
+                  }
                   styleLeft={styles.styleLeftTiposPagoCard}
                   styleRight={styles.styleRightTiposPagoCard}
                 />

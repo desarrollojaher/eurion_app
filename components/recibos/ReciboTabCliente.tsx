@@ -10,15 +10,16 @@ import {
 import Separador from "../commons/separador/Separador";
 import TextInput from "../commons/card/TextInput";
 import { GRIS } from "@/constants/Colors";
-import { IRecibo, IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
+import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { Control, Controller, FieldArrayWithId } from "react-hook-form";
 import { formatCurrency } from "@/helper/function/numericas";
 import { find } from "lodash";
+import { IDocumentosCabecera } from "@/models/IDocumentos";
 
 interface PropsRecibiTabCliente {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
-  datos: IRecibo;
+  datos: IDocumentosCabecera[];
 }
 
 const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
@@ -27,7 +28,7 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
   datos,
 }) => {
   const renderItem = useCallback(
-    ({ item, index }: { item: Partial<IReciboEnviar>; index: number }) => (
+    ({ item, index }: { item: IReciboEnviar; index: number }) => (
       <Card style={styles.styleCard}>
         <HeaderCard
           labelLeft={item.doctran}
@@ -38,29 +39,29 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
         <HeaderCard
           labelLeft="Deuda Total"
           labelRight={formatCurrency(
-            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+            find(datos, (valor) => item?.doctran === valor.nroDocumento)
               ?.deudaTotal ?? 0
           )}
         />
         <HeaderCard
           labelLeft="Saldo vencido"
           labelRight={formatCurrency(
-            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+            find(datos, (valor) => item?.doctran === valor.nroDocumento)
               ?.saldoVencido ?? 0
           )}
         />
         <HeaderCard
           labelLeft="Interes por mora"
           labelRight={formatCurrency(
-            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
+            find(datos, (valor) => item?.doctran === valor.nroDocumento)
               ?.interesMora ?? 0
           )}
         />
         <HeaderCard
           labelLeft="Gastos cobranza"
           labelRight={formatCurrency(
-            find(datos.documentos, (valor) => item?.doctran === valor.doctran)
-              ?.gastosPorCobranza ?? 0
+            find(datos, (valor) => item?.doctran === valor.nroDocumento)
+              ?.gastosCobranza ?? 0
           )}
         />
         <Controller

@@ -6,7 +6,19 @@ import {
   ISincronizarVerificaciones,
   ISincronizarZona,
 } from "@/models/ISincronizar";
-import { and, asc, desc, eq, gt, gte, like, ne, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gt,
+  gte,
+  isNotNull,
+  like,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacionDetalles,
@@ -23,7 +35,11 @@ import {
   ISubirInformacionActualizacionesGeneral,
   ISubirInformacionEliminar,
 } from "@/models/ISubirInformacion";
-import { IImagenCliente, IImagenDomicilio } from "@/models/IImagenes";
+import {
+  IImagenCliente,
+  IImagenDomicilio,
+  IImagenRecibos,
+} from "@/models/IImagenes";
 import _, { groupBy, mapValues, sumBy, union, unionBy } from "lodash";
 import {
   IDocumentoPasadoParams,
@@ -57,7 +73,18 @@ import {
   IDireccionCelularGcobranza,
   imagenActualizacion,
 } from "@/models/IDireccionCelularGcobranza";
-import { IImagenCompleta } from "@/models/IImagenCompleta";
+import {
+  IReciboEnviar,
+  IRecibosCabecera,
+  IRecibosCabeceraListado,
+  IRecibosCabeceraParams,
+  IRecibosEliminarParams,
+} from "@/models/IRecibo";
+import { IFormaPago } from "@/models/IFormaPago";
+import { ITarjetaCredito } from "@/models/ITarjetaCredito";
+import { IBancos } from "@/models/IBancos";
+import { ICabeceraReciboCelular } from "@/models/ICabeceraReciboCelular";
+import { IDetalleReciboCelular } from "@/models/IDetalleReciboCelular";
 
 export const dbSqliteService = {
   insertarVerificaciones: async (datos: ISincronizarVerificaciones[]) => {
@@ -136,7 +163,16 @@ export const dbSqliteService = {
   },
   insertarGCobranza: async (datos: IEnviarGcobranza[]) => {
     try {
-      await db.insert(schema.enviarGcobranzaCelularTable).values(datos);
+      await db
+        .insert(schema.enviarGcobranzaCelularTable)
+        .values(datos)
+        .onConflictDoNothing({
+          target: [
+            schema.enviarGcobranzaCelularTable.identificacionCliente,
+            schema.enviarGcobranzaCelularTable.nroDocumento,
+            schema.enviarGcobranzaCelularTable.periodo,
+          ],
+        });
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -184,6 +220,42 @@ export const dbSqliteService = {
   insertarDetalleFactura: async (datos: IDetalleFactura[]) => {
     try {
       await db.insert(schema.detalleFacturaGcobranzaTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarFormaPago: async (datos: IFormaPago[]) => {
+    try {
+      await db.insert(schema.formasPagoTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarTarjetaCredito: async (datos: ITarjetaCredito[]) => {
+    try {
+      await db.insert(schema.tarjetasCreditoTable).values(datos);
+      return true;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  insertarBanco: async (datos: IBancos[]) => {
+    try {
+      await db.insert(schema.bancoTable).values(datos);
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -308,7 +380,9 @@ export const dbSqliteService = {
   },
   deleteGcobranza: async () => {
     try {
-      await db.delete(schema.enviarGcobranzaCelularTable);
+      await db
+        .delete(schema.enviarGcobranzaCelularTable)
+        .where(eq(schema.enviarGcobranzaCelularTable.esGestionado, 0));
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -351,6 +425,39 @@ export const dbSqliteService = {
   deleteDetalleFactura: async () => {
     try {
       await db.delete(schema.detalleFacturaGcobranzaTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  deleteFormaPago: async () => {
+    try {
+      await db.delete(schema.formasPagoTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  deleteTarjetaCredito: async () => {
+    try {
+      await db.delete(schema.tarjetasCreditoTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw JSON.stringify(mensajeExtraido);
+    }
+  },
+
+  deleteBancos: async () => {
+    try {
+      await db.delete(schema.bancoTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -1170,6 +1277,8 @@ export const dbSqliteService = {
           saldoVencido: schema.documentosGcobranzaTable.saldoVencido,
           producto: schema.detalleFacturaGcobranzaTable.producto,
           fecha: schema.documentosGcobranzaTable.fechaEmision,
+          interesMora: schema.documentosGcobranzaTable.interesMora,
+          gastosCobranza: schema.documentosGcobranzaTable.gastosDeCobranza,
         })
         .from(schema.enviarGcobranzaCelularTable)
         .innerJoin(
@@ -1441,6 +1550,243 @@ export const dbSqliteService = {
         );
 
       await db.run("COMMIT");
+    } catch (error: any) {
+      await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerRecibosCabecera: async (data: IRecibosCabeceraParams) => {
+    try {
+      const recibos = await db
+        .selectDistinct({
+          identificacionCliente:
+            schema.enviarGcobranzaCelularTable.identificacionCliente,
+          apellidos: schema.enviarGcobranzaCelularTable.apellidoCliente,
+          nombres: schema.enviarGcobranzaCelularTable.nombreCliente,
+          deudaTotal: schema.documentosGcobranzaTable.deudaTotal,
+        })
+        .from(schema.enviarGcobranzaCelularTable)
+        .innerJoin(
+          schema.documentosGcobranzaTable,
+          and(
+            eq(
+              schema.enviarGcobranzaCelularTable.identificacionCliente,
+              schema.documentosGcobranzaTable.identificacionCliente
+            ),
+            eq(
+              schema.enviarGcobranzaCelularTable.nroDocumento,
+              schema.documentosGcobranzaTable.nroDocumento
+            ),
+            isNotNull(schema.documentosGcobranzaTable.deudaTotal),
+            gt(schema.documentosGcobranzaTable.saldoVencido, 0)
+          )
+        )
+        .where(
+          and(
+            eq(
+              schema.enviarGcobranzaCelularTable.periodo,
+              Number(format(new Date(), "yyyyMM"))
+            ),
+            eq(schema.enviarGcobranzaCelularTable.esGestionado, 0),
+            data.nombreCliente
+              ? or(
+                  like(
+                    schema.enviarGcobranzaCelularTable.nombreCliente,
+                    `%${data.nombreCliente}%`
+                  ),
+                  like(
+                    schema.enviarGcobranzaCelularTable.apellidoCliente,
+                    `%${data.nombreCliente}%`
+                  )
+                )
+              : undefined
+          )
+        )
+        .orderBy(desc(schema.documentosGcobranzaTable.deudaTotal));
+
+      console.log(recibos);
+
+      const resultado = mapValues(
+        groupBy(recibos, "identificacionCliente"),
+        (items) => ({
+          deudaTotal: sumBy(items, "deudaTotal"),
+          identificacionCliente: items[0].identificacionCliente,
+          apellidos: items[0].apellidos,
+          nombres: items[0].nombres,
+        })
+      );
+      const res: IRecibosCabecera[] = Object.values(resultado);
+
+      return res;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerFormasPago: async () => {
+    try {
+      const formasPago: IFormaPago[] = await db
+        .select()
+        .from(schema.formasPagoTable);
+      return formasPago;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerTarjetasCredito: async () => {
+    try {
+      const tarjetasCredito: ITarjetaCredito[] = await db
+        .select()
+        .from(schema.tarjetasCreditoTable);
+      return tarjetasCredito;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  guardarRecibos: async (recibos: IReciboEnviar) => {
+    try {
+      await db.run("BEGIN TRANSACTION");
+      const cabecera: ICabeceraReciboCelular = {
+        latitud: recibos.latitud ?? 0,
+        longitud: recibos.longitud ?? 0,
+        nroDocumento: recibos.doctran,
+        fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+        observaciones: recibos.observaciones ?? "",
+        total: recibos.valorCancela ?? 0,
+        totalInteresMora: recibos.valorMora ?? 0,
+        totalGastoCobranza: recibos.valorCobranza ?? 0,
+        cobroTotalCuotas:
+          (recibos.valorCancela ?? 0) +
+          (recibos.valorCobranza ?? 0) +
+          (recibos.valorMora ?? 0),
+        identificacionCliente: recibos.identificacionCliente,
+      };
+
+      const id = await db
+        .insert(schema.cabeceraReciboCelularTable)
+        .values(cabecera)
+        .returning({ insertedId: schema.cabeceraReciboCelularTable.id });
+
+      const detalle: IDetalleReciboCelular[] = [];
+
+      recibos.valores?.map((item) => {
+        detalle.push({
+          fechaVencimiento: item.fechaVencimiento ?? "",
+          numeroCheque: item.numeroCheque ?? "",
+          numeroCuenta: item.numeroCuenta ?? "",
+          valorTotal: item.valor,
+          idCabeceraReciboCelular: id[0].insertedId,
+          numeroDocumento: item.numeroDocumento ?? "",
+          codigoTipoPago: item.tipoPago,
+          codigoEmisor: item.emisor ?? "",
+          codigoBanco: item.banco ?? "",
+        });
+      });
+      await db.insert(schema.detalleReciboCelularTable).values(detalle);
+
+      const imagenes: IImagenRecibos[] = [];
+
+      recibos.imagenes?.map((item) => {
+        imagenes.push({
+          nroDocumento: recibos.doctran,
+          imagen: item.url,
+          titulo: item.titulo,
+          idCabecera: id[0].insertedId,
+        });
+      });
+      await db.insert(schema.imagenesRecibosTable).values(imagenes);
+
+      await db.run("COMMIT");
+      return true;
+    } catch (error: any) {
+      await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerRecibos: async () => {
+    try {
+      const recibos: IRecibosCabeceraListado[] = await db
+        .select({
+          nombres: schema.clientesTable.nombres,
+          apellidos: schema.clientesTable.apellidos,
+          fecha: schema.cabeceraReciboCelularTable.fecha,
+          capital: schema.cabeceraReciboCelularTable.total,
+          interesMora: schema.cabeceraReciboCelularTable.totalInteresMora,
+          gastoCobranza: schema.cabeceraReciboCelularTable.totalGastoCobranza,
+          cobroTotalCuotas: schema.cabeceraReciboCelularTable.cobroTotalCuotas,
+          id: schema.cabeceraReciboCelularTable.id,
+        })
+        .from(schema.cabeceraReciboCelularTable)
+        .leftJoin(
+          schema.clientesTable,
+          and(
+            eq(
+              schema.clientesTable.identificacion,
+              schema.cabeceraReciboCelularTable.identificacionCliente
+            ),
+            eq(schema.clientesTable.tipo, 2)
+          )
+        )
+        .where(eq(schema.cabeceraReciboCelularTable.sincronizado, 0));
+
+      return recibos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarRecibos: async (params: IRecibosEliminarParams) => {
+    try {
+      await db.run("BEGIN TRANSACTION");
+      await db
+        .delete(schema.cabeceraReciboCelularTable)
+        .where(
+          and(
+            eq(schema.cabeceraReciboCelularTable.sincronizado, 0),
+            eq(schema.cabeceraReciboCelularTable.id, params.id)
+          )
+        );
+
+      await db
+        .delete(schema.detalleReciboCelularTable)
+        .where(
+          and(
+            eq(schema.detalleReciboCelularTable.sincronizado, 0),
+            eq(schema.detalleReciboCelularTable.id, params.id)
+          )
+        );
+
+      await db
+        .delete(schema.imagenesRecibosTable)
+        .where(
+          and(
+            eq(schema.imagenesRecibosTable.sincronizado, 0),
+            eq(schema.imagenesRecibosTable.idCabecera, params.id)
+          )
+        );
+
+      await db.run("COMMIT");
+      return true;
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";

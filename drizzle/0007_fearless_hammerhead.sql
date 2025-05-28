@@ -1,0 +1,1 @@
+ALTER TABLE `imagenes_recibos` ADD `idCabecera` integer;

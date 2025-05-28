@@ -15,6 +15,9 @@ import { ITiposGestiones } from "@/models/ITiposGestiones";
 import { IGestionesCelular } from "@/models/IGestionesCelular";
 import { IClienteGarante } from "@/models/IClienteGarante";
 import { IDetalleFactura } from "@/models/IDetalleFactura";
+import { IFormaPago } from "@/models/IFormaPago";
+import { ITarjetaCredito } from "@/models/ITarjetaCredito";
+import { IBancos } from "@/models/IBancos";
 
 export const sincronizacionApi = {
   verificaciones: async () => {
@@ -97,6 +100,18 @@ export const sincronizacionApi = {
   },
   detalleFacturas: async () => {
     const res = await get<IDetalleFactura[]>("sincronizacion/detalle-facturas");
+    return res.data;
+  },
+  formasPago: async () => {
+    const res = await get<IFormaPago[]>("sincronizacion/forma-pago");
+    return res.data;
+  },
+  tarjetaCredito: async () => {
+    const res = await get<ITarjetaCredito[]>("sincronizacion/tarjeta-credito");
+    return res.data;
+  },
+  bancos: async () => {
+    const res = await get<IBancos[]>("sincronizacion/bancos");
     return res.data;
   },
 };

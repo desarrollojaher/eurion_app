@@ -1,11 +1,5 @@
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useCallback } from "react";
+import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
 import InputCustom from "../commons/input/InputCustom";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -18,15 +12,32 @@ import Card from "../commons/card/Card";
 import HeaderCard from "../commons/card/HeaderCard";
 import TextCard from "../commons/card/TextCard";
 import { router } from "expo-router";
-import { jsonRecibos } from "@/helper/json/jsonRecibos";
-import { IRecibo } from "@/models/IRecibo";
+import { IRecibosCabecera } from "@/models/IRecibo";
 import { useReciboStore } from "@/helper/store/storeRecibos";
+import { useObtenerRecibosCabecera } from "@/service/Recibos/useObtenerRecibosCabecera";
+import { formatCurrency } from "@/helper/function/numericas";
+import { useDebounce } from "@/hooks/debounce";
+import EmptyList from "../commons/FlatList/EmptyList";
+import LoadingComponent from "../commons/FlatList/LoadingComponent";
+import { RefreshControl } from "react-native";
 
 const RecibosPrincipal = () => {
+  const [filtro, setFiltro] = useState("");
+
   const { setDatos } = useReciboStore();
 
+  const debounce = useDebounce(filtro, 500);
+
+  const {
+    data: dataRecibos,
+    isLoading: isLoadingRecibos,
+    refetch: refechRecibos,
+  } = useObtenerRecibosCabecera({
+    nombreCliente: debounce,
+  });
+
   const redireccionar = useCallback(
-    (datos: IRecibo) => {
+    (datos: IRecibosCabecera) => {
       setDatos(datos);
       router.push("/principal/recibos/recibos-detalles");
     },
@@ -34,14 +45,17 @@ const RecibosPrincipal = () => {
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IRecibo; index: number }) => (
+    ({ item, index }: { item: IRecibosCabecera; index: number }) => (
       <Card>
         <TouchableOpacity onPress={() => redireccionar(item)}>
-          <TextCard titulo={item.nombre} subtitulo={item.cedula} />
+          <TextCard
+            titulo={`${item.apellidos} ${item.nombres}`}
+            subtitulo={item.identificacionCliente}
+          />
 
           <HeaderCard
             labelLeft="SALDO TOTAL: "
-            labelRight={`$ ${item.saldoTotal}`}
+            labelRight={formatCurrency(item.deudaTotal ?? 0)}
             styleLeft={styles.labelLeftStyle}
             styleRight={styles.labelRightStyle}
             styleContainer={styles.containerHeader}
@@ -64,14 +78,29 @@ const RecibosPrincipal = () => {
             color={AZUL}
           />
         }
+        value={filtro}
+        onChangeText={setFiltro}
       />
 
       <View style={styles.containerLista}>
         <FlatList
-          data={jsonRecibos}
+          data={dataRecibos}
           renderItem={renderItem}
           contentContainerStyle={styles.containerFlatList}
           showsVerticalScrollIndicator={false}
+          keyExtractor={(datos) => datos.identificacionCliente}
+          ListEmptyComponent={<EmptyList isLoading={isLoadingRecibos} />}
+          ListFooterComponent={
+            <LoadingComponent isLoading={isLoadingRecibos} />
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoadingRecibos}
+              onRefresh={refechRecibos}
+              colors={["#007AFF"]}
+              tintColor="#007AFF"
+            />
+          }
         />
       </View>
     </View>

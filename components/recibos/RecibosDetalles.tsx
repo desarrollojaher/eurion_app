@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, View } from "react-native";
-import React, { useCallback, useMemo, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Header from "../commons/header/Header";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -17,17 +17,33 @@ import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
-import { intersection, isEqual, isEqualWith, pick, set, sumBy } from "lodash";
+import {
+  cloneDeep,
+  intersection,
+  isEqual,
+  isEqualWith,
+  pick,
+  sumBy,
+} from "lodash";
 import ModalAlertBack from "./modal/ModalAlertBack";
 import useBackButtonHandle from "@/hooks/useBackButtonHandle";
+import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
+import { format } from "date-fns";
+import { useRecibosGuardar } from "@/service/Recibos/useRecibosGuardar";
+import * as Location from "expo-location";
+import ModalLoading from "../commons/modal/ModalLoading";
 
 const schema = z.object({
   datos: z.array(
     z.object({
+      identificacionCliente: z
+        .string()
+        .min(1, "La identificación es requerida"),
       doctran: z.string().min(1, "El número de transacción es requerido"),
       valores: z
         .array(
           z.object({
+            banco: z.string().nullish(),
             tipoPago: z.string().min(1, "El tipo de pago es requerido"),
             numeroDocumento: z.string().nullish(),
             fechaVencimiento: z.string().nullish(),
@@ -77,6 +93,8 @@ const schema = z.object({
         return typeof val === "number" ? val : null;
       }, z.number().min(0, "El valor a cancelar no puede ser negativo").nullish()),
       observaciones: z.string().nullish(),
+      latitud: z.number().nullish(),
+      longitud: z.number().nullish(),
       imagenes: z
         .array(
           z.object({
@@ -93,22 +111,29 @@ const RecibosDetalles = () => {
   const [tab, setTab] = useState(0);
 
   const [modalAlerta, setModalAlerta] = useState(false);
+  const [loadingRecibo, setIsLoadingRecibo] = useState(false);
 
   const tabs = useMemo(() => ["Cliente", "Tipo Pago", "Recibo"], []);
 
   const { datos } = useReciboStore();
 
+  const { data: documentos } = useDocumentosCabeceraObtener({
+    identificacion: datos?.identificacionCliente ?? "",
+  });
   const defaultValueRecibos = useMemo<IReciboEnviarDatos>(() => {
-    if (datos && datos.documentos.length > 0) {
-      const data = datos?.documentos.map<IReciboEnviar>((item) => ({
-        doctran: item.doctran,
-        fechaComprobante: item.fecha,
+    if (documentos && documentos.length > 0) {
+      const data = documentos.map<IReciboEnviar>((item) => ({
+        latitud: 0,
+        longitud: 0,
+        doctran: item.nroDocumento,
+        fechaComprobante: format(item.fecha, "dd-MM-yyyy HH:mm:ss"),
         valores: [],
         imagenes: null,
         valorMora: null,
         valorCobranza: null,
         valorCancela: null,
         observaciones: "",
+        identificacionCliente: datos?.identificacionCliente ?? "",
       }));
       const datosEnviar: IReciboEnviarDatos = {
         datos: data,
@@ -117,11 +142,12 @@ const RecibosDetalles = () => {
       return datosEnviar;
     }
     return { datos: [] };
-  }, [datos]);
+  }, [datos?.identificacionCliente, documentos]);
 
   const {
     control,
     handleSubmit,
+    reset,
     // formState: { errors },
     watch,
     setValue,
@@ -136,12 +162,12 @@ const RecibosDetalles = () => {
   });
 
   const children = useMemo(() => {
-    if (tabs[tab] === "Cliente" && datos) {
+    if (tabs[tab] === "Cliente" && documentos) {
       return (
         <ReciboTabCliente
           datosDocumentos={datosDocumentos}
           control={control}
-          datos={datos}
+          datos={documentos}
         />
       );
     } else if (tabs[tab] === "Recibo") {
@@ -162,7 +188,10 @@ const RecibosDetalles = () => {
         />
       );
     }
-  }, [control, datos, datosDocumentos, setValue, tab, tabs, watch]);
+  }, [control, datosDocumentos, documentos, setValue, tab, tabs, watch]);
+
+  const { mutate: guardarRecibos, isPending: isLoadingReciboGuardar } =
+    useRecibosGuardar();
 
   const handleCompararObjetos = useCallback((valor1: any, valor2: any) => {
     if (
@@ -174,18 +203,30 @@ const RecibosDetalles = () => {
     return undefined;
   }, []);
 
+  const handleObtenerDireccionGps = useCallback(async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      Toast.error("El GPS no tiene permiso");
+      return;
+    }
+    let location = await Location.getCurrentPositionAsync({});
+    if (location) {
+      return location;
+    }
+    return null;
+  }, []);
+
   const onSuccess = useCallback(
-    (data: IReciboEnviarDatos) => {
+    async (data: IReciboEnviarDatos) => {
+      setIsLoadingRecibo(true);
+      const datos: IReciboEnviar[] = [];
       for (let index = 0; index < data.datos.length; index++) {
         const element = data.datos[index];
-
         const ob = defaultValueRecibos.datos[index];
-
         const clavesComunes = intersection(
           Object.keys(element),
           Object.keys(ob)
         );
-
         const objetoFiltrado1 = pick(element, clavesComunes);
         const objetoFiltrado2 = pick(ob, clavesComunes);
         const sonIguales = isEqualWith(
@@ -193,7 +234,6 @@ const RecibosDetalles = () => {
           objetoFiltrado2,
           handleCompararObjetos
         );
-
         if (!sonIguales) {
           if (
             (element.valorCancela ?? 0) +
@@ -206,12 +246,25 @@ const RecibosDetalles = () => {
                 (element.valorCancela ?? 0) +
                 (element.valorCobranza ?? 0) +
                 (element.valorMora ?? 0);
-
               const sumaTiposComprobantes = sumBy(element.valores, (item) =>
                 Number(item.valor)
               );
               if (sumaTotal === sumaTiposComprobantes) {
-                console.log("Guardar los datos ====> ", element);
+                const location = await handleObtenerDireccionGps();
+                const dataAux = cloneDeep(element);
+                dataAux.latitud = location?.coords.latitude ?? 0;
+                dataAux.longitud = location?.coords.longitude ?? 0;
+                datos.push(dataAux);
+                guardarRecibos(dataAux, {
+                  onSuccess: () => {
+                    setIsLoadingRecibo(false);
+                    reset(defaultValueRecibos);
+                    setTab(0);
+                  },
+                  onError: () => {
+                    setIsLoadingRecibo(false);
+                  },
+                });
               } else {
                 Toast.error(
                   `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`
@@ -225,8 +278,16 @@ const RecibosDetalles = () => {
           }
         }
       }
+
+      setIsLoadingRecibo(false);
     },
-    [defaultValueRecibos, handleCompararObjetos]
+    [
+      defaultValueRecibos,
+      guardarRecibos,
+      handleCompararObjetos,
+      handleObtenerDireccionGps,
+      reset,
+    ]
   );
 
   const onError = useCallback((error: any) => {
@@ -242,12 +303,18 @@ const RecibosDetalles = () => {
     setModalAlerta(false);
   }, []);
 
+  useEffect(() => {
+    if (defaultValueRecibos) {
+      reset(defaultValueRecibos);
+    }
+  }, [defaultValueRecibos, reset]);
+
   // esta en la escucha del boton de retroceso por eso siempre se llama al ultimo de las funciones
   useBackButtonHandle(handleTabBack);
   return (
     <View style={styles.containerGeneral}>
       <Header
-        title="BYRON GODOY"
+        title={`${datos?.apellidos} ${datos?.nombres}`}
         handleTapIconRight={handleSubmit(onSuccess, onError)}
         iconRight={
           <Icon
@@ -262,6 +329,12 @@ const RecibosDetalles = () => {
       <Footer items={tabs} setTab={setTab} />
       {modalAlerta && (
         <ModalAlertBack onClose={handleCloseModal} visible={modalAlerta} />
+      )}
+      {(loadingRecibo || isLoadingReciboGuardar) && (
+        <ModalLoading
+          onClose={() => {}}
+          visible={loadingRecibo || isLoadingReciboGuardar}
+        />
       )}
     </View>
   );

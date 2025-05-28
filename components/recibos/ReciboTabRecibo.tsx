@@ -15,6 +15,7 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
+import { useRecibosFormaPago } from "@/service/Recibos/useRecibosFormaPago";
 
 interface PropsReciboTabRecibo {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
@@ -32,6 +33,8 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
   const [modalCamara, setModalCamara] = useState(false);
   const [index, setIndex] = useState(0);
   const imagenes = watch(`datos.${index}.imagenes`);
+
+  const { data: dataFormasPagos } = useRecibosFormaPago();
 
   const handleOpenModalCamara = useCallback((index: number) => {
     setIndex(index);
@@ -59,9 +62,10 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         watch={watch}
         handleOpenModalCamara={handleOpenModalCamara}
         control={control}
+        dataFormasPagos={dataFormasPagos}
       />
     ),
-    [control, handleOpenModalCamara, watch]
+    [control, dataFormasPagos, handleOpenModalCamara, watch]
   );
 
   return (

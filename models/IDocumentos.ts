@@ -28,6 +28,8 @@ export type IDocumentosCabecera = {
   producto: string;
   saldoVencido: number;
   fecha: Date;
+  interesMora: number;
+  gastosCobranza: number;
 };
 
 export type IDocumentoPasadoParams = {

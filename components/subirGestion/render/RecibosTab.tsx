@@ -1,4 +1,10 @@
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from "react-native";
 import React, { useCallback, useState } from "react";
 import Card from "@/components/commons/card/Card";
 import HeaderCard from "@/components/commons/card/HeaderCard";
@@ -7,16 +13,35 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { formatCurrency } from "@/helper/function/numericas";
 import ModalAlertaSubirEliminar from "@/components/commons/modal/ModalAlertaSubirEliminar";
+import { useRecibosObtener } from "@/service/Recibos/useRecibosObtener";
+import EmptyList from "@/components/commons/FlatList/EmptyList";
+import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
+import { IRecibosCabeceraListado } from "@/models/IRecibo";
+import { useRecibosEliminar } from "@/service/Recibos/useRecibosEliminar";
 
 const RecibosTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
+  const [reciboEliminar, setReciboEliminar] =
+    useState<IRecibosCabeceraListado | null>(null);
   const [tipoAlerta, setTipoAlerta] = useState<"subir" | "eliminar">("subir");
-  const handleTabDelete = useCallback(() => {
-    console.log("handleTabDelete");
+
+  const { mutate: eliminarRecibo, isPending: isLoadingEliminar } =
+    useRecibosEliminar();
+
+  const {
+    data: dataRecibos,
+    isLoading: isLoadingRecibos,
+    refetch: refetchRecibos,
+  } = useRecibosObtener();
+
+  const handleTabDelete = useCallback((item: IRecibosCabeceraListado) => {
+    setTipoAlerta("eliminar");
+    setReciboEliminar(item);
+    setModalAlertaSubida(true);
   }, []);
 
   const handleTabUpload = useCallback(() => {
@@ -27,42 +52,59 @@ const RecibosTab = () => {
     setModalAlertaSubida(false);
   }, []);
 
-  const handleEliminar = useCallback(() => {}, []);
+  const handleEliminar = useCallback(() => {
+    if (reciboEliminar) {
+      eliminarRecibo(
+        { id: reciboEliminar.id },
+        {
+          onSuccess: () => {
+            setModalAlertaSubida(false);
+          },
+        }
+      );
+    }
+  }, [eliminarRecibo, reciboEliminar]);
 
   const handleSubir = useCallback(() => {}, []);
 
   const renderItem = useCallback(
-    () => (
+    ({ item }: { item: IRecibosCabeceraListado }) => (
       <Card>
-        <HeaderCard labelLeft="AREVALO FAUSTO" labelRight="28-03-2025 12: 30" />
+        <HeaderCard labelLeft={`${item.apellidos}`} labelRight={item.fecha} />
         <Separador />
         <HeaderCard
           labelLeft="Capital"
-          labelRight={formatCurrency(200)}
+          labelRight={formatCurrency(item.capital ?? 0)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Interes mora"
-          labelRight={formatCurrency(20)}
+          labelRight={formatCurrency(item.interesMora ?? 0)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Gastos cobranza"
-          labelRight={formatCurrency(2)}
+          labelRight={formatCurrency(item.gastoCobranza ?? 0)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+        <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Total"
-          labelRight={formatCurrency(222)}
+          labelRight={formatCurrency(item.cobroTotalCuotas ?? 0)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
         <Separador />
         <View style={styles.containerBotones}>
-          <Pressable style={styles.pressableStyle} onPress={handleTabDelete}>
+          <Pressable
+            style={styles.pressableStyle}
+            onPress={() => handleTabDelete(item)}
+          >
             <Icon name="trash" size={convertirTamanoHorizontal(30)} />
           </Pressable>
           <Pressable style={styles.pressableStyle} onPress={handleTabUpload}>
@@ -76,9 +118,21 @@ const RecibosTab = () => {
   return (
     <View>
       <FlatList
-        data={[1, 2, 3, 4, 5]}
+        data={dataRecibos}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(datos) => datos.id.toString()}
+        ListEmptyComponent={<EmptyList isLoading={isLoadingRecibos} />}
+        ListFooterComponent={<LoadingComponent isLoading={isLoadingRecibos} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoadingRecibos}
+            onRefresh={refetchRecibos}
+            colors={["#007AFF"]}
+            tintColor="#007AFF"
+          />
+        }
       />
       {modalAlertaSubida && (
         <ModalAlertaSubirEliminar
@@ -87,6 +141,7 @@ const RecibosTab = () => {
           tipo={tipoAlerta}
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
+          isLoading={isLoadingEliminar}
         />
       )}
     </View>

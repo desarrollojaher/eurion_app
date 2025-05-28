@@ -19,6 +19,7 @@ import {
   Controller,
   useFieldArray,
   useForm,
+  UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
 import ButtonCustom from "@/components/commons/button/ButtonCustom";
@@ -26,16 +27,18 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
 import { formatCurrency } from "@/helper/function/numericas";
-import { sumBy } from "lodash";
+import { find, sumBy } from "lodash";
+import { ITarjetaCredito } from "@/models/ITarjetaCredito";
 
 const schemaTiposPago = z.object({
+  banco: z.string().nullish(),
   tipoPago: z.string().min(1, "El tipo de pago es requerido"),
   numeroDocumento: z.string().nullish(),
   fechaVencimiento: z.string().nullish(),
   emisor: z.string().nullish(),
   numeroCuenta: z.string().nullish(),
   propieario: z.string().nullish(),
-  numeroCheque: z.string().nullish(),
+  numeroCHE: z.string().nullish(),
   valor: z.preprocess((val): number | null | undefined => {
     if (val === undefined || val === null) {
       return val;
@@ -54,6 +57,9 @@ interface PropsCardReciboTabTipoPago {
   index: number;
   watch: UseFormWatch<IReciboEnviarDatos>;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
+  formasPago: IDatosSelect[];
+  tarjetasCredito: IDatosSelect[];
+  dataTarjetaCredito: ITarjetaCredito[] | undefined;
 }
 
 const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
@@ -61,6 +67,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   item,
   watch,
   control,
+  formasPago,
+  tarjetasCredito,
+  dataTarjetaCredito,
 }) => {
   const { append, fields } = useFieldArray({
     control,
@@ -83,16 +92,18 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const defaultValue = useMemo<IRecibosEnviarDetalles>(
     () => ({
-      tipoPago: "CONTADO",
+      tipoPago: formasPago[0].value,
       valor: null,
       emisor: null,
       fechaVencimiento: null,
-      numeroCheque: null,
+      numeroCHE: null,
       numeroCuenta: null,
       numeroDocumento: null,
       propieario: null,
+      numeroCheque: null,
+      banco: null,
     }),
-    []
+    [formasPago]
   );
 
   const {
@@ -101,24 +112,31 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     formState: { errors: errorsTipoDatos },
     setError: setErrorTiposPagos,
     reset: resetTiposPagos,
+    setValue: setValueTiposPagos,
   } = useForm<IRecibosEnviarDetalles>({
     resolver: zodResolver(schemaTiposPago),
     defaultValues: defaultValue,
   });
 
   const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
-  const tiposPagos = useMemo<IDatosSelect[]>(
-    () => [
-      { label: "CHEQUE", value: "CHEQUE" },
-      { label: "CONTADO", value: "CONTADO" },
-      { label: "TARJETA DE CREDITO", value: "TARJETACREDITO" },
-    ],
-    []
-  );
 
   const handleChangeSelectTipo = useCallback((data: IDatosSelect) => {
+    console.log(data);
+
     setTipoPago(data);
   }, []);
+
+  const handleChangeEmisor = useCallback(
+    (e: IDatosSelect) => {
+      setValueTiposPagos(`emisor`, e.value);
+      const banco = find(
+        dataTarjetaCredito,
+        (item) => e.value === item.codTarjeta
+      );
+      setValueTiposPagos(`banco`, banco?.codBanco);
+    },
+    [dataTarjetaCredito, setValueTiposPagos]
+  );
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
@@ -130,7 +148,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           return;
         }
       }
-      if (data.tipoPago === "CHEQUE") {
+      if (data.tipoPago === "CHE") {
         let errores = false;
         if (!data.valor || data.valor <= 0) {
           setErrorTiposPagos("valor", {
@@ -164,13 +182,13 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
         }
         if (!data.numeroCheque || data.numeroCheque === "") {
           setErrorTiposPagos("numeroCheque", {
-            message: "Debe ingresar un numero de cheque",
+            message: "Debe ingresar un numero de CHE",
           });
           errores = true;
         }
         if (errores) return;
       }
-      if (data.tipoPago === "TARJETACREDITO") {
+      if (data.tipoPago === "TCR") {
         let errores = false;
         if (!data.valor || data.valor <= 0) {
           setErrorTiposPagos("valor", {
@@ -270,7 +288,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           <TextInput
             text="TIPO DE PAGO"
             tipo="select"
-            datos={tiposPagos}
+            datos={formasPago}
             placeholder="Tipo pago"
             onChangeSelect={(e) => {
               handleChangeSelectTipo(e);
@@ -283,7 +301,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
         )}
       />
       <Separador />
-      {tipoPago?.value === "TARJETACREDITO" && (
+      {tipoPago?.value === "TCR" && (
         <Controller
           name="numeroDocumento"
           control={controlTiposPagos}
@@ -301,8 +319,25 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           )}
         />
       )}
-      {(tipoPago?.value === "TARJETACREDITO" ||
-        tipoPago?.value === "CHEQUE") && (
+      {(tipoPago?.value === "TCR" || tipoPago?.value === "CHE") && (
+        <Controller
+          name="emisor"
+          control={controlTiposPagos}
+          render={({ field: { value } }) => (
+            <TextInput
+              text="EMISOR"
+              tipo="select"
+              datos={tarjetasCredito}
+              placeholder="Emisor"
+              defaultValue={value ?? undefined}
+              onChangeSelect={(e) => handleChangeEmisor(e)}
+              isError={!!errorsTipoDatos.emisor}
+              labelError={errorsTipoDatos.emisor?.message}
+            />
+          )}
+        />
+      )}
+      {(tipoPago?.value === "TCR" || tipoPago?.value === "CHE") && (
         <Controller
           name="fechaVencimiento"
           control={controlTiposPagos}
@@ -320,27 +355,8 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           )}
         />
       )}
-      {(tipoPago?.value === "TARJETACREDITO" ||
-        tipoPago?.value === "CHEQUE") && (
-        <Controller
-          name="emisor"
-          control={controlTiposPagos}
-          render={({ field: { value, onChange } }) => (
-            <TextInput
-              text="EMISOR"
-              tipo="select"
-              datos={[{ label: "todos", value: "2" }]}
-              placeholder="Emisor"
-              defaultValue={value ?? undefined}
-              onChangeSelect={(e) => onChange(e.value)}
-              isError={!!errorsTipoDatos.emisor}
-              labelError={errorsTipoDatos.emisor?.message}
-            />
-          )}
-        />
-      )}
-      {(tipoPago?.value === "TARJETACREDITO" ||
-        tipoPago?.value === "CHEQUE") && (
+
+      {(tipoPago?.value === "TCR" || tipoPago?.value === "CHE") && (
         <Controller
           name="numeroCuenta"
           control={controlTiposPagos}
@@ -358,7 +374,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           )}
         />
       )}
-      {tipoPago?.value === "CHEQUE" && (
+      {tipoPago?.value === "CHE" && (
         <Controller
           name="propieario"
           control={controlTiposPagos}
@@ -376,7 +392,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           )}
         />
       )}
-      {tipoPago?.value === "CHEQUE" && (
+      {tipoPago?.value === "CHE" && (
         <Controller
           name="numeroCheque"
           control={controlTiposPagos}

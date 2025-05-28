@@ -192,6 +192,15 @@ export const enviarGcobranzaCelularTable = sqliteTable(
     latitud: integer({ mode: "number" }),
     longitud: integer({ mode: "number" }),
     direccion: text(),
+  },
+  (table) => {
+    return {
+      uniqueConstraint: unique().on(
+        table.identificacionCliente,
+        table.nroDocumento,
+        table.periodo
+      ),
+    };
   }
 );
 ///////
@@ -268,7 +277,66 @@ export const imagenesActualizarDireccionTable = sqliteTable(
   }
 );
 
+export const tarjetasCreditoTable = sqliteTable("tarjetas_credito", {
+  nomTarjeta: text(),
+  codTarjeta: text(),
+  codBanco: text(),
+});
+
+export const formasPagoTable = sqliteTable("formas_pago", {
+  codFormaPago: text(),
+  nombre: text(),
+  tipo: int(),
+});
+
+export const bancoTable = sqliteTable("banco", {
+  codBanco: text(),
+  nomBanco: text(),
+});
+
 export const bitacoraSincronizadoTable = sqliteTable("bitacora_sincronizado", {
   codigo: int().primaryKey({ autoIncrement: true }),
   fecha: text(),
+});
+
+export const cabeceraReciboCelularTable = sqliteTable(
+  "cabecera_recibo_celular",
+  {
+    id: int().primaryKey({ autoIncrement: true }),
+    identificacionCliente: text(),
+    fecha: text(),
+    observaciones: text(),
+    total: integer({ mode: "number" }),
+    totalInteresMora: integer({ mode: "number" }),
+    totalGastoCobranza: integer({ mode: "number" }),
+    latitud: integer({ mode: "number" }),
+    longitud: integer({ mode: "number" }),
+    nroDocumento: text(),
+    codComprobanteCancela: text(),
+    tipoComprobanteCancela: text(),
+    cobroTotalCuotas: integer({ mode: "number" }),
+    sincronizado: int().default(0),
+  }
+);
+
+export const detalleReciboCelularTable = sqliteTable("detalle_recibo_celular", {
+  id: int().primaryKey({ autoIncrement: true }),
+  idCabeceraReciboCelular: int(),
+  codigoTipoPago: text(),
+  valorTotal: integer({ mode: "number" }),
+  codigoEmisor: text(),
+  numeroCheque: text(),
+  numeroCuenta: text(),
+  numeroDocumento: text(),
+  codigoBanco: text(),
+  fechaVencimiento: text(),
+  sincronizado: int().default(0),
+});
+
+export const imagenesRecibosTable = sqliteTable("imagenes_recibos", {
+  nroDocumento: text(),
+  imagen: text(),
+  titulo: text(),
+  idCabecera: int(),
+  sincronizado: int().default(0),
 });

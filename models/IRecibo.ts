@@ -25,6 +25,7 @@ export interface IRecibosEnviarDetalles {
   propieario?: string | null;
   numeroCheque?: string | null;
   valor?: number | null | any;
+  banco?: string | null;
 }
 
 export interface IReciboEnviar {
@@ -37,8 +38,37 @@ export interface IReciboEnviar {
   valorCancela?: number | null | any;
   observaciones?: string | null;
   fechaComprobante?: string;
+  latitud?: number | null;
+  longitud?: number | null;
+  identificacionCliente: string;
+  banco?: string | null;
 }
 
 export interface IReciboEnviarDatos {
   datos: IReciboEnviar[];
+}
+
+export interface IRecibosCabeceraParams {
+  nombreCliente: string;
+}
+export interface IRecibosCabecera {
+  identificacionCliente: string;
+  apellidos: string;
+  nombres: string;
+  deudaTotal: number;
+}
+
+export interface IRecibosCabeceraListado {
+  nombres: string;
+  apellidos: string;
+  fecha: string;
+  capital: number;
+  interesMora: number;
+  gastoCobranza: number;
+  cobroTotalCuotas: number;
+  id: number;
+}
+
+export type IRecibosEliminarParams = {
+  id: number;
 }

@@ -35,6 +35,7 @@ import { IGestiones } from "@/models/IGestiones";
 import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
 import { useGuardarGestionesActualizacionDireccion } from "@/service/gestiones/useGuardarGestionesActualizacionDireccion";
 import { format } from "date-fns";
+import ModalLoading from "../commons/modal/ModalLoading";
 
 const schema = z.object({
   latitud: z.number({
@@ -114,7 +115,7 @@ const GestionesPageDetallesDireccion = forwardRef<
   });
 
   const [modalCamara, setModalCamara] = useState(false);
-  // const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
+  const [guardar, setGuardar] = useState(false);
 
   const { data: datosDocumentos } = useDocumentosCabeceraObtener({
     identificacion: datos.identificacionCliente,
@@ -133,9 +134,6 @@ const GestionesPageDetallesDireccion = forwardRef<
   const handleCaptureCamara = useCallback(
     (data: IImagenCompleta[]) => {
       append(data);
-
-      // const union = imagenes.concat(data);
-      // setImagenes(union);
     },
     [append]
   );
@@ -143,11 +141,6 @@ const GestionesPageDetallesDireccion = forwardRef<
   const handleRemoveImage = useCallback(
     (indexElemento: number) => {
       remove(indexElemento);
-      // const images = remove(
-      //   imagenes,
-      //   (item) => item !== imagenes[indexElemento]
-      // );
-      // setImagenes(images);
     },
     [remove]
   );
@@ -167,6 +160,7 @@ const GestionesPageDetallesDireccion = forwardRef<
 
   const onSucess = useCallback(
     (data: IDireccionCelularGcobranza) => {
+      setGuardar(true);
       const dataAux = cloneDeep(data);
       dataAux.fecha = format(new Date(), "yyyy-MM-dd HH:mm:ss");
       guardarDireccion(dataAux, {
@@ -178,6 +172,10 @@ const GestionesPageDetallesDireccion = forwardRef<
             longitud: datos.longitud,
             imagenes: [],
           });
+          setGuardar(false);
+        },
+        onError: () => {
+          setGuardar(false);
         },
       });
     },
@@ -307,6 +305,7 @@ const GestionesPageDetallesDireccion = forwardRef<
           </View>
         </Card>
       </ScrollView>
+      {guardar && <ModalLoading visible={guardar} onClose={() => {}} />}
     </View>
   );
 });

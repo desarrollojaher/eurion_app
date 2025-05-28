@@ -14,3 +14,9 @@ export interface IImagenDomicilio {
   fotoDelDomicilio: string;
   cedulaCliente: string;
 }
+export interface IImagenRecibos {
+  nroDocumento: string;
+  imagen: string;
+  titulo: string;
+  idCabecera: number;
+}

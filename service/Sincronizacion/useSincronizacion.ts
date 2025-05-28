@@ -194,13 +194,37 @@ export const useSincronizacion = () => {
       await dbSqliteService.deleteClientesGarante();
       await dbSqliteService.insertarClienteGarante(clienteGarante);
 
-      // sincronizar cliente garante
+      // sincronizar detalle facturas
       setIndex(13);
       setTabla("detalle facturas");
       const detalleFactura = await sincronizacionApi.detalleFacturas();
       setCantidadDatos(detalleFactura.length);
       await dbSqliteService.deleteDetalleFactura();
       await dbSqliteService.insertarDetalleFactura(detalleFactura);
+
+      // sincronizar formas pago
+      setIndex(14);
+      setTabla("formas de pago");
+      const formaPago = await sincronizacionApi.formasPago();
+      setCantidadDatos(formaPago.length);
+      await dbSqliteService.deleteFormaPago();
+      await dbSqliteService.insertarFormaPago(formaPago);
+
+      // sincronizar tarjeta credito
+      setIndex(15);
+      setTabla("tarjeta credito");
+      const tarjetaCredito = await sincronizacionApi.tarjetaCredito();
+      setCantidadDatos(tarjetaCredito.length);
+      await dbSqliteService.deleteTarjetaCredito();
+      await dbSqliteService.insertarTarjetaCredito(tarjetaCredito);
+
+      // sincronizar tarjeta credito
+      setIndex(16);
+      setTabla("tarjeta credito");
+      const bancos = await sincronizacionApi.bancos();
+      setCantidadDatos(bancos.length);
+      await dbSqliteService.deleteBancos();
+      await dbSqliteService.insertarBanco(bancos);
 
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),

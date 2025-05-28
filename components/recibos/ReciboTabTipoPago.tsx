@@ -1,9 +1,12 @@
 import { FlatList, ScrollView, StyleSheet } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { convertirTamanoVertical } from "@/helper/function/renderizadoImagen";
 import { Control, FieldArrayWithId, UseFormWatch } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import CardReciboTabTipoPago from "./render/CardReciboTabTipoPago";
+import { useRecibosFormaPago } from "@/service/Recibos/useRecibosFormaPago";
+import { IDatosSelect } from "../commons/select/Select";
+import { useRecibosTarjetaCredito } from "@/service/Recibos/useRecibosTarjetaCredito";
 
 interface PropsReciboTabTipoPago {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
@@ -16,6 +19,31 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
   watch,
   control,
 }) => {
+  const { data: dataFormasPagos } = useRecibosFormaPago();
+  const { data: dataTarjetaCredito } = useRecibosTarjetaCredito();
+
+  const formasPago = useMemo(() => {
+    const datos: IDatosSelect[] = [];
+    dataFormasPagos?.map((item) => {
+      datos.push({
+        label: item.nombre ?? "",
+        value: item.codFormaPago ?? "",
+      });
+    });
+    return datos;
+  }, [dataFormasPagos]);
+
+  const tarjetasCredito = useMemo(() => {
+    const datos: IDatosSelect[] = [];
+    dataTarjetaCredito?.map((item) => {
+      datos.push({
+        label: item.nomTarjeta ?? "",
+        value: item.codTarjeta ?? "",
+      });
+    });
+    return datos;
+  }, [dataTarjetaCredito]);
+
   const renderItem = useCallback(
     ({ item, index }: { item: Partial<IReciboEnviar>; index: number }) => (
       <CardReciboTabTipoPago
@@ -23,9 +51,12 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
         item={item}
         watch={watch}
         control={control}
+        formasPago={formasPago}
+        tarjetasCredito={tarjetasCredito}
+        dataTarjetaCredito={dataTarjetaCredito}
       />
     ),
-    [control, watch]
+    [control, dataTarjetaCredito, formasPago, tarjetasCredito, watch]
   );
 
   return (
