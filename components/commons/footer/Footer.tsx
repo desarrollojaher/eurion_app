@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { AZUL, BLANCO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
@@ -17,11 +17,8 @@ const Footer: React.FC<PropsFooter> = ({
   setTab,
   indexSeleccionado,
 }) => {
-  const [index, setIndex] = useState(indexSeleccionado);
-
   const handleChangeItem = useCallback(
     (posicion: number) => {
-      setIndex(posicion);
       setTab(posicion);
     },
     [setTab]
@@ -34,10 +31,12 @@ const Footer: React.FC<PropsFooter> = ({
         key={indexItem}
         style={styles.styleTouchable}
       >
-        <Text style={index === indexItem && styles.styleSelect}>{item}</Text>
+        <Text style={indexSeleccionado === indexItem && styles.styleSelect}>
+          {item}
+        </Text>
       </TouchableOpacity>
     ));
-  }, [handleChangeItem, index, items]);
+  }, [handleChangeItem, indexSeleccionado, items]);
 
   return <View style={styles.containerFotter}>{item}</View>;
 };

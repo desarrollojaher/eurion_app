@@ -56,13 +56,14 @@ const SubirGestionPrincipal = () => {
         handleTapIconRight={handleTapSave}
       />
       <View style={styles.containerBody}>{renderTab}</View>
-      <Footer items={tabs} setTab={setIndex} />
+      <Footer items={tabs} setTab={setIndex} indexSeleccionado={index} />
       {modalAlertaSubida && (
         <ModalAlertaSubirEliminar
           onClose={handleCloseModal}
           visible={modalAlertaSubida}
           subidaGeneral
           handleSubir={handleGuardarDatos}
+          isLoading={false}
         />
       )}
     </View>

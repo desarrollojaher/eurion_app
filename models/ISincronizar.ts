@@ -97,3 +97,7 @@ export interface ISincronizarImagenesParams {
   itemPagina: number;
 }
 
+export interface ISincronizacion {
+  codigo: number;
+  fecha: string | null;
+}

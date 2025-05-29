@@ -301,7 +301,7 @@ const RecibosDetalles = () => {
               Toast.error("Ingrese tipos de comprobantes");
             }
           } else {
-            Toast.error("Ingrese los valores correspondientes");
+            Toast.error("Ingrese los valores correctos");
           }
         }
       }
@@ -395,7 +395,6 @@ const styles = StyleSheet.create({
   },
   containerBody: {
     flex: 1,
-    // height: convertirTamanoVertical(750),
     marginVertical: convertirTamanoVertical(10),
   },
 });

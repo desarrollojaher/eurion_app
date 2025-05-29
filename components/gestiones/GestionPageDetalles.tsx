@@ -80,7 +80,7 @@ const GestionPageDetalles = () => {
         }
       />
       {tabCorrespondiente}
-      <Footer items={tabs} setTab={setTab} />
+      <Footer items={tabs} setTab={setTab} indexSeleccionado={tab} />
 
       {modalGestionar && datos && (
         <ModalRealizarGestion

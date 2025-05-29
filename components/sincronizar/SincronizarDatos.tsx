@@ -7,22 +7,19 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import IconFont from "react-native-vector-icons/FontAwesome5";
-import { AZUL } from "@/constants/Colors";
+import { AZUL, BLANCO } from "@/constants/Colors";
 import ModalDatos from "./modal/ModalDatos";
 import ModalSincronizarImagenes from "./modal/ModalSincronizarImagenes";
 import { useSincronizacion } from "@/service/Sincronizacion/useSincronizacion";
 import ModalError from "./modal/ModalError";
-import { useSQLiteContext } from "expo-sqlite";
-import { drizzle } from "drizzle-orm/expo-sqlite";
-import * as schema from "@/db/schema";
 import ModalDatosSincronizados from "./modal/ModalDatosSincronizados";
+import { useObtenerFecha } from "@/service/Sincronizacion/useObtenerFecha";
 
 const SincronizarDatos = () => {
   const [modalImagenes, setModalImagenes] = useState(false);
 
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
-  
+  // const db = useSQLiteContext();
+  // const drizzleDb = drizzle(db, { schema });
 
   const {
     index,
@@ -35,14 +32,13 @@ const SincronizarDatos = () => {
     onCloseError,
     onCloseSincronizado,
     sincronizado,
-  } = useSincronizacion(drizzleDb);
+  } = useSincronizacion();
+
+  const { data: dataFecha } = useObtenerFecha();
 
   const handleSincronizarDatos = useCallback(() => {
     sincronizar();
   }, [sincronizar]);
-  const handleSincronizarImagenes = useCallback(() => {
-    setModalImagenes(true);
-  }, []);
 
   const handleCloseModalInformacion = useCallback(() => {
     console.log("cerro en la sincronizcion");
@@ -55,6 +51,10 @@ const SincronizarDatos = () => {
   return (
     <View>
       <Header title="Sincronizar" />
+      <View style={styles.containerFechas}>
+        <Text style={styles.textStyle}>Última Sincronización:</Text>
+        <Text style={styles.textStyle}>{dataFecha?.fecha ?? ""}</Text>
+      </View>
       <View style={styles.containerBotones}>
         <Card
           width={convertirTamanoHorizontal(160)}
@@ -71,7 +71,7 @@ const SincronizarDatos = () => {
             <Text style={styles.textIconos}>Información</Text>
           </TouchableOpacity>
         </Card>
-        <Card
+        {/* <Card
           width={convertirTamanoHorizontal(160)}
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
@@ -85,7 +85,7 @@ const SincronizarDatos = () => {
             />
             <Text style={styles.textIconos}>Imagenes</Text>
           </TouchableOpacity>
-        </Card>
+        </Card> */}
       </View>
 
       {loading && (
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   containerBotones: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: convertirTamanoVertical(57),
+    marginTop: convertirTamanoVertical(20),
     marginHorizontal: convertirTamanoHorizontal(35),
   },
   styleCard: {
@@ -142,5 +142,14 @@ const styles = StyleSheet.create({
     fontWeight: "regular",
     color: AZUL,
     textAlign: "center",
+  },
+  containerFechas: {
+    marginTop: convertirTamanoVertical(40),
+    flexDirection: "row",
+    gap: convertirTamanoHorizontal(10),
+    marginHorizontal: convertirTamanoHorizontal(35),
+  },
+  textStyle: {
+    color: BLANCO,
   },
 });

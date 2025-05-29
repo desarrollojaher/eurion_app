@@ -25,7 +25,7 @@ const InformacionSubidaPrincipal = () => {
     <View style={styles.constainerGeneral}>
       <Header title="Información subida" />
       <View style={styles.containerBody}>{renderTab}</View>
-      <Footer items={tabs} setTab={setIndex} />
+      <Footer items={tabs} setTab={setIndex} indexSeleccionado={index} />
     </View>
   );
 };

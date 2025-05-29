@@ -2,6 +2,8 @@ import { useState } from "react";
 import { sincronizacionApi } from "@/api/sincronizacion";
 import { dbSqliteService } from "../db/db";
 import { format } from "date-fns";
+import { useQueryClient } from "@tanstack/react-query";
+import { sincronizacionKeys } from "./sincronizacionKey";
 
 export const useSincronizacion = () => {
   const [index, setIndex] = useState(1);
@@ -11,6 +13,8 @@ export const useSincronizacion = () => {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [sincronizado, setSincronizado] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const onCloseError = () => {
     setError(false);
@@ -229,6 +233,8 @@ export const useSincronizacion = () => {
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
       });
+
+      queryClient.invalidateQueries({ queryKey: sincronizacionKeys.fechas() });
 
       setLoading(false);
       setSincronizado(true);

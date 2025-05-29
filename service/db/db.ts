@@ -1,5 +1,6 @@
 import * as schema from "@/db/schema";
 import {
+  ISincronizacion,
   ISincronizarClientes,
   ISincronizarConyugue,
   ISincronizarDirecciones,
@@ -1697,23 +1698,27 @@ export const dbSqliteService = {
       });
       await db.insert(schema.detalleReciboCelularTable).values(detalle);
 
-      const imagenes: IImagenRecibos[] = [];
+      if (recibos.imagenes && recibos.imagenes?.length > 0) {
+        const imagenes: IImagenRecibos[] = [];
 
-      recibos.imagenes?.map((item) => {
-        imagenes.push({
-          nroDocumento: recibos.doctran,
-          imagen: item.url,
-          titulo: item.titulo,
-          idCabecera: id[0].insertedId,
+        recibos.imagenes?.map((item) => {
+          imagenes.push({
+            nroDocumento: recibos.doctran,
+            imagen: item.url,
+            titulo: item.titulo,
+            idCabecera: id[0].insertedId,
+          });
         });
-      });
-      await db.insert(schema.imagenesRecibosTable).values(imagenes);
+        await db.insert(schema.imagenesRecibosTable).values(imagenes);
+      }
 
       await db.run("COMMIT");
       return true;
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
+      console.log(mensajeError);
+
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
@@ -1789,6 +1794,22 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerUltimaSincronizacion: async () => {
+    try {
+      const sincronizacion: ISincronizacion[] = await db
+        .select()
+        .from(schema.bitacoraSincronizadoTable)
+        .orderBy(desc(schema.bitacoraSincronizadoTable.codigo))
+        .limit(1);
+      return sincronizacion[0];
+    } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
