@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, View } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -11,6 +11,7 @@ import CardReciboTabRecibo from "./render/CardReciboTabRecibo";
 import {
   Control,
   FieldArrayWithId,
+  UseFormGetValues,
   UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
@@ -22,6 +23,7 @@ interface PropsReciboTabRecibo {
   watch: UseFormWatch<IReciboEnviarDatos>;
   setValue: UseFormSetValue<IReciboEnviarDatos>;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
+  getValues: UseFormGetValues<IReciboEnviarDatos>;
 }
 
 const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
@@ -29,12 +31,31 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
   watch,
   setValue,
   control,
+  getValues,
 }) => {
   const [modalCamara, setModalCamara] = useState(false);
   const [index, setIndex] = useState(0);
   const imagenes = watch(`datos.${index}.imagenes`);
 
   const { data: dataFormasPagos } = useRecibosFormaPago();
+
+  const itemsCambios = useMemo(() => {
+    if (datosDocumentos.length > 0) {
+      const d: IReciboEnviar[] = [];
+      for (let index = 0; index < datosDocumentos.length; index++) {
+        const datos = getValues(`datos.${index}`);
+        if (
+          (datos.valorCancela !== null && datos.valorCancela !== "") ||
+          (datos.valorCobranza !== null && datos.valorCobranza !== "") ||
+          (datos.valorMora !== null && datos.valorMora !== "")
+        ) {
+          d.push(datos);
+        }
+      }
+      return d;
+    }
+    return [];
+  }, [datosDocumentos, getValues]);
 
   const handleOpenModalCamara = useCallback((index: number) => {
     setIndex(index);
@@ -63,15 +84,16 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         handleOpenModalCamara={handleOpenModalCamara}
         control={control}
         dataFormasPagos={dataFormasPagos}
+        datosDocumentos={datosDocumentos}
       />
     ),
-    [control, dataFormasPagos, handleOpenModalCamara, watch]
+    [control, dataFormasPagos, datosDocumentos, handleOpenModalCamara, watch]
   );
 
   return (
     <View>
       <FlatList
-        data={datosDocumentos}
+        data={itemsCambios}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}

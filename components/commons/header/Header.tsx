@@ -44,7 +44,7 @@ const Header: React.FC<PropsHeader> = ({
           color={BLANCO}
         />
       </TouchableOpacity>
-      <Text style={styles.textHeader} numberOfLines={1}>
+      <Text style={styles.textHeader} numberOfLines={1} ellipsizeMode="clip">
         {title}
       </Text>
       {iconRight && (

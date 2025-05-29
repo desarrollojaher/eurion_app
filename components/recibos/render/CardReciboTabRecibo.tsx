@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
 import HeaderCard from "@/components/commons/card/HeaderCard";
 import Separador from "@/components/commons/separador/Separador";
@@ -11,11 +11,17 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome5";
 import IconFont from "react-native-vector-icons/FontAwesome";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
-import { Control, useFieldArray, UseFormWatch } from "react-hook-form";
-import { GRIS } from "@/constants/Colors";
+import {
+  Control,
+  FieldArrayWithId,
+  useFieldArray,
+  UseFormWatch,
+} from "react-hook-form";
+import { BLANCO, GRIS } from "@/constants/Colors";
 import { formatCurrency } from "@/helper/function/numericas";
 import { IFormaPago } from "@/models/IFormaPago";
-import { find } from "lodash";
+import { find, findIndex } from "lodash";
+import LottieAnimation from "@/components/commons/lottie/LottieAnimation";
 
 interface PropsCardReciboTabRecibo {
   item: Partial<IReciboEnviar>;
@@ -24,16 +30,25 @@ interface PropsCardReciboTabRecibo {
   handleOpenModalCamara: (index: number) => void;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
   dataFormasPagos: IFormaPago[] | undefined;
+  datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
 }
 
 const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
-  index,
   item,
   watch,
   handleOpenModalCamara,
   control,
   dataFormasPagos,
+  datosDocumentos,
 }) => {
+  const index = useMemo(() => {
+    const index = findIndex(
+      datosDocumentos,
+      (items) => items.doctran === item.doctran
+    );
+    return index;
+  }, [datosDocumentos, item.doctran]);
+
   const { fields, remove } = useFieldArray({
     control,
     name: `datos.${index}.imagenes`,
@@ -48,6 +63,10 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
   const valorCobranza = watch(`datos.${index}.valorCobranza`);
   const valorCancela = watch(`datos.${index}.valorCancela`);
   const observaciones = watch(`datos.${index}.observaciones`);
+
+  const animation = useMemo(() => {
+    return require("../../../assets/animations/empty.json");
+  }, []);
 
   const valorTotal = useMemo(() => {
     const valor =
@@ -75,6 +94,16 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
     [removeValores]
   );
 
+  if (!valorMora && !valorCobranza && !valorCancela && index === 0)
+    return (
+      <View style={styles.styleSinInfo}>
+        <LottieAnimation resource={animation} />
+        <Text style={styles.styleText}>No a ingresado ningun valor</Text>
+      </View>
+    );
+
+  if (!valorMora && !valorCobranza && !valorCancela && index !== 0) return;
+
   return (
     <Card style={styles.styleCard}>
       <HeaderCard labelLeft={item.doctran} labelRight={item.fechaComprobante} />
@@ -97,27 +126,25 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
         )}
       </View>
       <Separador />
-      {/* <HeaderCard
-        labelLeft="# SECUENCIA"
-        labelRight="REC-536-1"
-        styleLeft={styles.styleLeftCard}
-        styleRight={styles.styleRightCard}
-      /> */}
       <HeaderCard
-        labelLeft="VALOR A PAGAR"
-        labelRight={formatCurrency(Number(valorCancela))}
+        labelLeft="VALOR A PAGAR CANCELADO"
+        labelRight={formatCurrency(
+          Number(valorCancela?.replace(",", ".") ?? 0)
+        )}
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
       />
       <HeaderCard
         labelLeft="INTERES MORA"
-        labelRight={formatCurrency(Number(valorMora))}
+        labelRight={formatCurrency(Number(valorMora?.replace(",", ".") ?? 0))}
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
       />
       <HeaderCard
         labelLeft="GASTOS COBRANZA"
-        labelRight={formatCurrency(Number(valorCobranza))}
+        labelRight={formatCurrency(
+          Number(valorCobranza?.replace(",", ".") ?? 0)
+        )}
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
       />
@@ -216,5 +243,17 @@ const styles = StyleSheet.create({
   styleLeftTiposPagoCard: {
     width: convertirTamanoHorizontal(130),
     fontSize: convertirTamanoHorizontal(13),
+  },
+  styleSinInfo: {
+    marginTop: convertirTamanoVertical(40),
+    height: convertirTamanoVertical(240),
+    width: convertirTamanoHorizontal(345),
+    alignSelf: "center",
+  },
+  styleText: {
+    fontSize: convertirTamanoHorizontal(18),
+    fontWeight: "bold",
+    color: BLANCO,
+    textAlign: "center",
   },
 });

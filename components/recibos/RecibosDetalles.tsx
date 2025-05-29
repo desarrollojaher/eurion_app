@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Header from "../commons/header/Header";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
 import {
   cloneDeep,
+  find,
   intersection,
   isEqual,
   isEqualWith,
@@ -151,6 +152,7 @@ const RecibosDetalles = () => {
     // formState: { errors },
     watch,
     setValue,
+    getValues,
   } = useForm<IReciboEnviarDatos>({
     resolver: zodResolver(schema),
     defaultValues: defaultValueRecibos,
@@ -160,6 +162,8 @@ const RecibosDetalles = () => {
     control,
     name: "datos",
   });
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const children = useMemo(() => {
     if (tabs[tab] === "Cliente" && documentos) {
@@ -177,6 +181,7 @@ const RecibosDetalles = () => {
           watch={watch}
           setValue={setValue}
           control={control}
+          getValues={getValues}
         />
       );
     } else {
@@ -185,10 +190,20 @@ const RecibosDetalles = () => {
           datosDocumentos={datosDocumentos}
           watch={watch}
           control={control}
+          getValues={getValues}
         />
       );
     }
-  }, [control, datosDocumentos, documentos, setValue, tab, tabs, watch]);
+  }, [
+    control,
+    datosDocumentos,
+    documentos,
+    getValues,
+    setValue,
+    tab,
+    tabs,
+    watch,
+  ]);
 
   const { mutate: guardarRecibos, isPending: isLoadingReciboGuardar } =
     useRecibosGuardar();
@@ -235,11 +250,23 @@ const RecibosDetalles = () => {
           handleCompararObjetos
         );
         if (!sonIguales) {
+          const dato = find(
+            documentos,
+            (item) => item.nroDocumento === element.doctran
+          );
+
+          const saldoVencido = dato ? dato.saldoVencido : 0;
+          const gastosCobranza = dato ? dato.gastosCobranza : 0;
+          const interesMora = dato ? dato.interesMora : 0;
+
           if (
             (element.valorCancela ?? 0) +
               (element.valorCobranza ?? 0) +
               (element.valorMora ?? 0) >
-            0
+              0 &&
+            (element.valorCancela ?? 0) <= saldoVencido &&
+            (element.valorCobranza ?? 0) <= gastosCobranza &&
+            (element.valorMora ?? 0) <= interesMora
           ) {
             if (element.valores && element.valores?.length > 0) {
               const sumaTotal =
@@ -283,6 +310,7 @@ const RecibosDetalles = () => {
     },
     [
       defaultValueRecibos,
+      documentos,
       guardarRecibos,
       handleCompararObjetos,
       handleObtenerDireccionGps,
@@ -309,8 +337,25 @@ const RecibosDetalles = () => {
     }
   }, [defaultValueRecibos, reset]);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   // esta en la escucha del boton de retroceso por eso siempre se llama al ultimo de las funciones
   useBackButtonHandle(handleTabBack);
+
   return (
     <View style={styles.containerGeneral}>
       <Header
@@ -326,7 +371,9 @@ const RecibosDetalles = () => {
         handleTapIconLeft={handleTabBack}
       />
       <View style={styles.containerBody}>{children}</View>
-      <Footer items={tabs} setTab={setTab} />
+      {!isKeyboardVisible && (
+        <Footer items={tabs} setTab={setTab} indexSeleccionado={tab} />
+      )}
       {modalAlerta && (
         <ModalAlertBack onClose={handleCloseModal} visible={modalAlerta} />
       )}
@@ -348,6 +395,7 @@ const styles = StyleSheet.create({
   },
   containerBody: {
     flex: 1,
+    // height: convertirTamanoVertical(750),
     marginVertical: convertirTamanoVertical(10),
   },
 });

@@ -17,9 +17,9 @@ import {
 import {
   Control,
   Controller,
+  FieldArrayWithId,
   useFieldArray,
   useForm,
-  UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
 import ButtonCustom from "@/components/commons/button/ButtonCustom";
@@ -27,7 +27,7 @@ import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
 import { formatCurrency } from "@/helper/function/numericas";
-import { find, sumBy } from "lodash";
+import { find, findIndex, sumBy } from "lodash";
 import { ITarjetaCredito } from "@/models/ITarjetaCredito";
 
 const schemaTiposPago = z.object({
@@ -38,7 +38,7 @@ const schemaTiposPago = z.object({
   emisor: z.string().nullish(),
   numeroCuenta: z.string().nullish(),
   propieario: z.string().nullish(),
-  numeroCHE: z.string().nullish(),
+  numeroCheque: z.string().nullish(),
   valor: z.preprocess((val): number | null | undefined => {
     if (val === undefined || val === null) {
       return val;
@@ -54,23 +54,31 @@ const schemaTiposPago = z.object({
 
 interface PropsCardReciboTabTipoPago {
   item: Partial<IReciboEnviar>;
-  index: number;
   watch: UseFormWatch<IReciboEnviarDatos>;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
   formasPago: IDatosSelect[];
   tarjetasCredito: IDatosSelect[];
   dataTarjetaCredito: ITarjetaCredito[] | undefined;
+  datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
 }
 
 const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
-  index,
   item,
   watch,
   control,
   formasPago,
   tarjetasCredito,
   dataTarjetaCredito,
+  datosDocumentos,
 }) => {
+  const index = useMemo(() => {
+    const index = findIndex(
+      datosDocumentos,
+      (items) => items.doctran === item.doctran
+    );
+    return index;
+  }, [datosDocumentos, item.doctran]);
+
   const { append, fields } = useFieldArray({
     control,
     name: `datos.${index}.valores`,
@@ -121,8 +129,6 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
 
   const handleChangeSelectTipo = useCallback((data: IDatosSelect) => {
-    console.log(data);
-
     setTipoPago(data);
   }, []);
 
@@ -140,7 +146,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
-      if (data.tipoPago === "CONTADO") {
+      console.log(data);
+
+      if (data.tipoPago === "EFE") {
         if (!data.valor || (data.valor && data.valor <= 0)) {
           setErrorTiposPagos("valor", {
             message: "Debe ingresar un valor válido",
@@ -224,6 +232,10 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
       }
 
       if (valorTotal > 0) {
+        if (data.valor === null || data.valor === "") {
+          Toast.error("Ingrese un valor válido");
+          return;
+        }
         if (valorIngresado + Number(data.valor) > valorTotal) {
           Toast.error("El valor a pagar va a sobrepasar al valor total");
           return;

@@ -9,10 +9,15 @@ import {
 interface PropsFooter {
   items: string[];
   setTab: React.Dispatch<React.SetStateAction<number>>;
+  indexSeleccionado: number;
 }
 
-const Footer: React.FC<PropsFooter> = ({ items, setTab }) => {
-  const [index, setIndex] = useState(0);
+const Footer: React.FC<PropsFooter> = ({
+  items,
+  setTab,
+  indexSeleccionado,
+}) => {
+  const [index, setIndex] = useState(indexSeleccionado);
 
   const handleChangeItem = useCallback(
     (posicion: number) => {
