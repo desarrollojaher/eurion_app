@@ -3,6 +3,7 @@ import { useRouter } from "expo-router"; // Para manejar la navegación
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUsuario } from "@/models/IUsuario";
 import { jwtDecode } from "jwt-decode";
+import { dbSqliteService } from "@/service/db/db";
 
 const AuthContext = createContext<{
   signIn: (token: string) => void;
@@ -43,7 +44,7 @@ export function SessionProvider({ children, token }: any) {
     // Eliminar el token de sessionStorage
     try {
       await AsyncStorage.removeItem("token");
-      // setSession(null);
+      await dbSqliteService.eliminarBitacoraSincronizacion();
       router.replace("/auth");
     } catch (error) {
       console.log(error);

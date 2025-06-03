@@ -1042,6 +1042,7 @@ export const dbSqliteService = {
           apellidos: schema.enviarGcobranzaCelularTable.apellidoCliente,
           nombres: schema.enviarGcobranzaCelularTable.nombreCliente,
           direccion: schema.enviarGcobranzaCelularTable.direccion,
+          detalleAdicional: schema.enviarGcobranzaCelularTable.observaciones,
           latitud: schema.direccionTable.latitud,
           longitud: schema.direccionTable.longitud,
           zonaNombre: schema.zonaTable.nombres,
@@ -1052,9 +1053,15 @@ export const dbSqliteService = {
         .from(schema.enviarGcobranzaCelularTable)
         .innerJoin(
           schema.documentosGcobranzaTable,
-          eq(
-            schema.enviarGcobranzaCelularTable.identificacionCliente,
-            schema.documentosGcobranzaTable.identificacionCliente
+          and(
+            eq(
+              schema.enviarGcobranzaCelularTable.identificacionCliente,
+              schema.documentosGcobranzaTable.identificacionCliente
+            ),
+            eq(
+              schema.documentosGcobranzaTable.nroDocumento,
+              schema.enviarGcobranzaCelularTable.nroDocumento
+            )
           )
         )
         .leftJoin(
@@ -1097,10 +1104,6 @@ export const dbSqliteService = {
         )
         .where(
           and(
-            eq(
-              schema.enviarGcobranzaCelularTable.periodo,
-              Number(format(new Date(), "yyyyMM"))
-            ),
             eq(schema.enviarGcobranzaCelularTable.esGestionado, 0),
             eq(schema.direccionTable.tipo, 2),
             eq(
@@ -1128,6 +1131,7 @@ export const dbSqliteService = {
           deudaTotal: sumBy(items, "deudaTotal"),
           saldoVencido: sumBy(items, "saldoVencido"),
           telefono: items[0].telefono,
+          detalleAdicional: items[0].detalleAdicional,
         })
       );
       const res: IGestiones[] = Object.values(resultado);
@@ -1808,7 +1812,18 @@ export const dbSqliteService = {
         .from(schema.bitacoraSincronizadoTable)
         .orderBy(desc(schema.bitacoraSincronizadoTable.codigo))
         .limit(1);
+      if (sincronizacion.length === 0) return null;
       return sincronizacion[0];
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  eliminarBitacoraSincronizacion: async () => {
+    try {
+      await db.delete(schema.bitacoraSincronizadoTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =

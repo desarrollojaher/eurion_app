@@ -53,7 +53,9 @@ const SincronizarDatos = () => {
       <Header title="Sincronizar" />
       <View style={styles.containerFechas}>
         <Text style={styles.textStyle}>Última Sincronización:</Text>
-        <Text style={styles.textStyle}>{dataFecha?.fecha ?? ""}</Text>
+        <Text style={styles.textStyle}>
+          {dataFecha?.fecha ?? "No sincronizado"}
+        </Text>
       </View>
       <View style={styles.containerBotones}>
         <Card

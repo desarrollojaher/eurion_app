@@ -14,6 +14,7 @@ export interface IGestiones {
   imagenCliente: string;
   imagenDomicilio: string;
   telefono: string;
+  detalleAdicional: string;
 }
 
 export interface IGestionesFiltro {

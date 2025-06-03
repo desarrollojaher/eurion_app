@@ -36,6 +36,7 @@ import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentos
 import { useGuardarGestionesActualizacionDireccion } from "@/service/gestiones/useGuardarGestionesActualizacionDireccion";
 import { format } from "date-fns";
 import ModalLoading from "../commons/modal/ModalLoading";
+import ModalTelefonos from "./modal/ModalTelefonos";
 
 const schema = z.object({
   latitud: z.number({
@@ -102,6 +103,7 @@ const GestionesPageDetallesDireccion = forwardRef<
       latitud: datos.latitud,
       longitud: datos.longitud,
       identificacionCliente: datos.identificacionCliente,
+      direccionIngresada: datos.direccion,
     },
   });
 
@@ -115,6 +117,7 @@ const GestionesPageDetallesDireccion = forwardRef<
   });
 
   const [modalCamara, setModalCamara] = useState(false);
+  const [modalTelefono, setModalTelefono] = useState(false);
   const [guardar, setGuardar] = useState(false);
 
   const { data: datosDocumentos } = useDocumentosCabeceraObtener({
@@ -189,6 +192,13 @@ const GestionesPageDetallesDireccion = forwardRef<
     handleSubmit: handleSubmit(onSucess, onError),
   }));
 
+  const handleOpenTelefono = useCallback(() => {
+    setModalTelefono(true);
+  }, []);
+  const handleCloseTelefono = useCallback(() => {
+    setModalTelefono(false);
+  }, []);
+
   useEffect(() => {
     if (datosDocumentos && datosDocumentos.length > 0) {
       setValue("nroDocumento", datosDocumentos[0].nroDocumento);
@@ -228,6 +238,20 @@ const GestionesPageDetallesDireccion = forwardRef<
         </Card>
 
         <Card style={styles.cardMargin}>
+          <Pressable onPress={handleOpenTelefono}>
+            <TextInput
+              tipo="text"
+              text="Telefono"
+              direction="column"
+              placeholder="Telefono"
+              styleHeader={styles.styleTextHeader}
+              defaultValueText={datos.telefono}
+              readOnly
+              isError={!!errors.indicacionesAdicionales}
+              labelError={errors.indicacionesAdicionales?.message}
+            />
+          </Pressable>
+
           <Controller
             control={control}
             name="direccionIngresada"
@@ -306,6 +330,13 @@ const GestionesPageDetallesDireccion = forwardRef<
         </Card>
       </ScrollView>
       {guardar && <ModalLoading visible={guardar} onClose={() => {}} />}
+      {modalTelefono && (
+        <ModalTelefonos
+          onClose={handleCloseTelefono}
+          visible={modalTelefono}
+          cedula={datos.identificacionCliente}
+        />
+      )}
     </View>
   );
 });

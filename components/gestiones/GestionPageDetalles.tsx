@@ -22,7 +22,7 @@ const GestionPageDetalles = () => {
   const gestionDireccion =
     React.useRef<PropsGestionesPageDetallesDireccionRef>(null);
 
-  const tabs = useMemo(() => ["Cliente", "Documentos", "Dirección"], []);
+  const tabs = useMemo(() => ["Cliente", "Documentos", "Actualización"], []);
 
   const tabCorrespondiente = useMemo(() => {
     if (tabs[tab] === "Cliente") {
@@ -33,7 +33,7 @@ const GestionPageDetalles = () => {
       );
     } else if (tabs[tab] === "Documentos" && datos) {
       return <GestionesPageDetallesDocumenos datos={datos} />;
-    } else if (tabs[tab] === "Dirección" && datos) {
+    } else if (tabs[tab] === "Actualización" && datos) {
       return (
         <GestionesPageDetallesDireccion datos={datos} ref={gestionDireccion} />
       );
@@ -41,7 +41,7 @@ const GestionPageDetalles = () => {
   }, [datos, tab, tabs]);
 
   const tabIcon = useMemo(() => {
-    if (tabs[tab] === "Dirección") {
+    if (tabs[tab] === "Actualización") {
       return "save";
     }
     return "plus";
@@ -54,7 +54,7 @@ const GestionPageDetalles = () => {
   }, []);
 
   const handleOpenModalGestion = useCallback(() => {
-    if (tabs[tab] === "Dirección") {
+    if (tabs[tab] === "Actualización") {
       handleGuardarDireccion();
       return;
     }

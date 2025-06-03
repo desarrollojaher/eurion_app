@@ -72,6 +72,10 @@ const schema = z.object({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
+  tipoReferencia: z.string({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
 });
 
 interface PropsModalRealizarGestion {
@@ -117,7 +121,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
     return [
       { label: "CLIENTE", value: "CLIENTE" },
       { label: "FAMILIAR", value: "FAMILIAR" },
-      { label: "TIPO REFERENCIA", value: "TIPO REFERENCIA" },
+      { label: "TIPO REFERENCIA", value: "TIPOREFERENCIA" },
     ];
   }, []);
 
@@ -214,7 +218,21 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
 
       <View style={styles.container}>
         <Text>Tipo referencia</Text>
-        <Select datos={tipoReferencia} styleContainer={styles.styleSelect} />
+        <Controller
+          name="tipoReferencia"
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <Select
+              datos={tipoReferencia}
+              styleContainer={styles.styleSelect}
+              defaultValue={find(
+                tipoReferencia,
+                (item) => item.value === value
+              )}
+              onSelect={(e) => onChange(e.value)}
+            />
+          )}
+        />
       </View>
 
       {find(tipoGestiones, (item) => item.codigo === tipoGestion)?.pideFecha ===
@@ -240,7 +258,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
         </View>
       )}
 
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <TextInput
           text="Telefono"
           tipo="text"
@@ -264,7 +282,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
           styleHeader={styles.textHeader}
           styleTextInput={styles.styleInput}
         />
-      </View>
+      </View> */}
 
       <View style={styles.container}>
         <Controller

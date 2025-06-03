@@ -19,61 +19,57 @@ import IconFont6 from "react-native-vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
 import NetInfo from "@react-native-community/netinfo";
 import ModalSincronizar from "./modal/ModalSincronizar";
-import { useSQLiteContext } from "expo-sqlite";
-import { drizzle, useLiveQuery } from "drizzle-orm/expo-sqlite";
-import * as schema from "@/db/schema";
-import { desc } from "drizzle-orm";
+import { useObtenerFecha } from "@/service/Sincronizacion/useObtenerFecha";
+import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import ModalCerrarSesion from "./modal/ModalCerrarSesion";
-import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
-
+import Constants from "expo-constants";
 const Principal = () => {
   const [modalAlerta, setModalAlerta] = useState(false);
   const [modalCerrarSesion, setModalCerrarSesion] = useState(false);
 
   const { usuario } = useSession();
 
+  const { data: dataFecha } = useObtenerFecha();
+
   const router = useRouter();
 
-  const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
-  useDrizzleStudio(db);
-
-  const { data } = useLiveQuery(
-    drizzleDb
-      .select()
-      .from(schema.usuarioTable)
-      .orderBy(desc(schema.usuarioTable.id))
-      .limit(1)
-  );
-
-  const insertarUsuario = useCallback(
-    async (nombre: string, correo: string) => {
-      try {
-        const r = await drizzleDb
-          .insert(schema.usuarioTable)
-          .values({
-            age: 4,
-            createdAt: 0,
-            email: correo,
-            name: nombre,
-            password: "adawwd",
-            updatedAt: 0,
-          })
-          .returning();
-        console.log(r);
-      } catch (e) {
-        console.log("error", e);
-      }
-    },
-    [drizzleDb]
-  );
+  const version = Constants.manifest?.version || "Versión no disponible";
+  console.log("Versión de la app:", version);
 
   const verificarInternetSincronizacion = useCallback(async () => {
     const valor = await NetInfo.fetch();
-    return valor.isConnected ?? false;
-    // todo: verificar si no tiene internet deja pasar caso contrario si tiene internet verifica la hora si
-    // ya paso y no a sincronizado y tiene internet salta la alerta de sicronizacion caso contrario realiza lo primero
-  }, []);
+    if (valor.isConnected === false) return true;
+
+    if (dataFecha && dataFecha.fecha) {
+      const inicioDia = startOfDay(new Date());
+      const horaSincronizacion1 = new Date();
+      horaSincronizacion1.setHours(8, 0, 0, 0);
+
+      const horaSincronizacion2 = new Date();
+      horaSincronizacion2.setHours(13, 0, 0, 0);
+
+      const ultimaSincronizacion = parseISO(dataFecha?.fecha);
+
+      const estamosAntesDeLa1 =
+        isBefore(new Date(), horaSincronizacion2) &&
+        isAfter(ultimaSincronizacion, inicioDia);
+      const estamosDespuesDeLa1 = isAfter(new Date(), horaSincronizacion2);
+
+      const sincronizoAntesDe8 =
+        estamosAntesDeLa1 && isAfter(ultimaSincronizacion, horaSincronizacion1);
+
+      const sincronizoAntesDe13 =
+        estamosDespuesDeLa1 &&
+        isAfter(ultimaSincronizacion, horaSincronizacion2) &&
+        sincronizoAntesDe8;
+
+      const puedeUsarApp = sincronizoAntesDe8 || sincronizoAntesDe13;
+
+      return puedeUsarApp;
+    }
+
+    return false;
+  }, [dataFecha]);
 
   const handleModalAlerta = useCallback(() => {
     setModalAlerta(!modalAlerta);
@@ -88,26 +84,35 @@ const Principal = () => {
   }, []);
 
   const handleOpenSincronizador = useCallback(() => {
-    // insertarUsuario(`usu${Math.random().toFixed(1)}`, `correo${Math.random()}`);
     router.push("/principal/sincronizar");
   }, [router]);
 
   const handleOpenVerificaciones = useCallback(async () => {
-    // const conectado = await verificarInternetSincronizacion();
-    // if (!conectado) {
-    router.push("/principal/verificaciones/verificaciones-principal");
-    // } else {
-    //   handleModalAlerta();
-    // }
-  }, [router]);
+    const conectado = await verificarInternetSincronizacion();
+    if (conectado) {
+      router.push("/principal/verificaciones/verificaciones-principal");
+    } else {
+      handleModalAlerta();
+    }
+  }, [handleModalAlerta, router, verificarInternetSincronizacion]);
 
-  const handleOpenGestiones = useCallback(() => {
-    router.push("/principal/gestiones/gestiones-principal");
-  }, [router]);
+  const handleOpenGestiones = useCallback(async () => {
+    const conectado = await verificarInternetSincronizacion();
+    if (conectado) {
+      router.push("/principal/gestiones/gestiones-principal");
+    } else {
+      handleModalAlerta();
+    }
+  }, [handleModalAlerta, router, verificarInternetSincronizacion]);
 
-  const handleOpenRecibos = useCallback(() => {
-    router.push("/principal/recibos/recibos-principal");
-  }, [router]);
+  const handleOpenRecibos = useCallback(async () => {
+    const conectado = await verificarInternetSincronizacion();
+    if (conectado) {
+      router.push("/principal/recibos/recibos-principal");
+    } else {
+      handleModalAlerta();
+    }
+  }, [handleModalAlerta, router, verificarInternetSincronizacion]);
 
   const handleOpenSubirInformacion = useCallback(() => {
     router.push("/principal/subir-informacion");

@@ -217,6 +217,7 @@ export const gestionesCelularGcobranzaTable = sqliteTable(
     codigoTipoGestionProxima: text(),
     latitud: integer({ mode: "number" }),
     longitud: integer({ mode: "number" }),
+    tipoReferencia: text().default(""),
     sincronizado: int().default(0),
   }
 );
@@ -338,5 +339,12 @@ export const imagenesRecibosTable = sqliteTable("imagenes_recibos", {
   imagen: text(),
   titulo: text(),
   idCabecera: int(),
+  sincronizado: int().default(0),
+});
+
+export const telefonosActualizar = sqliteTable("telefonos_actualizar", {
+  identificacionCliente: text(),
+  telefono: text(),
+  tipoTelefono: text(),
   sincronizado: int().default(0),
 });

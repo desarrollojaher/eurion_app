@@ -21,6 +21,7 @@ import { authApi } from "@/api/auth";
 import NetInfo from "@react-native-community/netinfo";
 import { Slot } from "expo-router";
 import { StatusBar } from "react-native";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,13 +36,15 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-  
+
   // query client de tanskquery
   const queryClient = new QueryClient();
 
+  // inicializa el drizzle con la base de datos sqlite
+  useDrizzleStudio(expoDB);
+
   // llamado a la base de datos sqlite
   const { success } = useMigrations(db, migrations);
-  // useDrizzleStudio(expoDB);
 
   const verificarInternetSincronizacion = useCallback(async () => {
     const valor = await NetInfo.fetch();

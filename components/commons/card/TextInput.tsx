@@ -36,6 +36,7 @@ interface PropsTextInput {
   styleContainer?: any;
   styleHeader?: any;
   styleTextInput?: any;
+  styleSelect?: any;
   isError?: boolean;
   labelError?: string | FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
   readOnly?: boolean;
@@ -64,6 +65,7 @@ const TextInput: React.FC<PropsTextInput> = ({
   inputMode = "text",
   onBlurs,
   onPressText,
+  styleSelect,
 }) => {
   const [modalFecha, setModalFecha] = useState(false);
 
@@ -145,7 +147,7 @@ const TextInput: React.FC<PropsTextInput> = ({
           placeholder={placeholder}
           defaultValue={find(datos, (item) => item.value === defaultValue)}
           onSelect={onChangeSelect}
-          styleContainer={styles.containerSelect}
+          styleContainer={[styles.containerSelect, styleSelect]}
           isError={isError}
           labelError={typeof labelError === "string" ? labelError : ""}
         />

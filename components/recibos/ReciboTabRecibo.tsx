@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   convertirTamanoHorizontal,
@@ -17,6 +17,8 @@ import {
 } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { useRecibosFormaPago } from "@/service/Recibos/useRecibosFormaPago";
+import LottieAnimation from "../commons/lottie/LottieAnimation";
+import { BLANCO } from "@/constants/Colors";
 
 interface PropsReciboTabRecibo {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
@@ -56,6 +58,10 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
     }
     return [];
   }, [datosDocumentos, getValues]);
+
+  const animation = useMemo(() => {
+    return require("../../assets/animations/empty.json");
+  }, []);
 
   const handleOpenModalCamara = useCallback((index: number) => {
     setIndex(index);
@@ -98,6 +104,12 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.doctran}
+        ListEmptyComponent={() => (
+          <View style={styles.styleSinInfo}>
+            <LottieAnimation resource={animation} />
+            <Text style={styles.styleText}>No a ingresado ningun valor</Text>
+          </View>
+        )}
       />
       {modalCamara && (
         <Camara
@@ -123,5 +135,17 @@ const styles = StyleSheet.create({
   styleInput: {
     height: convertirTamanoVertical(50),
     width: convertirTamanoHorizontal(185),
+  },
+  styleSinInfo: {
+    marginTop: convertirTamanoVertical(40),
+    height: convertirTamanoVertical(240),
+    width: convertirTamanoHorizontal(345),
+    alignSelf: "center",
+  },
+  styleText: {
+    fontSize: convertirTamanoHorizontal(18),
+    fontWeight: "bold",
+    color: BLANCO,
+    textAlign: "center",
   },
 });

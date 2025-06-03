@@ -58,6 +58,7 @@ const ModalFiltros: React.FC<PropsModalFiltros> = ({
           styleContainer={styles.styleSelect}
           defaultValue={find(zonaFiltro, (item) => item.value === zona)}
           onSelect={handleChangeZona}
+          search
         />
       </View>
       {/* <View style={styles.container}>

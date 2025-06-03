@@ -32,24 +32,30 @@ export const useSincronizacion = () => {
       setTabla("Verificaciones");
       const datos = await sincronizacionApi.verificaciones();
       setCantidadDatos(datos.length);
-      await dbSqliteService.deleteVerificaciones();
-      await dbSqliteService.insertarVerificaciones(datos);
+      if (datos.length > 0) {
+        await dbSqliteService.deleteVerificaciones();
+        await dbSqliteService.insertarVerificaciones(datos);
+      }
 
       // sincroniza clientes
       setIndex(2);
       setTabla("Clientes");
       const clientes = await sincronizacionApi.clientes();
       setCantidadDatos(clientes.length);
-      await dbSqliteService.deleteClientes();
-      await dbSqliteService.insertarClientes(clientes);
+      if (clientes.length > 0) {
+        await dbSqliteService.deleteClientes();
+        await dbSqliteService.insertarClientes(clientes);
+      }
 
       // sincronizar conyugue
       setIndex(3);
       setTabla("ClienteConyugue");
       const conyugue = await sincronizacionApi.conyugue();
       setCantidadDatos(conyugue.length);
-      await dbSqliteService.deleteConyuge();
-      await dbSqliteService.insertarConyugue(conyugue);
+      if (conyugue.length > 0) {
+        await dbSqliteService.deleteConyuge();
+        await dbSqliteService.insertarConyugue(conyugue);
+      }
 
       // sincronizar direcciones
 
@@ -57,16 +63,20 @@ export const useSincronizacion = () => {
       setTabla("Direcciones");
       const direcciones = await sincronizacionApi.direcciones();
       setCantidadDatos(direcciones.length);
-      await dbSqliteService.deleteDirecciones();
-      await dbSqliteService.insertarDirecciones(direcciones);
+      if (direcciones.length > 0) {
+        await dbSqliteService.deleteDirecciones();
+        await dbSqliteService.insertarDirecciones(direcciones);
+      }
 
       // sincronizar zona
       setIndex(5);
       setTabla("Zona");
       const zona = await sincronizacionApi.zona();
       setCantidadDatos(zona.length);
-      await dbSqliteService.deleteZona();
-      await dbSqliteService.insertarZona(zona);
+      if (zona.length > 0) {
+        await dbSqliteService.deleteZona();
+        await dbSqliteService.insertarZona(zona);
+      }
 
       //sincronizar imagenes
       // setIndex(6);
@@ -161,8 +171,10 @@ export const useSincronizacion = () => {
       setTabla("documentos cobranza");
       const documentos = await sincronizacionApi.documentos();
       setCantidadDatos(documentos.length);
-      await dbSqliteService.deleteDocumentos();
-      await dbSqliteService.insertarDocumentos(documentos);
+      if (documentos.length > 0) {
+        await dbSqliteService.deleteDocumentos();
+        await dbSqliteService.insertarDocumentos(documentos);
+      }
 
       // sincronizar gestiones
 
@@ -170,65 +182,80 @@ export const useSincronizacion = () => {
       setTabla("Gestiones cobranza");
       const gcobanza = await sincronizacionApi.enviarGcobranza();
       setCantidadDatos(gcobanza.length);
-      await dbSqliteService.deleteGcobranza();
-      await dbSqliteService.insertarGCobranza(gcobanza);
-
+      if (gcobanza.length > 0) {
+        await dbSqliteService.deleteGcobranza();
+        await dbSqliteService.insertarGCobranza(gcobanza);
+      }
       // sincronizar tipoGestiones
 
       setIndex(10);
       setTabla("Tipos gestiones");
       const tipoGestiones = await sincronizacionApi.tipoGestiones();
       setCantidadDatos(tipoGestiones.length);
-      await dbSqliteService.deleteTipoGestiones();
-      await dbSqliteService.insertarTipoGestiones(tipoGestiones);
+      if (tipoGestiones.length > 0) {
+        await dbSqliteService.deleteTipoGestiones();
+        await dbSqliteService.insertarTipoGestiones(tipoGestiones);
+      }
 
       // sincronizar tipoGestiones
       setIndex(11);
       setTabla("gestiones celular");
       const gestionesCelular = await sincronizacionApi.gestionesCelular();
       setCantidadDatos(gestionesCelular.length);
-      await dbSqliteService.deleteGestionesCelular();
-      await dbSqliteService.insertarGestionesCelular(gestionesCelular);
+      if (gestionesCelular.length > 0) {
+        await dbSqliteService.deleteGestionesCelular();
+        await dbSqliteService.insertarGestionesCelular(gestionesCelular);
+      }
 
       // sincronizar cliente garante
       setIndex(12);
       setTabla("Cliente garante");
       const clienteGarante = await sincronizacionApi.clienteGarante();
       setCantidadDatos(clienteGarante.length);
-      await dbSqliteService.deleteClientesGarante();
-      await dbSqliteService.insertarClienteGarante(clienteGarante);
+      if (clienteGarante.length > 0) {
+        await dbSqliteService.deleteClientesGarante();
+        await dbSqliteService.insertarClienteGarante(clienteGarante);
+      }
 
       // sincronizar detalle facturas
       setIndex(13);
       setTabla("detalle facturas");
       const detalleFactura = await sincronizacionApi.detalleFacturas();
       setCantidadDatos(detalleFactura.length);
-      await dbSqliteService.deleteDetalleFactura();
-      await dbSqliteService.insertarDetalleFactura(detalleFactura);
+      if (detalleFactura.length > 0) {
+        await dbSqliteService.deleteDetalleFactura();
+        await dbSqliteService.insertarDetalleFactura(detalleFactura);
+      }
 
       // sincronizar formas pago
       setIndex(14);
       setTabla("formas de pago");
       const formaPago = await sincronizacionApi.formasPago();
       setCantidadDatos(formaPago.length);
-      await dbSqliteService.deleteFormaPago();
-      await dbSqliteService.insertarFormaPago(formaPago);
+      if (formaPago.length > 0) {
+        await dbSqliteService.deleteFormaPago();
+        await dbSqliteService.insertarFormaPago(formaPago);
+      }
 
       // sincronizar tarjeta credito
       setIndex(15);
       setTabla("tarjeta credito");
       const tarjetaCredito = await sincronizacionApi.tarjetaCredito();
       setCantidadDatos(tarjetaCredito.length);
-      await dbSqliteService.deleteTarjetaCredito();
-      await dbSqliteService.insertarTarjetaCredito(tarjetaCredito);
+      if (tarjetaCredito.length > 0) {
+        await dbSqliteService.deleteTarjetaCredito();
+        await dbSqliteService.insertarTarjetaCredito(tarjetaCredito);
+      }
 
       // sincronizar tarjeta credito
       setIndex(16);
-      setTabla("tarjeta credito");
+      setTabla("Bancos");
       const bancos = await sincronizacionApi.bancos();
       setCantidadDatos(bancos.length);
-      await dbSqliteService.deleteBancos();
-      await dbSqliteService.insertarBanco(bancos);
+      if (bancos.length > 0) {
+        await dbSqliteService.deleteBancos();
+        await dbSqliteService.insertarBanco(bancos);
+      }
 
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),

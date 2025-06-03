@@ -24,6 +24,7 @@ export type IGestionesCelularCrear = {
   latitud: number;
   longitud: number;
   sincronizado: number;
+  tipoReferencia: string;
 };
 
 export type IGestionesCelularPasadas = {

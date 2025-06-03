@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     marginTop: convertirTamanoVertical(50),
     paddingHorizontal: convertirTamanoHorizontal(30),
     flexDirection: "row",
-    gap: 3,
+    gap: convertirTamanoHorizontal(3),
   },
   containerStyle: {
     width: convertirTamanoHorizontal(30),
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   textHeader: {
     flex: 1,
     color: BLANCO,
-    fontSize: convertirTamanoHorizontal(24),
+    fontSize: convertirTamanoHorizontal(20),
     textAlign: "center",
     justifyContent: "center",
     fontWeight: "bold",

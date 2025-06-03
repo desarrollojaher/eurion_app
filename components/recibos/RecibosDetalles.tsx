@@ -33,6 +33,7 @@ import { format } from "date-fns";
 import { useRecibosGuardar } from "@/service/Recibos/useRecibosGuardar";
 import * as Location from "expo-location";
 import ModalLoading from "../commons/modal/ModalLoading";
+import ModalAlertaGurdar from "./modal/ModalAlertaGurdar";
 
 const schema = z.object({
   datos: z.array(
@@ -113,6 +114,7 @@ const RecibosDetalles = () => {
 
   const [modalAlerta, setModalAlerta] = useState(false);
   const [loadingRecibo, setIsLoadingRecibo] = useState(false);
+  const [modalAlertaGuardar, setModalAlertaGuardar] = useState(false);
 
   const tabs = useMemo(() => ["Cliente", "Tipo Pago", "Recibo"], []);
 
@@ -172,6 +174,7 @@ const RecibosDetalles = () => {
           datosDocumentos={datosDocumentos}
           control={control}
           datos={documentos}
+          setValue={setValue}
         />
       );
     } else if (tabs[tab] === "Recibo") {
@@ -233,8 +236,9 @@ const RecibosDetalles = () => {
 
   const onSuccess = useCallback(
     async (data: IReciboEnviarDatos) => {
+      setModalAlertaGuardar(false);
       setIsLoadingRecibo(true);
-      const datos: IReciboEnviar[] = [];
+      let noExiste = false;
       for (let index = 0; index < data.datos.length; index++) {
         const element = data.datos[index];
         const ob = defaultValueRecibos.datos[index];
@@ -250,6 +254,15 @@ const RecibosDetalles = () => {
           handleCompararObjetos
         );
         if (!sonIguales) {
+          noExiste = true;
+          console.log(element.imagenes);
+
+          if (element.imagenes?.length === 0) {
+            Toast.error(
+              `El recibo de la factura ${element.doctran} no tiene imagenes`
+            );
+            break;
+          }
           const dato = find(
             documentos,
             (item) => item.nroDocumento === element.doctran
@@ -281,7 +294,6 @@ const RecibosDetalles = () => {
                 const dataAux = cloneDeep(element);
                 dataAux.latitud = location?.coords.latitude ?? 0;
                 dataAux.longitud = location?.coords.longitude ?? 0;
-                datos.push(dataAux);
                 guardarRecibos(dataAux, {
                   onSuccess: () => {
                     setIsLoadingRecibo(false);
@@ -306,6 +318,9 @@ const RecibosDetalles = () => {
         }
       }
 
+      if (!noExiste) {
+        Toast.error("Debe ingresar valores en un comprobante");
+      }
       setIsLoadingRecibo(false);
     },
     [
@@ -329,6 +344,14 @@ const RecibosDetalles = () => {
 
   const handleCloseModal = useCallback(() => {
     setModalAlerta(false);
+  }, []);
+
+  const handleCloseModalGuardar = useCallback(() => {
+    setModalAlertaGuardar(false);
+  }, []);
+
+  const handleOpenModalGuardar = useCallback(() => {
+    setModalAlertaGuardar(true);
   }, []);
 
   useEffect(() => {
@@ -360,7 +383,7 @@ const RecibosDetalles = () => {
     <View style={styles.containerGeneral}>
       <Header
         title={`${datos?.apellidos} ${datos?.nombres}`}
-        handleTapIconRight={handleSubmit(onSuccess, onError)}
+        handleTapIconRight={handleOpenModalGuardar}
         iconRight={
           <Icon
             name="save"
@@ -381,6 +404,13 @@ const RecibosDetalles = () => {
         <ModalLoading
           onClose={() => {}}
           visible={loadingRecibo || isLoadingReciboGuardar}
+        />
+      )}
+      {modalAlertaGuardar && (
+        <ModalAlertaGurdar
+          onClose={handleCloseModalGuardar}
+          visible={modalAlertaGuardar}
+          handleGuardar={handleSubmit(onSuccess, onError)}
         />
       )}
     </View>
