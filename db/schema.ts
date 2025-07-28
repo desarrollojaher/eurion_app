@@ -341,10 +341,10 @@ export const verificacionTable = sqliteTable(
         table.idVerificacion,
         table.idCliente,
         table.periodo,
-        table.tipoVerificacion
+        table.tipoVerificacion,
       ),
     };
-  }
+  },
 );
 
 export const clienteTable = sqliteTable(
@@ -356,7 +356,7 @@ export const clienteTable = sqliteTable(
     nombreCliente: text(),
     apellidoCliente: text(),
     estadoCivilCliente: text(),
-    didependientesCliente: int(),
+    dependientesCliente: int(),
     referencias: text(),
     observaciones: text(),
     categoriaCliente: text(),
@@ -372,12 +372,13 @@ export const clienteTable = sqliteTable(
     direccionTrabajoCliente: text(),
     fotoCliente: text(),
     fotoDireccion: text(),
+    telefonoCliente: text(),
   },
   (table) => {
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  }
+  },
 );
 
 export const conyugueTable = sqliteTable(
@@ -400,7 +401,7 @@ export const conyugueTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  }
+  },
 );
 
 export const viviendaTable = sqliteTable(
@@ -416,7 +417,7 @@ export const viviendaTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  }
+  },
 );
 
 export const verificacionResultTable = sqliteTable("verificacion_result", {
@@ -432,20 +433,20 @@ export const verificacionResultTable = sqliteTable("verificacion_result", {
   vrProcesado: int().default(0),
 });
 
-export const verificacionResultDetTable = sqliteTable("verificacion_result_det", {
-  vcId: int().primaryKey({ autoIncrement: true }),
-  vrId: int(),
-  fecha: text(),
-  vcImagenBase: text(),
-  vcPeriodo: text(),
-  nombre: text(),
-  vrdProcesado: int().default(0),
-});
-
-export const tiposVerificacionTable = sqliteTable(
-  "tipos_verificacion",
+export const verificacionResultDetTable = sqliteTable(
+  "verificacion_result_det",
   {
-    vtId: int(),
-    vtDescripcion: text(),
-  }
+    vcId: int().primaryKey({ autoIncrement: true }),
+    vrId: int(),
+    fecha: text(),
+    vcImagenBase: text(),
+    vcPeriodo: text(),
+    nombre: text(),
+    vrdProcesado: int().default(0),
+  },
 );
+
+export const tiposVerificacionTable = sqliteTable("tipos_verificacion", {
+  vtId: int(),
+  vtDescripcion: text(),
+});

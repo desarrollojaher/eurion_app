@@ -1,9 +1,9 @@
 import { IActividadEconomica } from "./IActividadEconomica";
 import { IBuro } from "./IBuro";
-import { IConyugue } from "./IConyugue";
+import { IConyugueDetalles } from "./IConyugue";
 import { IImagenesVerificaciones } from "./IImagenes";
 import { IUsuarioGeneral } from "./IUsuario";
-import { IVivienda } from "./IVivienda";
+import { IViviendaDetalles } from "./IVivienda";
 
 export interface IVerificacion {
   idVerificacion: number;
@@ -36,15 +36,17 @@ export interface IVerificacionesCabecera {
   fotoDomicilio: string;
   clienteId: number;
   periodo: string;
+  latitud: number;
+  longitud: number;
 }
 
 export interface IVerificacionDetalles {
   actividadEconomica: IActividadEconomica;
   actividadEconomicaConyugue: IActividadEconomica;
   buro: IBuro;
-  datosConyugue: IConyugue;
+  datosConyugue: IConyugueDetalles;
   datosGenerales: IUsuarioGeneral;
-  datosVivienda: IVivienda;
+  datosVivienda: IViviendaDetalles;
 }
 
 export interface IVerificacionDetallesParams {
@@ -66,10 +68,10 @@ export interface IVerificacionesGuardar {
 }
 
 export interface IActualizarVerificacion {
-  vdId: number,
-  estado: number
+  vdId: number;
+  estado: number;
 }
 
 export interface IVerificacionesVdId {
-  vdId: number
+  vdId: number;
 }

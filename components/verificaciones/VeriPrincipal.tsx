@@ -36,10 +36,13 @@ import { useDebounce } from "@/hooks/debounce";
 import { format } from "date-fns";
 import LoadingComponent from "../commons/FlatList/LoadingComponent";
 import EmptyList from "../commons/FlatList/EmptyList";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import ModalError from "../sincronizar/modal/ModalError";
 
 const VeriPrincipal = () => {
   const [openImagenes, setOpenImagenes] = useState(false);
   const [openGuardar, setOpenGuardar] = useState(false);
+  const [openError, setOpenError] = useState(false);
 
   const [cliente, setCliente] = useState<IVerificacionesCabecera>();
   const [filtro, setFiltro] = useState("");
@@ -88,12 +91,25 @@ const VeriPrincipal = () => {
     setOpenGuardar(true);
   }, []);
 
+  const handleOpenGoogleMaps = useCallback(
+    (cliente: IVerificacionesCabecera) => {
+      if (cliente.latitud && cliente.longitud) {
+        Linking.openURL(
+          `geo:${cliente.latitud},${cliente.longitud}?q=${cliente.latitud},${cliente.longitud}`,
+        );
+      } else {
+        setOpenError(true);
+      }
+    },
+    [],
+  );
+
   const handleChangePage = useCallback(
     (item: IVerificacionesCabecera) => {
       setDatos(item);
       router.push("/principal/verificaciones/verifcaciones-detalles");
     },
-    [router, setDatos]
+    [router, setDatos],
   );
 
   const renderItem = useCallback(
@@ -101,15 +117,18 @@ const VeriPrincipal = () => {
       <Card style={styles.cardStyle}>
         <TouchableOpacity onPress={() => handleChangePage(item)}>
           <HeaderCard
-            labelLeft={
-              item.codigoTipoDeRuta
-            }
+            labelLeft={item.codigoTipoDeRuta}
             labelRight={format(item.fecha, "dd-MM-yyyy")}
           />
           <Separador />
-          <TextCard titulo={`${item.apellidos} ${item.nombres}`} subtitulo={item.identificacion} />
+          <TextCard
+            titulo={`${item.apellidos} ${item.nombres}`}
+            subtitulo={item.identificacion}
+          />
           <Text style={styles.textDescripcion}>
-            {item.codigoTipoDeRuta === 1 ? item.direccion : item.direccionTrabajo}
+            {item.codigoTipoDeRuta === "Domiciliaria"
+              ? item.direccion
+              : item.direccionTrabajo}
           </Text>
           <Separador />
           <View style={styles.containerIcons}>
@@ -119,6 +138,9 @@ const VeriPrincipal = () => {
             <Pressable onPress={() => handleLlamarPersona(item.telefono)}>
               <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
             </Pressable>
+            <Pressable onPress={() => handleOpenGoogleMaps(item)}>
+              <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
+            </Pressable>
             <Pressable onPress={() => handleOpenGuardar(item)}>
               <FontAwesome5 name="plus" color={NEGRO} size={30} />
             </Pressable>
@@ -126,7 +148,13 @@ const VeriPrincipal = () => {
         </TouchableOpacity>
       </Card>
     ),
-    [handleChangePage, handleLlamarPersona, handleOpenGuardar, handleOpenImagenes]
+    [
+      handleChangePage,
+      handleLlamarPersona,
+      handleOpenGoogleMaps,
+      handleOpenGuardar,
+      handleOpenImagenes,
+    ],
   );
 
   const handleCerrarImagenes = useCallback(() => {
@@ -135,6 +163,10 @@ const VeriPrincipal = () => {
 
   const handleCloseGuardar = useCallback(() => {
     setOpenGuardar(false);
+  }, []);
+
+  const handleCloseError = useCallback(() => {
+    setOpenError(false);
   }, []);
 
   const handleSelect = useCallback((value: IDatosSelect) => {
@@ -153,7 +185,13 @@ const VeriPrincipal = () => {
           placeholder="Buscar"
           styleContainer={styles.styleInput}
           onChangeText={setFiltro}
-          leftIcon={<Ionicons name="search" color={AZUL} size={convertirTamanoHorizontal(25)} />}
+          leftIcon={
+            <Ionicons
+              name="search"
+              color={AZUL}
+              size={convertirTamanoHorizontal(25)}
+            />
+          }
         />
         <Select
           onSelect={handleSelect}
@@ -170,8 +208,12 @@ const VeriPrincipal = () => {
           keyExtractor={(item, index) => item.identificacion + index}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<EmptyList isLoading={isLoadingVerificacionesCabecera} />}
-          ListFooterComponent={<LoadingComponent isLoading={isLoadingVerificacionesCabecera} />}
+          ListEmptyComponent={
+            <EmptyList isLoading={isLoadingVerificacionesCabecera} />
+          }
+          ListFooterComponent={
+            <LoadingComponent isLoading={isLoadingVerificacionesCabecera} />
+          }
           refreshControl={
             <RefreshControl
               refreshing={isLoadingVerificacionesCabecera}
@@ -195,6 +237,14 @@ const VeriPrincipal = () => {
           onClose={handleCloseGuardar}
           visible={openGuardar}
           seccion="cabecera"
+        />
+      )}
+      {openError && (
+        <ModalError
+          errorMessage="No existe coordenadas para esta verificación"
+          onClose={handleCloseError}
+          visible={openError}
+          tabla=""
         />
       )}
     </View>

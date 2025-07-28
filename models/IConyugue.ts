@@ -30,3 +30,10 @@ export interface IConyugue {
   direccionTrabajoConyugue: string;
   idCliente: number;
 }
+
+export interface IConyugueDetalles {
+  cedulaConyuge: string;
+  nombre: string;
+  apellidos: string;
+  celular: string;
+}

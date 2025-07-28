@@ -1,13 +1,3 @@
-// export interface ICliente {
-//   identificacion: string | null;
-//   nombres: string | null;
-//   apellido: string | null;
-//   estadoCivil: string | null;
-//   dependientes: number | null;
-//   telefono: string | null;
-//   referencias: string | null;
-//   observacion: string | null;
-// }
 
 export interface IClienteParams {
   identificacion: string;
@@ -50,4 +40,5 @@ export interface ICliente {
   direccionTrabajoCliente: string;
   fotoCliente: string;
   fotoDireccion: string;
+  telefonoCliente: string;
 }

@@ -1,4 +1,10 @@
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useCallback, useState } from "react";
 import {
   convertirTamanoHorizontal,
@@ -14,7 +20,6 @@ import { useRouter } from "expo-router";
 import NetInfo from "@react-native-community/netinfo";
 import ModalSincronizar from "./modal/ModalSincronizar";
 import { useObtenerFecha } from "@/service/Sincronizacion/useObtenerFecha";
-import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import ModalCerrarSesion from "./modal/ModalCerrarSesion";
 import Constants from "expo-constants";
 const Principal = () => {
@@ -27,7 +32,7 @@ const Principal = () => {
 
   const router = useRouter();
 
-  const version = Constants.manifest?.version || "Versión no disponible";
+  const version = Constants.expoConfig?.version || "Versión no disponible";
   console.log("Versión de la app:", version);
 
   const verificarInternetSincronizacion = useCallback(async () => {
@@ -119,9 +124,18 @@ const Principal = () => {
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
-        <Text style={styles.textHeader}>Bienvenido {usuario?.usuNombre.split(" ")[0]}</Text>
-        <Pressable onPress={handleOpenModalCerrarSesion} style={styles.iconStyle}>
-          <Icon name={"logout"} size={convertirTamanoHorizontal(30)} color={BLANCO} />
+        <Text style={styles.textHeader}>
+          Bienvenido {usuario?.usuNombre.split(" ")[0]}
+        </Text>
+        <Pressable
+          onPress={handleOpenModalCerrarSesion}
+          style={styles.iconStyle}
+        >
+          <Icon
+            name={"logout"}
+            size={convertirTamanoHorizontal(30)}
+            color={BLANCO}
+          />
         </Pressable>
       </View>
 
@@ -222,10 +236,15 @@ const Principal = () => {
           </TouchableOpacity>
         </Card>
       </View>
-      <Text style={styles.textVersion}>Version: 2.0.0</Text>
-      {modalAlerta && <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />}
+      <Text style={styles.textVersion}>Version: {version}</Text>
+      {modalAlerta && (
+        <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />
+      )}
       {modalCerrarSesion && (
-        <ModalCerrarSesion onClose={handleCloseModalCerrarSesion} visible={modalCerrarSesion} />
+        <ModalCerrarSesion
+          onClose={handleCloseModalCerrarSesion}
+          visible={modalCerrarSesion}
+        />
       )}
     </View>
   );

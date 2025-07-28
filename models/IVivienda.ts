@@ -5,3 +5,13 @@ export interface IVivienda {
   contruccionVivienda: string;
   idCliente: number;
 }
+
+
+export interface IViviendaDetalles {
+  direccion: string;
+  zona: string;
+  tipoVivienda: string;
+  nombreDueno: string;
+  telDueno: string;
+  construccon: string;
+}

@@ -1446,16 +1446,16 @@ export const dbSqliteService = {
   //     }
   //   },
 
-  //   eliminarBitacoraSincronizacion: async () => {
-  //     try {
-  //       await db.delete(schema.bitacoraSincronizadoTable);
-  //     } catch (error: any) {
-  //       const mensajeError = error?.message || "Error desconocido";
-  //       const mensajeExtraido =
-  //         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
-  //       throw { message: mensajeExtraido };
-  //     }
-  //   },
+  eliminarBitacoraSincronizacion: async () => {
+    try {
+      await db.delete(schema.bitacoraSincronizadoTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
   insertarBitacoraSincronizacion: async (datos: ISincronizado) => {
     try {
       await db.insert(schema.bitacoraSincronizadoTable).values(datos);
@@ -1664,6 +1664,8 @@ export const dbSqliteService = {
           fotoDomicilio: schema.clienteTable.fotoDireccion,
           telefono: schema.clienteTable.telefonoEmpresaCliente,
           periodo: schema.verificacionTable.periodo,
+          latitud: schema.verificacionTable.latitudCliente,
+          longitud: schema.verificacionTable.longitudCliente,
         })
         .from(schema.verificacionTable)
         .innerJoin(
@@ -1692,8 +1694,8 @@ export const dbSqliteService = {
             nombreCliente: schema.clienteTable.nombreCliente,
             apellidoCliente: schema.clienteTable.apellidoCliente,
             estadoCivil: schema.clienteTable.estadoCivilCliente,
-            dependientes: schema.clienteTable.didependientesCliente,
-            telefono: schema.clienteTable.telefonoEmpresaCliente, // poner el que es del cliente
+            dependientes: schema.clienteTable.dependientesCliente,
+            telefono: schema.clienteTable.telefonoCliente,
             observacion: schema.clienteTable.observaciones,
             referencias: schema.clienteTable.referencias,
             detalleAdicional: schema.clienteTable.direccionCliente,

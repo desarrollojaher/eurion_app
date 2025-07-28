@@ -1,4 +1,4 @@
-import { useContext, createContext, useEffect, useCallback } from "react";
+import { useContext, createContext, useEffect, useCallback, useState } from "react";
 import { useRouter } from "expo-router"; // Para manejar la navegación
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUsuario } from "@/models/IUsuario";
@@ -26,14 +26,15 @@ export function useSession() {
 }
 
 export function SessionProvider({ children, token }: any) {
-  // const [[isLoading, session], setSession] = useStorageState("session");
+  const [usuario, setUsuario] = useState<IUsuario | null>(null);
   const router = useRouter();
 
   const signIn = async (token: string) => {
     // Guardar token en sessionStorage
     try {
       await AsyncStorage.setItem("token", token);
-      // setSession(token);
+      const decodedUser = jwtDecode(token) as IUsuario;
+      setUsuario(decodedUser);
       router.replace("/principal");
     } catch (error) {
       console.log(error);
@@ -43,6 +44,7 @@ export function SessionProvider({ children, token }: any) {
   const signOut = async () => {
     // Eliminar el token de sessionStorage
     try {
+      setUsuario(null);
       await AsyncStorage.removeItem("token");
       await dbSqliteService.eliminarBitacoraSincronizacion();
       router.replace("/auth");
@@ -55,8 +57,11 @@ export function SessionProvider({ children, token }: any) {
 
   const handleToken = useCallback(async () => {
     if (token) {
+      const decodedUser = jwtDecode(token) as IUsuario;
+      setUsuario(decodedUser);
       router.replace("/principal");
     } else {
+      setUsuario(null);
       router.replace("/auth");
     }
   }, [router, token]);
@@ -70,7 +75,7 @@ export function SessionProvider({ children, token }: any) {
       value={{
         signIn,
         signOut,
-        usuario: token ? (jwtDecode(token) as IUsuario) : null,
+        usuario
         // session,
         // isLoading,
       }}
