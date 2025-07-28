@@ -1,8 +1,7 @@
 export interface IVivienda {
-  construccon: string;
-  direccion: string;
-  nombreDueno: string;
-  telDueno: string;
   tipoVivienda: string;
-  zona: string;
+  nombreDuenoVivienda: string;
+  telefonoDuenoVivienda: string;
+  contruccionVivienda: string;
+  idCliente: number;
 }

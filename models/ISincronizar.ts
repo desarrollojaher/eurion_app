@@ -1,14 +1,18 @@
+import { ICliente } from "./ICliente";
+import { IConyugue } from "./IConyugue";
 import { IImagenCliente, IImagenDomicilio } from "./IImagenes";
+import { IVerificacion } from "./IVerificaciones";
+import { IVivienda } from "./IVivienda";
 
-export interface ISincronizarVerificaciones {
-  fecha: string;
-  identificacionCliente: string;
-  codigoDireccion: string;
-  codigoZona: string;
-  identificacionAgente: string;
-  codigoTipoRuta: number;
-  esVerificado: number;
-}
+// export interface ISincronizarVerificaciones {
+//   fecha: string;
+//   identificacionCliente: string;
+//   codigoDireccion: string;
+//   codigoZona: string;
+//   identificacionAgente: string;
+//   codigoTipoRuta: number;
+//   esVerificado: number;
+// }
 
 export interface ISincronizarClientes {
   identificacion: string;
@@ -100,4 +104,33 @@ export interface ISincronizarImagenesParams {
 export interface ISincronizacion {
   codigo: number;
   fecha: string | null;
+}
+
+///////////////////////////////////////////nuevo esquema
+
+export interface ISincronizarVerificaciones {
+  verificacion: IVerificacion | null;
+  cliente: ICliente | null;
+  conyugue: IConyugue | null;
+  vivienda: IVivienda | null;
+}
+
+export interface ISincronizarVerificacionesEnviar {
+  vrId: number | null;
+  vrComentario: string | null;
+  vdId: number | null;
+  vtId: number | null;
+  clId: number | null;
+  usIdCobrador: number | null;
+  vrPeriodo: string | null;
+  vrFechaVerificacion: string | null;
+  vrLatitud: number | null;
+  vrLongitud: number | null;
+  fecha: string | null;
+  vcImagenBase: string | null | undefined;
+  vcPeriodo: string | null;
+}
+
+export interface IVerificacionesEnviar {
+  verificaciones: ISincronizarVerificacionesEnviar[];
 }

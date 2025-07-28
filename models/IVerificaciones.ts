@@ -5,8 +5,26 @@ import { IImagenesVerificaciones } from "./IImagenes";
 import { IUsuarioGeneral } from "./IUsuario";
 import { IVivienda } from "./IVivienda";
 
+export interface IVerificacion {
+  idVerificacion: number;
+  idCliente: number;
+  fechaVerificacion: string;
+  latitudCliente: number;
+  longitudCliente: number;
+  tipoVerificacion: string;
+  identificacionCobrador: number;
+  periodo: string;
+  producto: string;
+}
+
+export interface IVerificacionesCabeceraParams {
+  tipoRuta: string | null;
+  nombreCliente: string;
+}
+
 export interface IVerificacionesCabecera {
-  codigoTipoDeRuta: number;
+  idVerificacion: number;
+  codigoTipoDeRuta: string;
   fecha: Date;
   identificacion: string;
   nombres: string;
@@ -16,11 +34,8 @@ export interface IVerificacionesCabecera {
   direccionTrabajo: string;
   fotoCliente: string;
   fotoDomicilio: string;
-}
-
-export interface IVerificacionesCabeceraParams {
-  tipoRuta: number | null;
-  nombreCliente: string;
+  clienteId: number;
+  periodo: string;
 }
 
 export interface IVerificacionDetalles {
@@ -37,31 +52,24 @@ export interface IVerificacionDetallesParams {
 }
 
 export interface IVerificacionesGuardar {
-  id: string;
-  fecha: string;
-  observaciones: string;
-  codigoTipoGestion: number;
-  verificacion: number;
-  identificacionCliente: string;
-  identificacionAgente: string;
-  codigoDireccion: string;
-  latitud: number;
-  longitud: number;
-  codigoTipoRuta: number;
-  calificacion: number;
+  vrId: number | null;
+  veComentario: string;
+  vdId: number;
+  vtId: number;
+  clId: number;
+  usIdCobrador: number;
+  vrPeriodo: string;
+  vrFechaVerificacion: string;
+  vrLatitud: number;
+  vrLongitud: number;
   imagenes: IImagenesVerificaciones[];
 }
 
 export interface IActualizarVerificacion {
-  calificacion: number;
-  codigoTipoGestion: number;
-  identificacionCliente: string;
-  reversar: boolean;
+  vdId: number,
+  estado: number
 }
 
-export interface IVerificacionesEliminar {
-  id: string;
-  cedulaCliente: string;
-  calificacion: number;
-  tipoGestion: number;
+export interface IVerificacionesVdId {
+  vdId: number
 }

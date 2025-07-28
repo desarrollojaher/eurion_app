@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "626a8ccc-c621-4d47-a734-44367a27fb6c",
-  "prevId": "6413414f-2112-440b-9bc0-12063af7e3a2",
+  "id": "d422925f-4b24-4518-9816-712fb2c84f9d",
+  "prevId": "d17262f1-c606-4990-bc8c-dc886ab27989",
   "tables": {
     "bitacora_sincronizado": {
       "name": "bitacora_sincronizado",
@@ -28,126 +28,18 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "cliente_conyuge": {
-      "name": "cliente_conyuge",
+    "cliente": {
+      "name": "cliente",
       "columns": {
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombres": {
-          "name": "nombres",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "identificacion": {
-          "name": "identificacion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "apellidos": {
-          "name": "apellidos",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "ocupacionLaboral": {
-          "name": "ocupacionLaboral",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombreEmpresa": {
-          "name": "nombreEmpresa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "antiguedad": {
-          "name": "antiguedad",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "cargo": {
-          "name": "cargo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombreJefe": {
-          "name": "nombreJefe",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "ingresos": {
-          "name": "ingresos",
+        "idCliente": {
+          "name": "idCliente",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "telefonoEmpresa": {
-          "name": "telefonoEmpresa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "celularJefe": {
-          "name": "celularJefe",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccionEmpresa": {
-          "name": "direccionEmpresa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "referencias": {
-          "name": "referencias",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "celularConyugue": {
-          "name": "celularConyugue",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "cliente_garante_gcobranza": {
-      "name": "cliente_garante_gcobranza",
-      "columns": {
-        "identificacion": {
-          "name": "identificacion",
+        "direccionCliente": {
+          "name": "direccionCliente",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -156,648 +48,6 @@
         "identificacionCliente": {
           "name": "identificacionCliente",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombre": {
-          "name": "nombre",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "telefono": {
-          "name": "telefono",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccion": {
-          "name": "direccion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "detalleDireccion": {
-          "name": "detalleDireccion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "trabajaEn": {
-          "name": "trabajaEn",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccionTrabajo": {
-          "name": "direccionTrabajo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "telefonoTrabajo": {
-          "name": "telefonoTrabajo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "celular": {
-          "name": "celular",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "clientes": {
-      "name": "clientes",
-      "columns": {
-        "identificacion": {
-          "name": "identificacion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombres": {
-          "name": "nombres",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "apellidos": {
-          "name": "apellidos",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "telefono": {
-          "name": "telefono",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "estadoCivil": {
-          "name": "estadoCivil",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nroDependientes": {
-          "name": "nroDependientes",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "ocupacionLaboral": {
-          "name": "ocupacionLaboral",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombreEmpresa": {
-          "name": "nombreEmpresa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "antiguedad": {
-          "name": "antiguedad",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "cargo": {
-          "name": "cargo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombreJefe": {
-          "name": "nombreJefe",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "ingresos": {
-          "name": "ingresos",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "telefonoEmpresa": {
-          "name": "telefonoEmpresa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "celularJefe": {
-          "name": "celularJefe",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccionEmpresa": {
-          "name": "direccionEmpresa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "referencias": {
-          "name": "referencias",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "observacion": {
-          "name": "observacion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "cupoCredito": {
-          "name": "cupoCredito",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "montoDisponible": {
-          "name": "montoDisponible",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "chequesPendientes": {
-          "name": "chequesPendientes",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "productos": {
-          "name": "productos",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "score": {
-          "name": "score",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "categoria": {
-          "name": "categoria",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "telefonoDuenoCasa": {
-          "name": "telefonoDuenoCasa",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tipo": {
-          "name": "tipo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "detalle_garante_gcobranza": {
-      "name": "detalle_garante_gcobranza",
-      "columns": {
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nroDocumento": {
-          "name": "nroDocumento",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "producto": {
-          "name": "producto",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "direccion_celular_gcobranza": {
-      "name": "direccion_celular_gcobranza",
-      "columns": {
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccionIngresada": {
-          "name": "direccionIngresada",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "indicacionesAdicionales": {
-          "name": "indicacionesAdicionales",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "latitud": {
-          "name": "latitud",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "longitud": {
-          "name": "longitud",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nroDocumento": {
-          "name": "nroDocumento",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fecha": {
-          "name": "fecha",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sincronizado": {
-          "name": "sincronizado",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "direccion": {
-      "name": "direccion",
-      "columns": {
-        "codigo": {
-          "name": "codigo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccion": {
-          "name": "direccion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tipoVivienda": {
-          "name": "tipoVivienda",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nombreDueno": {
-          "name": "nombreDueno",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "latitud": {
-          "name": "latitud",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "longitud": {
-          "name": "longitud",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "observacionesAdicionales": {
-          "name": "observacionesAdicionales",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tipoResidencia": {
-          "name": "tipoResidencia",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tipoConstruccion": {
-          "name": "tipoConstruccion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tipo": {
-          "name": "tipo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "documentos_gcobranza": {
-      "name": "documentos_gcobranza",
-      "columns": {
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "numeroDePagos": {
-          "name": "numeroDePagos",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "monto": {
-          "name": "monto",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "montoCancelado": {
-          "name": "montoCancelado",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fechaEmision": {
-          "name": "fechaEmision",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fechaVencimiento": {
-          "name": "fechaVencimiento",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "nroDocumento": {
-          "name": "nroDocumento",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "interesMora": {
-          "name": "interesMora",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tramo": {
-          "name": "tramo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "gastosDeCobranza": {
-          "name": "gastosDeCobranza",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "valorTotalVencido": {
-          "name": "valorTotalVencido",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "deudaTotal": {
-          "name": "deudaTotal",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "cuotasPagadas": {
-          "name": "cuotasPagadas",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "cuotasPendientes": {
-          "name": "cuotasPendientes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fechaUltimoPago": {
-          "name": "fechaUltimoPago",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "totalPendiente": {
-          "name": "totalPendiente",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "saldoVencido": {
-          "name": "saldoVencido",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "estado": {
-          "name": "estado",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "saldoDelCredito": {
-          "name": "saldoDelCredito",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "valorCuota": {
-          "name": "valorCuota",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "enviar_gcobranza_celular": {
-      "name": "enviar_gcobranza_celular",
-      "columns": {
-        "nroDocumento": {
-          "name": "nroDocumento",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoCargo": {
-          "name": "codigoCargo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fecha": {
-          "name": "fecha",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "periodo": {
-          "name": "periodo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoZona": {
-          "name": "codigoZona",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "esGestionado": {
-          "name": "esGestionado",
-          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -816,6 +66,27 @@
           "notNull": false,
           "autoincrement": false
         },
+        "estadoCivilCliente": {
+          "name": "estadoCivilCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "didependientesCliente": {
+          "name": "didependientesCliente",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "referencias": {
+          "name": "referencias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "observaciones": {
           "name": "observaciones",
           "type": "text",
@@ -823,39 +94,78 @@
           "notNull": false,
           "autoincrement": false
         },
-        "latitud": {
-          "name": "latitud",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "longitud": {
-          "name": "longitud",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "direccion": {
-          "name": "direccion",
+        "categoriaCliente": {
+          "name": "categoriaCliente",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "foto_cliente": {
-      "name": "foto_cliente",
-      "columns": {
-        "identificacionCliente": {
-          "name": "identificacionCliente",
+        },
+        "scoreCliente": {
+          "name": "scoreCliente",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ocupacionLaboralCliente": {
+          "name": "ocupacionLaboralCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "empresaLaboraCliente": {
+          "name": "empresaLaboraCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "antiguedadCliente": {
+          "name": "antiguedadCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cargoCliente": {
+          "name": "cargoCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nombreJefeCliente": {
+          "name": "nombreJefeCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ingresosCliente": {
+          "name": "ingresosCliente",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telefonoEmpresaCliente": {
+          "name": "telefonoEmpresaCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "celJefeCliente": {
+          "name": "celJefeCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "direccionTrabajoCliente": {
+          "name": "direccionTrabajoCliente",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -867,13 +177,20 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "fotoDireccion": {
+          "name": "fotoDireccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
-        "foto_cliente_identificacionCliente_unique": {
-          "name": "foto_cliente_identificacionCliente_unique",
+        "cliente_idCliente_unique": {
+          "name": "cliente_idCliente_unique",
           "columns": [
-            "identificacionCliente"
+            "idCliente"
           ],
           "isUnique": true
         }
@@ -883,29 +200,99 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "foto_del_domicilio": {
-      "name": "foto_del_domicilio",
+    "conyugue": {
+      "name": "conyugue",
       "columns": {
-        "identificacionCliente": {
-          "name": "identificacionCliente",
+        "identificacionConyugue": {
+          "name": "identificacionConyugue",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "fotoDelDomicilio": {
-          "name": "fotoDelDomicilio",
+        "nombresConyugue": {
+          "name": "nombresConyugue",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "apellidosConyugue": {
+          "name": "apellidosConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telefonoConyugue": {
+          "name": "telefonoConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ocupacionLaboralConyugue": {
+          "name": "ocupacionLaboralConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "empresaLaboraConyugue": {
+          "name": "empresaLaboraConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "antiguedadConyugue": {
+          "name": "antiguedadConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "cargoConyugue": {
+          "name": "cargoConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telefonoEmpresaConyugue": {
+          "name": "telefonoEmpresaConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "celJefeConyugue": {
+          "name": "celJefeConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "direccionTrabajoConyugue": {
+          "name": "direccionTrabajoConyugue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "idCliente": {
+          "name": "idCliente",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         }
       },
       "indexes": {
-        "foto_del_domicilio_identificacionCliente_unique": {
-          "name": "foto_del_domicilio_identificacionCliente_unique",
+        "conyugue_idCliente_unique": {
+          "name": "conyugue_idCliente_unique",
           "columns": [
-            "identificacionCliente"
+            "idCliente"
           ],
           "isUnique": true
         }
@@ -915,86 +302,22 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "gestiones_celular_gcobranza": {
-      "name": "gestiones_celular_gcobranza",
+    "tipos_verificacion": {
+      "name": "tipos_verificacion",
       "columns": {
-        "nroDocumento": {
-          "name": "nroDocumento",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fechaGestion": {
-          "name": "fechaGestion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "observaciones": {
-          "name": "observaciones",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoTipoGestion": {
-          "name": "codigoTipoGestion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fechaProximaGestion": {
-          "name": "fechaProximaGestion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "observacionesProximaGestion": {
-          "name": "observacionesProximaGestion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoTipoGestionProxima": {
-          "name": "codigoTipoGestionProxima",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "latitud": {
-          "name": "latitud",
+        "vtId": {
+          "name": "vtId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "longitud": {
-          "name": "longitud",
-          "type": "integer",
+        "vtDescripcion": {
+          "name": "vtDescripcion",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "sincronizado": {
-          "name": "sincronizado",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 0
         }
       },
       "indexes": {},
@@ -1003,18 +326,39 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "imagen_verificacion": {
-      "name": "imagen_verificacion",
+    "verificacion_result_det": {
+      "name": "verificacion_result_det",
       "columns": {
-        "id": {
-          "name": "id",
+        "vcId": {
+          "name": "vcId",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "vrId": {
+          "name": "vrId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fecha": {
+          "name": "fecha",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "idVerificacion": {
-          "name": "idVerificacion",
+        "vcImagenBase": {
+          "name": "vcImagenBase",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vcPeriodo": {
+          "name": "vcPeriodo",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1027,15 +371,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "imagen": {
-          "name": "imagen",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sincronizado": {
-          "name": "sincronizado",
+        "vrdProcesado": {
+          "name": "vrdProcesado",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -1049,232 +386,74 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "imagenes_actualizar_direccion": {
-      "name": "imagenes_actualizar_direccion",
+    "verificacion_result": {
+      "name": "verificacion_result",
       "columns": {
-        "identiticacionCliente": {
-          "name": "identiticacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "imagen": {
-          "name": "imagen",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "titulo": {
-          "name": "titulo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sincronizado": {
-          "name": "sincronizado",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "tipo_de_gestion_gcobranza": {
-      "name": "tipo_de_gestion_gcobranza",
-      "columns": {
-        "codigo": {
-          "name": "codigo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "descripcion": {
-          "name": "descripcion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "pideFoto": {
-          "name": "pideFoto",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "pideFecha": {
-          "name": "pideFecha",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "usuario": {
-      "name": "usuario",
-      "columns": {
-        "id": {
-          "name": "id",
+        "vrId": {
+          "name": "vrId",
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "age": {
-          "name": "age",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "usuario_email_unique": {
-          "name": "usuario_email_unique",
-          "columns": [
-            "email"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "verificaciones_resultado": {
-      "name": "verificaciones_resultado",
-      "columns": {
-        "id": {
-          "name": "id",
+        "vrComentario": {
+          "name": "vrComentario",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "fecha": {
-          "name": "fecha",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "observaciones": {
-          "name": "observaciones",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoTipoGestion": {
-          "name": "codigoTipoGestion",
+        "vdId": {
+          "name": "vdId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "verificacion": {
-          "name": "verificacion",
+        "vtId": {
+          "name": "vtId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "identificacionCliente": {
-          "name": "identificacionCliente",
+        "clId": {
+          "name": "clId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "usIdCobrador": {
+          "name": "usIdCobrador",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vrFechaVerificacion": {
+          "name": "vrFechaVerificacion",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "identificacionAgente": {
-          "name": "identificacionAgente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoDireccion": {
-          "name": "codigoDireccion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "latitud": {
-          "name": "latitud",
+        "vrLatitud": {
+          "name": "vrLatitud",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "longitud": {
-          "name": "longitud",
+        "vrLongitud": {
+          "name": "vrLongitud",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "codigoTipoRuta": {
-          "name": "codigoTipoRuta",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "sincronizado": {
-          "name": "sincronizado",
+        "vrProcesado": {
+          "name": "vrProcesado",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -1288,60 +467,74 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "verificaciones": {
-      "name": "verificaciones",
+    "verificacion": {
+      "name": "verificacion",
       "columns": {
-        "fecha": {
-          "name": "fecha",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "identificacionCliente": {
-          "name": "identificacionCliente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoDireccion": {
-          "name": "codigoDireccion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoZona": {
-          "name": "codigoZona",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "identificacionAgente": {
-          "name": "identificacionAgente",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "codigoTipoRuta": {
-          "name": "codigoTipoRuta",
+        "idVerificacion": {
+          "name": "idVerificacion",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "esVerificado": {
-          "name": "esVerificado",
+        "idCliente": {
+          "name": "idCliente",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "sincronizado": {
-          "name": "sincronizado",
+        "fechaVerificacion": {
+          "name": "fechaVerificacion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "latitudCliente": {
+          "name": "latitudCliente",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "longitudCliente": {
+          "name": "longitudCliente",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tipoVerificacion": {
+          "name": "tipoVerificacion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "identificacionCobrador": {
+          "name": "identificacionCobrador",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "periodo": {
+          "name": "periodo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "producto": {
+          "name": "producto",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "procesado": {
+          "name": "procesado",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -1350,11 +543,13 @@
         }
       },
       "indexes": {
-        "verificaciones_identificacionCliente_codigoTipoRuta_unique": {
-          "name": "verificaciones_identificacionCliente_codigoTipoRuta_unique",
+        "verificacion_idVerificacion_idCliente_periodo_tipoVerificacion_unique": {
+          "name": "verificacion_idVerificacion_idCliente_periodo_tipoVerificacion_unique",
           "columns": [
-            "identificacionCliente",
-            "codigoTipoRuta"
+            "idVerificacion",
+            "idCliente",
+            "periodo",
+            "tipoVerificacion"
           ],
           "isUnique": true
         }
@@ -1364,25 +559,54 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "zona": {
-      "name": "zona",
+    "vivienda": {
+      "name": "vivienda",
       "columns": {
-        "codigo": {
-          "name": "codigo",
+        "tipoVivienda": {
+          "name": "tipoVivienda",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nombreDuenoVivienda": {
+          "name": "nombreDuenoVivienda",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "nombres": {
-          "name": "nombres",
+        "telefonoDuenoVivienda": {
+          "name": "telefonoDuenoVivienda",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "contruccionVivienda": {
+          "name": "contruccionVivienda",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "idCliente": {
+          "name": "idCliente",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vivienda_idCliente_unique": {
+          "name": "vivienda_idCliente_unique",
+          "columns": [
+            "idCliente"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

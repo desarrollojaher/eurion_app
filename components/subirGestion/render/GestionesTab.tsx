@@ -21,8 +21,9 @@ import EmptyList from "@/components/commons/FlatList/EmptyList";
 import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
 import { ISubirInformacion } from "@/models/ISubirInformacion";
 import { useSubirGestionEliminar } from "@/service/SubirInformacion/useSubirGestionEliminar";
-import { useSubirGestionEliminarVerificacion } from "@/service/SubirInformacion/useSubirGestionEliminarVerificacion";
 import { format, parseISO } from "date-fns";
+import { subirVerificacionUnica } from "@/service/SubirInformacion/subirVerificacionUnica";
+import ModalError from "@/components/sincronizar/modal/ModalError";
 
 const GestionesTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
@@ -36,13 +37,22 @@ const GestionesTab = () => {
     refetch: refetchSubirInformacion,
   } = useSubirInformacionObtener();
 
+  const {
+    subirVerificacion,
+    onCloseError,
+    error,
+    errorMessage,
+    tabla,
+    loading,
+  } = subirVerificacionUnica();
+
   const { mutate: eliminarGestion, isPending: isLoadingEliminaGestion } =
     useSubirGestionEliminar();
 
-  const {
-    mutate: eliminarGestionVerificacion,
-    isPending: isLoadingEliminaGestionVerificacion,
-  } = useSubirGestionEliminarVerificacion();
+  // const {
+  //   mutate: eliminarGestionVerificacion,
+  //   isPending: isLoadingEliminaGestionVerificacion,
+  // } = useSubirGestionEliminarVerificacion();
 
   const handleTabDelete = useCallback((datos: ISubirInformacion) => {
     setGestion(datos);
@@ -62,14 +72,10 @@ const GestionesTab = () => {
 
   const handleEliminar = useCallback(() => {
     if (gestion) {
-      if (
-        gestion.factura === "VERIFICACION" &&
-        (gestion.calificacion === "POSITIVA" ||
-          gestion.calificacion === "NEGATIVA")
-      ) {
+      if (gestion.factura === "VERIFICACION") {
         eliminarGestion(
           {
-            calificacion: gestion.calificacion,
+            calificacion: gestion.calificacion ?? "",
             factura: gestion.factura,
             identificacionCliente: gestion.identificacionCliente,
             modulo:
@@ -81,28 +87,29 @@ const GestionesTab = () => {
             onSuccess: () => {
               handleCloseModal();
             },
-          }
-        );
-      } else if (
-        gestion.factura === "VERIFICACION" &&
-        (gestion.calificacion === "ANULAR" ||
-          gestion.calificacion === "REASIGNAR")
-      ) {
-        eliminarGestionVerificacion(
-          {
-            calificacion: 0,
-            identificacionCliente: gestion.identificacionCliente,
-            reversar: true,
-            codigoTipoGestion:
-              gestion.tipoGestion === "VERIFICACION DOMICILIO" ? 1 : 2,
           },
-          {
-            onSuccess: () => {
-              handleCloseModal();
-            },
-          }
         );
       }
+      // else if (
+      //   gestion.factura === "VERIFICACION" &&
+      //   (gestion.calificacion === "ANULAR" ||
+      //     gestion.calificacion === "REASIGNAR")
+      // ) {
+      //   eliminarGestionVerificacion(
+      //     {
+      //       calificacion: 0,
+      //       identificacionCliente: gestion.identificacionCliente,
+      //       reversar: true,
+      //       codigoTipoGestion:
+      //         gestion.tipoGestion === "VERIFICACION DOMICILIO" ? 1 : 2,
+      //     },
+      //     {
+      //       onSuccess: () => {
+      //         handleCloseModal();
+      //       },
+      //     }
+      //   );
+      // }
       if (gestion.factura !== "VERIFICACION") {
         eliminarGestion(
           {
@@ -117,13 +124,17 @@ const GestionesTab = () => {
             onSuccess: () => {
               handleCloseModal();
             },
-          }
+          },
         );
       }
     }
-  }, [eliminarGestion, eliminarGestionVerificacion, gestion, handleCloseModal]);
+  }, [eliminarGestion, gestion, handleCloseModal]);
 
-  const handleSubir = useCallback(() => {}, []);
+  const handleSubir = useCallback(() => {
+    if (gestion && gestion.factura === "VERIFICACION") {
+      subirVerificacion(Number(gestion.id), handleCloseModal);
+    }
+  }, [gestion, handleCloseModal, subirVerificacion]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: ISubirInformacion; index: number }) => (
@@ -182,7 +193,7 @@ const GestionesTab = () => {
         </View>
       </Card>
     ),
-    [handleTabDelete, handleTabUpload]
+    [handleTabDelete, handleTabUpload],
   );
 
   return (
@@ -212,9 +223,15 @@ const GestionesTab = () => {
           tipo={tipoAlerta}
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
-          isLoading={
-            isLoadingEliminaGestion || isLoadingEliminaGestionVerificacion
-          }
+          isLoading={isLoadingEliminaGestion || loading}
+        />
+      )}
+      {error && (
+        <ModalError
+          onClose={onCloseError}
+          errorMessage={errorMessage}
+          tabla={tabla}
+          visible={error}
         />
       )}
     </View>

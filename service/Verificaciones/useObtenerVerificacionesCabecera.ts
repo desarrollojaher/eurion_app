@@ -6,6 +6,7 @@ import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { verificacionesKeys } from "./verificacionesKeys";
 import { dbSqliteService } from "../db/db";
 
+
 export const useObtenerVerificacionesCabecera = (
   params: IVerificacionesCabeceraParams,
   queryOptions?: UseQueryOptions<

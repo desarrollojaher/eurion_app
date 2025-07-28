@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Separador from "@/components/commons/separador/Separador";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -12,7 +12,7 @@ import ButtonCustom from "@/components/commons/button/ButtonCustom";
 import Camara from "@/components/commons/camera/Camara";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
 import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
-import { remove } from "lodash";
+import { find, remove } from "lodash";
 import { Toast } from "toastify-react-native";
 import {
   IVerificacionesCabecera,
@@ -26,6 +26,7 @@ import uuid from "react-native-uuid";
 import { IImagenesVerificaciones } from "@/models/IImagenes";
 import { useGuardarVerificaciones } from "@/service/Verificaciones/useGuardarVerificaciones";
 import { router } from "expo-router";
+import { useObtenerTiposVerificaciones } from "@/service/TiposVerificaciones/useObtenerTiposVerificaciones";
 
 interface PropsModalRealizarVerificacion {
   visible: boolean;
@@ -51,6 +52,10 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
 
   const { mutate: guardarVerificacion, isPending: isLoadingGestion } =
     useGuardarVerificaciones();
+
+  const { data: datosTipoVerificaciones } = useObtenerTiposVerificaciones()
+
+  const datosTipo = useMemo<IDatosSelect[]>(() => datosTipoVerificaciones && datosTipoVerificaciones.map((item) => ({ label: item.vtDescripcion, value: item.vtId?.toString() })), [datosTipoVerificaciones])
 
   const onOpenCamara = useCallback(() => {
     setVisibleCamara(true);
@@ -102,7 +107,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
 
     if (
       imagenes.length < 3 &&
-      (calificacion.value === "1" || calificacion.value === "2")
+      (calificacion.value === find(datosTipo, { label: "POSITIVA" })?.value || calificacion.value === find(datosTipo, { label: "NEGATIVA" })?.value)
     ) {
       Toast.error("Debe ingresar minimo 3 imagenes");
       return;
@@ -121,28 +126,27 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       setLoadingGuardado(false);
       return;
     }
-    const uuidv4 = uuid.v4();
 
     const imgs = imagenes.map<IImagenesVerificaciones>((item) => ({
-      id: uuid.v4(),
-      idVerificacion: uuidv4,
+      vcId: null,
+      fecha: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
+      vrId: 3,
       nombre: item.titulo,
-      imagen: item.url,
+      periodo: cliente.periodo,
+      vcImagenBase: item.url,
     }));
 
     const datos: IVerificacionesGuardar = {
-      calificacion: Number(calificacion?.value),
-      identificacionCliente: cliente.identificacion,
-      codigoTipoRuta: cliente.codigoTipoDeRuta,
-      codigoTipoGestion: cliente.codigoTipoDeRuta,
-      codigoDireccion: cliente.identificacion,
-      fecha: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
-      observaciones: observaciones,
-      verificacion: Number(calificacion?.value),
-      latitud: localizacion?.coords.latitude,
-      longitud: localizacion?.coords.longitude,
-      identificacionAgente: usuario?.identificacion ?? "",
-      id: uuidv4,
+      clId: cliente.clienteId,
+      vrId: null,
+      usIdCobrador: usuario?.usuId ?? -1,
+      vdId: cliente.idVerificacion,
+      veComentario: observaciones,
+      vrFechaVerificacion: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
+      vrLatitud: localizacion.coords.latitude,
+      vrLongitud: localizacion.coords.longitude,
+      vrPeriodo: cliente.periodo,
+      vtId: Number(calificacion.value),
       imagenes: imgs,
     };
 
@@ -158,18 +162,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
         setLoadingGuardado(false);
       },
     });
-  }, [
-    calificacion,
-    cliente.codigoTipoDeRuta,
-    cliente.identificacion,
-    guardarVerificacion,
-    handleObtenerDireccionGps,
-    imagenes,
-    observaciones,
-    onClose,
-    seccion,
-    usuario?.identificacion,
-  ]);
+  }, [calificacion, cliente.clienteId, cliente.idVerificacion, cliente.periodo, guardarVerificacion, handleObtenerDireccionGps, imagenes, observaciones, onClose, seccion, usuario?.usuId]);
 
   return (
     <ModalCustom
@@ -201,12 +194,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
         tipo="select"
         placeholder="Seleccione"
         onChangeSelect={handleChangeSelect}
-        datos={[
-          { label: "POSITIVA", value: "1" },
-          { label: "NEGATIVA", value: "2" },
-          { label: "REASIGNAR", value: "3" },
-          { label: "ANULAR", value: "4" },
-        ]}
+        datos={datosTipo}
       />
       <TextInput
         text={""}

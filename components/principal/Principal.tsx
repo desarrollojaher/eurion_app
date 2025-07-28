@@ -1,10 +1,4 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useState } from "react";
 import {
   convertirTamanoHorizontal,
@@ -37,39 +31,39 @@ const Principal = () => {
   console.log("Versión de la app:", version);
 
   const verificarInternetSincronizacion = useCallback(async () => {
-    const valor = await NetInfo.fetch();
-    if (valor.isConnected === false) return true;
+    // const valor = await NetInfo.fetch();
+    // if (valor.isConnected === false) return true;
 
-    if (dataFecha && dataFecha.fecha) {
-      const inicioDia = startOfDay(new Date());
-      const horaSincronizacion1 = new Date();
-      horaSincronizacion1.setHours(8, 0, 0, 0);
+    // if (dataFecha && dataFecha.fecha) {
+    //   const inicioDia = startOfDay(new Date());
+    //   const horaSincronizacion1 = new Date();
+    //   horaSincronizacion1.setHours(8, 0, 0, 0);
 
-      const horaSincronizacion2 = new Date();
-      horaSincronizacion2.setHours(13, 0, 0, 0);
+    //   const horaSincronizacion2 = new Date();
+    //   horaSincronizacion2.setHours(13, 0, 0, 0);
 
-      const ultimaSincronizacion = parseISO(dataFecha?.fecha);
+    //   const ultimaSincronizacion = parseISO(dataFecha?.fecha);
 
-      const estamosAntesDeLa1 =
-        isBefore(new Date(), horaSincronizacion2) &&
-        isAfter(ultimaSincronizacion, inicioDia);
-      const estamosDespuesDeLa1 = isAfter(new Date(), horaSincronizacion2);
+    //   const estamosAntesDeLa1 =
+    //     isBefore(new Date(), horaSincronizacion2) &&
+    //     isAfter(ultimaSincronizacion, inicioDia);
+    //   const estamosDespuesDeLa1 = isAfter(new Date(), horaSincronizacion2);
 
-      const sincronizoAntesDe8 =
-        estamosAntesDeLa1 && isAfter(ultimaSincronizacion, horaSincronizacion1);
+    //   const sincronizoAntesDe8 =
+    //     estamosAntesDeLa1 && isAfter(ultimaSincronizacion, horaSincronizacion1);
 
-      const sincronizoAntesDe13 =
-        estamosDespuesDeLa1 &&
-        isAfter(ultimaSincronizacion, horaSincronizacion2) &&
-        sincronizoAntesDe8;
+    //   const sincronizoAntesDe13 =
+    //     estamosDespuesDeLa1 &&
+    //     isAfter(ultimaSincronizacion, horaSincronizacion2) &&
+    //     sincronizoAntesDe8;
 
-      const puedeUsarApp = sincronizoAntesDe8 || sincronizoAntesDe13;
+    //   const puedeUsarApp = sincronizoAntesDe8 || sincronizoAntesDe13;
 
-      return puedeUsarApp;
-    }
+    //   return puedeUsarApp;
+    // }
 
-    return false;
-  }, [dataFecha]);
+    return true;
+  }, []);
 
   const handleModalAlerta = useCallback(() => {
     setModalAlerta(!modalAlerta);
@@ -125,18 +119,9 @@ const Principal = () => {
   return (
     <View style={styles.container}>
       <View style={styles.containerHeader}>
-        <Text style={styles.textHeader}>
-          Bienvenido {usuario?.usuNombre.split(" ")[0]}
-        </Text>
-        <Pressable
-          onPress={handleOpenModalCerrarSesion}
-          style={styles.iconStyle}
-        >
-          <Icon
-            name={"logout"}
-            size={convertirTamanoHorizontal(30)}
-            color={BLANCO}
-          />
+        <Text style={styles.textHeader}>Bienvenido {usuario?.usuNombre.split(" ")[0]}</Text>
+        <Pressable onPress={handleOpenModalCerrarSesion} style={styles.iconStyle}>
+          <Icon name={"logout"} size={convertirTamanoHorizontal(30)} color={BLANCO} />
         </Pressable>
       </View>
 
@@ -238,14 +223,9 @@ const Principal = () => {
         </Card>
       </View>
       <Text style={styles.textVersion}>Version: 2.0.0</Text>
-      {modalAlerta && (
-        <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />
-      )}
+      {modalAlerta && <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />}
       {modalCerrarSesion && (
-        <ModalCerrarSesion
-          onClose={handleCloseModalCerrarSesion}
-          visible={modalCerrarSesion}
-        />
+        <ModalCerrarSesion onClose={handleCloseModalCerrarSesion} visible={modalCerrarSesion} />
       )}
     </View>
   );

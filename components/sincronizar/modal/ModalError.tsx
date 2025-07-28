@@ -24,10 +24,7 @@ const ModalError: React.FC<PropsModalError> = ({
   return (
     <ModalCustom onClose={onClose} visible={visible} titulo="Error">
       <LottieAnimation resource={resource} />
-      <Text style={styles.texto}>
-        Hubo un error al descargar los datos en la tabla {tabla} con el mensaje{" "}
-        {errorMessage}
-      </Text>
+      <Text style={styles.texto}>{errorMessage}</Text>
     </ModalCustom>
   );
 };

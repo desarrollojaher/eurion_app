@@ -5,64 +5,22 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1748354208774,
-      "tag": "0000_lovely_zaran",
+      "when": 1753310435960,
+      "tag": "0000_nasty_lily_hollister",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1748355268489,
-      "tag": "0001_fixed_namora",
+      "when": 1753371936433,
+      "tag": "0001_lush_mandarin",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "6",
-      "when": 1748360278290,
-      "tag": "0002_clear_blazing_skull",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1748385656134,
-      "tag": "0003_quiet_true_believers",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1748440731288,
-      "tag": "0004_sudden_joystick",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1748464625097,
-      "tag": "0005_curved_yellow_claw",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1748464670808,
-      "tag": "0006_natural_obadiah_stane",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1748468451531,
-      "tag": "0007_fearless_hammerhead",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1748963657317,
-      "tag": "0008_concerned_multiple_man",
+      "when": 1753391459737,
+      "tag": "0002_lumpy_sebastian_shaw",
       "breakpoints": true
     }
   ]

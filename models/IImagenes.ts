@@ -1,9 +1,3 @@
-export interface IImagenesVerificaciones {
-  id: string;
-  idVerificacion: string;
-  nombre: string;
-  imagen: string;
-}
 
 export interface IImagenCliente {
   fotoCliente: string;
@@ -19,4 +13,15 @@ export interface IImagenRecibos {
   imagen: string;
   titulo: string;
   idCabecera: number;
+}
+
+
+/////////////////////////////////////
+export interface IImagenesVerificaciones {
+  vcId: number | null;
+  vrId: number;
+  fecha: string;
+  vcImagenBase: string;
+  nombre: string;
+  periodo: string;
 }

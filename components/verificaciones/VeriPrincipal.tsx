@@ -36,8 +36,6 @@ import { useDebounce } from "@/hooks/debounce";
 import { format } from "date-fns";
 import LoadingComponent from "../commons/FlatList/LoadingComponent";
 import EmptyList from "../commons/FlatList/EmptyList";
-import { dbSqliteService } from "@/service/db/db";
-import { set } from "lodash";
 
 const VeriPrincipal = () => {
   const [openImagenes, setOpenImagenes] = useState(false);
@@ -45,7 +43,7 @@ const VeriPrincipal = () => {
 
   const [cliente, setCliente] = useState<IVerificacionesCabecera>();
   const [filtro, setFiltro] = useState("");
-  const [filtroRuta, setFiltroRuta] = useState<number | null>(null);
+  const [filtroRuta, setFiltroRuta] = useState<string | null>(null);
 
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
 
@@ -104,21 +102,14 @@ const VeriPrincipal = () => {
         <TouchableOpacity onPress={() => handleChangePage(item)}>
           <HeaderCard
             labelLeft={
-              item.codigoTipoDeRuta === 1
-                ? "VERIFICACION DOMICILIO"
-                : "VERIFICACION TRABAJO"
+              item.codigoTipoDeRuta
             }
             labelRight={format(item.fecha, "dd-MM-yyyy")}
           />
           <Separador />
-          <TextCard
-            titulo={`${item.apellidos} ${item.nombres}`}
-            subtitulo={item.identificacion}
-          />
+          <TextCard titulo={`${item.apellidos} ${item.nombres}`} subtitulo={item.identificacion} />
           <Text style={styles.textDescripcion}>
-            {item.codigoTipoDeRuta === 1
-              ? item.direccion
-              : item.direccionTrabajo}
+            {item.codigoTipoDeRuta === 1 ? item.direccion : item.direccionTrabajo}
           </Text>
           <Separador />
           <View style={styles.containerIcons}>
@@ -135,12 +126,7 @@ const VeriPrincipal = () => {
         </TouchableOpacity>
       </Card>
     ),
-    [
-      handleChangePage,
-      handleLlamarPersona,
-      handleOpenGuardar,
-      handleOpenImagenes,
-    ]
+    [handleChangePage, handleLlamarPersona, handleOpenGuardar, handleOpenImagenes]
   );
 
   const handleCerrarImagenes = useCallback(() => {
@@ -154,10 +140,8 @@ const VeriPrincipal = () => {
   const handleSelect = useCallback((value: IDatosSelect) => {
     if (value.value === "todos") {
       setFiltroRuta(null);
-    } else if (value.value === "domicilio") {
-      setFiltroRuta(1);
     } else {
-      setFiltroRuta(2);
+      setFiltroRuta(value.value);
     }
   }, []);
 
@@ -169,20 +153,14 @@ const VeriPrincipal = () => {
           placeholder="Buscar"
           styleContainer={styles.styleInput}
           onChangeText={setFiltro}
-          leftIcon={
-            <Ionicons
-              name="search"
-              color={AZUL}
-              size={convertirTamanoHorizontal(25)}
-            />
-          }
+          leftIcon={<Ionicons name="search" color={AZUL} size={convertirTamanoHorizontal(25)} />}
         />
         <Select
           onSelect={handleSelect}
           datos={[
             { label: "TODOS", value: "todos" },
-            { label: "VERIFICACION DOMICILIO", value: "domicilio" },
-            { label: "VERIFICACION TRABAJO", value: "trabajo" },
+            { label: "VERIFICACION DOMICILIO", value: "Domiciliaria" },
+            { label: "VERIFICACION TRABAJO", value: "Laboral" },
           ]}
           defaultValue={{ label: "TODOS", value: "todos" }}
         />
@@ -192,12 +170,8 @@ const VeriPrincipal = () => {
           keyExtractor={(item, index) => item.identificacion + index}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <EmptyList isLoading={isLoadingVerificacionesCabecera} />
-          }
-          ListFooterComponent={
-            <LoadingComponent isLoading={isLoadingVerificacionesCabecera} />
-          }
+          ListEmptyComponent={<EmptyList isLoading={isLoadingVerificacionesCabecera} />}
+          ListFooterComponent={<LoadingComponent isLoading={isLoadingVerificacionesCabecera} />}
           refreshControl={
             <RefreshControl
               refreshing={isLoadingVerificacionesCabecera}

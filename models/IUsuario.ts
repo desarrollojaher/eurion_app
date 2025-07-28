@@ -1,6 +1,7 @@
 export interface IUsuario {
   usuNombre: string;
   identificacion: string;
+  usuId: number;
 }
 
 export interface IUsuarioGeneral {

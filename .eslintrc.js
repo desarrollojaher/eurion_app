@@ -9,5 +9,6 @@ module.exports = {
       "warn",
       { vars: "all", args: "none", ignoreRestSiblings: true },
     ],
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
   },
 };

@@ -39,13 +39,7 @@ const VerificacionDetalle = () => {
     <View style={styles.scrollView}>
       <Header
         title={datos?.nombres}
-        iconRight={
-          <Icon
-            name="plus"
-            color={BLANCO}
-            size={convertirTamanoHorizontal(30)}
-          />
-        }
+        iconRight={<Icon name="plus" color={BLANCO} size={convertirTamanoHorizontal(30)} />}
         handleTapIconRight={handlePressIconRight}
       />
 
@@ -288,9 +282,7 @@ const VerificacionDetalle = () => {
         )}
         {data?.actividadEconomicaConyugue && (
           <Card style={styles.cardStyle}>
-            <Text style={styles.textTituloHeader}>
-              Actividad Economica Conyugue
-            </Text>
+            <Text style={styles.textTituloHeader}>Actividad Economica Conyugue</Text>
             <Separador />
             <HeaderCard
               labelLeft="Ocupacion Laboral"
@@ -329,9 +321,7 @@ const VerificacionDetalle = () => {
             />
             <HeaderCard
               labelLeft="Ingresos"
-              labelRight={formatCurrency(
-                data?.actividadEconomicaConyugue.ingresos
-              )}
+              labelRight={formatCurrency(data?.actividadEconomicaConyugue.ingresos)}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
