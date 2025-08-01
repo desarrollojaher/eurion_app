@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://192.168.153.41:5133",
+  baseURL: "https://app.jmsg.ec/bedapi/eurionapp",
   timeout: 30000,
 });
 
