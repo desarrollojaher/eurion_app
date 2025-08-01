@@ -14,7 +14,7 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Separador from "@/components/commons/separador/Separador";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { GRIS, GRIS_CLARO } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO, ROJO } from "@/constants/Colors";
 import ModalAlertaSubirEliminar from "../../commons/modal/ModalAlertaSubirEliminar";
 import { useSubirInformacionObtener } from "@/service/SubirInformacion/useSubirInformacionObtener";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
@@ -37,14 +37,8 @@ const GestionesTab = () => {
     refetch: refetchSubirInformacion,
   } = useSubirInformacionObtener();
 
-  const {
-    subirVerificacion,
-    onCloseError,
-    error,
-    errorMessage,
-    tabla,
-    loading,
-  } = subirVerificacionUnica();
+  const { subirVerificacion, onCloseError, error, errorMessage, loading } =
+    subirVerificacionUnica();
 
   const { mutate: eliminarGestion, isPending: isLoadingEliminaGestion } =
     useSubirGestionEliminar();
@@ -182,7 +176,11 @@ const GestionesTab = () => {
             style={styles.pressableStyle}
             onPress={() => handleTabDelete(item)}
           >
-            <Icon name="trash" size={convertirTamanoHorizontal(30)} />
+            <Icon
+              name="trash"
+              size={convertirTamanoHorizontal(30)}
+              color={ROJO}
+            />
           </Pressable>
           <Pressable
             style={styles.pressableStyle}
@@ -230,7 +228,7 @@ const GestionesTab = () => {
         <ModalError
           onClose={onCloseError}
           errorMessage={errorMessage}
-          tabla={tabla}
+          tabla={""}
           visible={error}
         />
       )}
