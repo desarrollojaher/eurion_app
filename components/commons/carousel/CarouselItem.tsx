@@ -50,7 +50,7 @@ const CarouselItem: React.FC<PropsCarouselItem> = ({
           <Animated.Image
             style={[styles.imagen]}
             source={{
-              uri: `data:image/png;base64,${item.url}`,
+              uri: item.url,
             }}
             resizeMode={"contain"}
           />

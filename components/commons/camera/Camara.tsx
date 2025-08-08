@@ -50,12 +50,12 @@ const Camara: React.FC<PropsCamara> = ({
   }, []);
 
   const handleTakePicture = useCallback(async () => {
-    const photo = await ref.current?.takePictureAsync({ base64: true });
+    const photo = await ref.current?.takePictureAsync(); //{ base64: true }
     if (!photo) {
       Toast.error("No se pudo tomar la foto");
       return;
     } else {
-      setImagenes((current) => [...current, photo.base64 ?? ""]);
+      setImagenes((current) => [...current, photo.uri ?? ""]);
     }
   }, [setImagenes]);
 
@@ -93,7 +93,7 @@ const Camara: React.FC<PropsCamara> = ({
       <TouchableOpacity onPress={() => handleOpenImagenCompleta(item)}>
         <View style={{ position: "relative" }}>
           <Image
-            source={{ uri: `data:image/png;base64,${item}` }}
+            source={{ uri: item }}
             resizeMode="contain"
             style={{
               width: convertirTamanoHorizontal(60),

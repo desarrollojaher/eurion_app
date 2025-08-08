@@ -22,11 +22,11 @@ import { IDatosSelect } from "@/components/commons/select/Select";
 import { format } from "date-fns";
 import * as Location from "expo-location";
 import { useSession } from "@/helper/provider/Auth";
-import uuid from "react-native-uuid";
 import { IImagenesVerificaciones } from "@/models/IImagenes";
 import { useGuardarVerificaciones } from "@/service/Verificaciones/useGuardarVerificaciones";
 import { router } from "expo-router";
 import { useObtenerTiposVerificaciones } from "@/service/TiposVerificaciones/useObtenerTiposVerificaciones";
+import * as FileSystem from "expo-file-system";
 
 interface PropsModalRealizarVerificacion {
   visible: boolean;
@@ -53,9 +53,17 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   const { mutate: guardarVerificacion, isPending: isLoadingGestion } =
     useGuardarVerificaciones();
 
-  const { data: datosTipoVerificaciones } = useObtenerTiposVerificaciones()
+  const { data: datosTipoVerificaciones } = useObtenerTiposVerificaciones();
 
-  const datosTipo = useMemo<IDatosSelect[]>(() => datosTipoVerificaciones && datosTipoVerificaciones.map((item) => ({ label: item.vtDescripcion, value: item.vtId?.toString() })), [datosTipoVerificaciones])
+  const datosTipo = useMemo<IDatosSelect[]>(
+    () =>
+      datosTipoVerificaciones &&
+      datosTipoVerificaciones.map((item) => ({
+        label: item.vtDescripcion ?? "",
+        value: item.vtId ? item.vtId.toString() : "",
+      })),
+    [datosTipoVerificaciones],
+  );
 
   const onOpenCamara = useCallback(() => {
     setVisibleCamara(true);
@@ -70,18 +78,18 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       const union = imagenes.concat(images);
       setImagenes(union);
     },
-    [imagenes]
+    [imagenes],
   );
 
   const handleRemoveImage = useCallback(
     (indexElemento: number) => {
       const images = remove(
         imagenes,
-        (item) => item !== imagenes[indexElemento]
+        (item) => item !== imagenes[indexElemento],
       );
       setImagenes(images);
     },
-    [imagenes]
+    [imagenes],
   );
 
   const handleObtenerDireccionGps = useCallback(async () => {
@@ -95,6 +103,31 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
     return location;
   }, []);
 
+  const handleChangeDireccionImagenes = useCallback(
+    async (imagenes: IImagenCompleta) => {
+      try {
+        const info = await FileSystem.getInfoAsync(imagenes.url);
+        if (info.exists) {
+          const folder = `${FileSystem.documentDirectory}photos`;
+          await FileSystem.makeDirectoryAsync(folder, { intermediates: true });
+          const newPath = `${folder}/${imagenes.titulo}.jpg`;
+
+          await FileSystem.moveAsync({
+            from: imagenes.url,
+            to: newPath,
+          });
+          return newPath;
+        } else {
+          return null;
+        }
+      } catch (err) {
+        console.error("Error al mover la imagen:", err);
+        return null;
+      }
+    },
+    [],
+  );
+
   const handleChangeSelect = useCallback((item: IDatosSelect) => {
     if (item) setCalificacion(item);
   }, []);
@@ -107,13 +140,14 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
 
     if (
       imagenes.length < 3 &&
-      (calificacion.value === find(datosTipo, { label: "POSITIVA" })?.value || calificacion.value === find(datosTipo, { label: "NEGATIVA" })?.value)
+      (calificacion.value === find(datosTipo, { label: "POSITIVA" })?.value ||
+        calificacion.value === find(datosTipo, { label: "NEGATIVA" })?.value)
     ) {
       Toast.error("Debe ingresar minimo 3 imagenes");
       return;
     }
 
-    if (observaciones.length < 5) {
+    if (observaciones.trim().length < 5) {
       Toast.error("Ingrese una observacion");
       return;
     }
@@ -127,14 +161,24 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       return;
     }
 
-    const imgs = imagenes.map<IImagenesVerificaciones>((item) => ({
-      vcId: null,
-      fecha: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
-      vrId: 3,
-      nombre: item.titulo,
-      periodo: cliente.periodo,
-      vcImagenBase: item.url,
-    }));
+    const imgs: IImagenesVerificaciones[] = [];
+
+    for (const item of imagenes) {
+      const imagenConvertida = await handleChangeDireccionImagenes(item);
+
+      if (imagenConvertida !== null) {
+        const registro: IImagenesVerificaciones = {
+          vcId: null,
+          fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+          vrId: 3,
+          nombre: item.titulo,
+          periodo: cliente.periodo,
+          vcImagenBase: imagenConvertida,
+        };
+
+        imgs.push(registro);
+      }
+    }
 
     const datos: IVerificacionesGuardar = {
       clId: cliente.clienteId,
@@ -162,7 +206,21 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
         setLoadingGuardado(false);
       },
     });
-  }, [calificacion, cliente.clienteId, cliente.idVerificacion, cliente.periodo, guardarVerificacion, handleObtenerDireccionGps, imagenes, observaciones, onClose, seccion, usuario?.usuId]);
+  }, [
+    calificacion,
+    cliente.clienteId,
+    cliente.idVerificacion,
+    cliente.periodo,
+    datosTipo,
+    guardarVerificacion,
+    handleChangeDireccionImagenes,
+    handleObtenerDireccionGps,
+    imagenes,
+    observaciones,
+    onClose,
+    seccion,
+    usuario?.usuId,
+  ]);
 
   return (
     <ModalCustom

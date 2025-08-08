@@ -122,12 +122,11 @@ export interface ISincronizarVerificacionesEnviar {
   vtId: number | null;
   clId: number | null;
   usIdCobrador: number | null;
-  vrPeriodo: string | null;
   vrFechaVerificacion: string | null;
   vrLatitud: number | null;
   vrLongitud: number | null;
   fecha: string | null;
-  vcImagenBase: string | null | undefined;
+  vcImagenBase: string;
   vcPeriodo: string | null;
 }
 

@@ -111,8 +111,12 @@ export const sincronizacionApi = {
     );
     return res.data;
   },
-  sincronizarVerificacionEnviar: async (datos: IVerificacionesEnviar) => {
-    const res = await post("sincronizacion/recibirVerificacion", datos);
+  sincronizarVerificacionEnviar: async (datos: FormData) => {
+    const res = await post("sincronizacion/recibirVerificacion", datos, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return res.data;
   },
 };

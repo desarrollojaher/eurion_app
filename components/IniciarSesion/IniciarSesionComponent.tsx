@@ -18,7 +18,7 @@ import InputCustom from "../commons/input/InputCustom";
 import { useSession } from "@/helper/provider/Auth";
 import { useIniciarSesion } from "@/service/Auth/useIniciarSesion";
 import { Toast } from "toastify-react-native";
-const logo = require("@/assets/images/logo.png");
+const logo = require("@/assets/images/logos.png");
 const IniciarSesionComponent = () => {
   const [usuario, setUsuario] = useState("");
   const [contra, setContra] = useState("");

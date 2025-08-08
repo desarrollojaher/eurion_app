@@ -14,7 +14,7 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Separador from "@/components/commons/separador/Separador";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { GRIS, GRIS_CLARO, ROJO } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO, ROJO, VERDE_CLARO } from "@/constants/Colors";
 import ModalAlertaSubirEliminar from "../../commons/modal/ModalAlertaSubirEliminar";
 import { useSubirInformacionObtener } from "@/service/SubirInformacion/useSubirInformacionObtener";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
@@ -22,7 +22,7 @@ import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
 import { ISubirInformacion } from "@/models/ISubirInformacion";
 import { useSubirGestionEliminar } from "@/service/SubirInformacion/useSubirGestionEliminar";
 import { format, parseISO } from "date-fns";
-import { subirVerificacionUnica } from "@/service/SubirInformacion/subirVerificacionUnica";
+import { SubirVerificacionUnica } from "@/service/SubirInformacion/subirVerificacionUnica";
 import ModalError from "@/components/sincronizar/modal/ModalError";
 
 const GestionesTab = () => {
@@ -38,7 +38,7 @@ const GestionesTab = () => {
   } = useSubirInformacionObtener();
 
   const { subirVerificacion, onCloseError, error, errorMessage, loading } =
-    subirVerificacionUnica();
+    SubirVerificacionUnica();
 
   const { mutate: eliminarGestion, isPending: isLoadingEliminaGestion } =
     useSubirGestionEliminar();
@@ -186,7 +186,11 @@ const GestionesTab = () => {
             style={styles.pressableStyle}
             onPress={() => handleTabUpload(item)}
           >
-            <Icon name="upload" size={convertirTamanoHorizontal(30)} />
+            <Icon
+              name="upload"
+              size={convertirTamanoHorizontal(30)}
+              color={VERDE_CLARO}
+            />
           </Pressable>
         </View>
       </Card>

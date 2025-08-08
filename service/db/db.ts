@@ -1637,15 +1637,15 @@ export const dbSqliteService = {
           : undefined,
         params.nombreCliente
           ? or(
-            like(
-              schema.clienteTable.apellidoCliente,
-              `%${params.nombreCliente}%`,
-            ),
-            like(
-              schema.clienteTable.nombreCliente,
-              `%${params.nombreCliente}%`,
-            ),
-          )
+              like(
+                schema.clienteTable.apellidoCliente,
+                `%${params.nombreCliente}%`,
+              ),
+              like(
+                schema.clienteTable.nombreCliente,
+                `%${params.nombreCliente}%`,
+              ),
+            )
           : undefined,
       ].filter(Boolean);
 
