@@ -44,7 +44,7 @@ export const SubirVerificacionUnica = () => {
         // Agregar imagen al FormData con nombre único
         formData.append(`imagen_${i}`, {
           uri: compressed.uri,
-          name: `verificacion_${i}.jpg`,
+          name: `verificacion_${vdId}_${i}.jpg`,
           type: "image/jpeg",
         } as any);
       }
