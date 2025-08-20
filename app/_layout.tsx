@@ -12,8 +12,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { SessionProvider } from "@/helper/provider/Auth";
 import CargaPantalla from "@/components/commons/animation/CargaPantalla";
 import ToastManager from "toastify-react-native";
-import { openDatabaseSync, SQLiteProvider } from "expo-sqlite";
-import { drizzle } from "drizzle-orm/expo-sqlite";
+import { SQLiteProvider } from "expo-sqlite";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import migrations from "@/drizzle/migrations";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -21,13 +20,15 @@ import { authApi } from "@/api/auth";
 import NetInfo from "@react-native-community/netinfo";
 import { Slot } from "expo-router";
 import { StatusBar } from "react-native";
+// import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { DATABASE_NAME, db, expoDBInstance } from "@/helper/db/db";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-export const DATABASE_NAME = "cobranza";
-const expoDB = openDatabaseSync(DATABASE_NAME);
-export const db = drizzle(expoDB, { logger: true });
+// export const DATABASE_NAME = "cobranza";
+// const expoDB = openDatabaseSync(DATABASE_NAME);
+// export const db = drizzle(expoDB, { logger: true });
 
 export default function RootLayout() {
   const [cargaInicial, setCargaInicial] = useState(false);
@@ -41,7 +42,7 @@ export default function RootLayout() {
   const queryClient = new QueryClient();
 
   // inicializa el drizzle con la base de datos sqlite
-  useDrizzleStudio(expoDB);
+  useDrizzleStudio(expoDBInstance);
 
   // llamado a la base de datos sqlite
   const { success } = useMigrations(db, migrations);

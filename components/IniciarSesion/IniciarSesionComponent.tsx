@@ -38,7 +38,7 @@ const IniciarSesionComponent = () => {
         onSuccess: (res) => {
           signIn(res.token);
         },
-      }
+      },
     );
   }, [contra, iniciarSesion, signIn, usuario]);
 

@@ -1,9 +1,16 @@
-import { useContext, createContext, useEffect, useCallback, useState } from "react";
+import {
+  useContext,
+  createContext,
+  useEffect,
+  useCallback,
+  useState,
+} from "react";
 import { useRouter } from "expo-router"; // Para manejar la navegación
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IUsuario } from "@/models/IUsuario";
 import { jwtDecode } from "jwt-decode";
 import { dbSqliteService } from "@/service/db/db";
+import { Toast } from "toastify-react-native";
 
 const AuthContext = createContext<{
   signIn: (token: string) => void;
@@ -32,11 +39,26 @@ export function SessionProvider({ children, token }: any) {
   const signIn = async (token: string) => {
     // Guardar token en sessionStorage
     try {
-      await AsyncStorage.setItem("token", token);
       const decodedUser = jwtDecode(token) as IUsuario;
-      setUsuario(decodedUser);
-      router.replace("/principal");
+      if (
+        decodedUser.roles.length === 1 &&
+        decodedUser.roles[0] === "COBRADOR"
+      ) {
+        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("rol", decodedUser.roles[0]);
+        setUsuario(decodedUser);
+        router.replace("/principal/dashboard");
+      } else if (decodedUser.roles.length > 1) {
+        await AsyncStorage.setItem("token", token);
+        setUsuario(decodedUser);
+        router.replace("/auth/roles");
+      } else {
+        Toast.error(
+          "No tiene permisos para usar la app, Comuniquese con el departamento de auditoria para que se le asigne un rol",
+        );
+      }
     } catch (error) {
+      Toast.error(JSON.stringify(error));
       console.log(error);
     }
   };
@@ -46,8 +68,9 @@ export function SessionProvider({ children, token }: any) {
     try {
       setUsuario(null);
       await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("rol");
       await dbSqliteService.eliminarBitacoraSincronizacion();
-      router.replace("/auth");
+      router.replace("/auth/iniciarSesion");
     } catch (error) {
       console.log(error);
     }
@@ -56,13 +79,20 @@ export function SessionProvider({ children, token }: any) {
   };
 
   const handleToken = useCallback(async () => {
+    const rol = await AsyncStorage.getItem("rol");
     if (token) {
       const decodedUser = jwtDecode(token) as IUsuario;
       setUsuario(decodedUser);
-      router.replace("/principal");
+      if (!rol) {
+        router.replace("/auth/roles");
+      } else if (rol === "COBRADOR") {
+        router.replace("/principal/dashboard");
+      } else {
+        router.replace("/principal/dashboard-administrador");
+      }
     } else {
       setUsuario(null);
-      router.replace("/auth");
+      router.replace("/auth/iniciarSesion");
     }
   }, [router, token]);
 
@@ -75,7 +105,7 @@ export function SessionProvider({ children, token }: any) {
       value={{
         signIn,
         signOut,
-        usuario
+        usuario,
         // session,
         // isLoading,
       }}

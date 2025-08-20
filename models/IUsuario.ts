@@ -2,6 +2,7 @@ export interface IUsuario {
   usuNombre: string;
   identificacion: string;
   usuId: number;
+  roles: string[];
 }
 
 export interface IUsuarioGeneral {

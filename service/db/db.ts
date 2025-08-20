@@ -1,92 +1,4 @@
 import * as schema from "@/db/schema";
-// import {
-//   ISincronizacion,
-//   ISincronizarClientes,
-//   ISincronizarConyugue,
-//   ISincronizarDirecciones,
-//   ISincronizarVerificaciones,
-//   ISincronizarZona,
-// } from "@/models/ISincronizar";
-// import {
-//   and,
-//   asc,
-//   desc,
-//   eq,
-//   gt,
-//   gte,
-//   isNotNull,
-//   like,
-//   ne,
-//   or,
-//   sql,
-// } from "drizzle-orm";
-// import {
-//   IActualizarVerificacion,
-//   IVerificacionDetalles,
-//   IVerificacionDetallesParams,
-//   IVerificacionesCabecera,
-//   IVerificacionesCabeceraParams,
-//   IVerificacionesEliminar,
-//   IVerificacionesGuardar,
-// } from "@/models/IVerificaciones";
-import { db } from "@/app/_layout";
-// import {
-//   ISubirInformacion,
-//   ISubirInformacionActualizaciones,
-//   ISubirInformacionActualizacionesGeneral,
-//   ISubirInformacionEliminar,
-// } from "@/models/ISubirInformacion";
-// import {
-//   IImagenCliente,
-//   IImagenDomicilio,
-//   IImagenRecibos,
-// } from "@/models/IImagenes";
-// import _, { groupBy, mapValues, sumBy, union, unionBy } from "lodash";
-// import {
-//   IDocumentoPasadoParams,
-//   IDocumentos,
-//   IDocumentosCabecera,
-// } from "@/models/IDocumentos";
-// import { IEnviarGcobranza } from "@/models/IEnviarGcobranza";
-// import { format } from "date-fns";
-// import { IGestiones, IGestionesFiltro } from "@/models/IGestiones";
-// import { IZona } from "@/models/IZona";
-// import {
-//   ITiposGestiones,
-//   ITiposGestionesObtener,
-// } from "@/models/ITiposGestiones";
-// import {
-//   IGestionesCelular,
-//   IGestionesCelularCrear,
-//   IGestionesCelularPasadas,
-// } from "@/models/IGestionesCelular";
-// import { IClienteGarante } from "@/models/IClienteGarante";
-// import { IDetalleFactura } from "@/models/IDetalleFactura";
-// import { ISincronizado } from "@/models/ISincronizado";
-// import {
-//   ICliente,
-//   IClienteGaranteCobranza,
-//   IClienteParams,
-// } from "@/models/ICliente";
-// import { IClienteConyugue } from "@/models/IConyugue";
-// import { IDireccionGcobranza } from "@/models/IDireccion";
-// import {
-//   IDireccionCelularGcobranza,
-//   imagenActualizacion,
-// } from "@/models/IDireccionCelularGcobranza";
-// import {
-//   IReciboEnviar,
-//   IRecibosCabecera,
-//   IRecibosCabeceraListado,
-//   IRecibosCabeceraParams,
-//   IRecibosEliminarParams,
-// } from "@/models/IRecibo";
-// import { IFormaPago } from "@/models/IFormaPago";
-// import { ITarjetaCredito } from "@/models/ITarjetaCredito";
-// import { IBancos } from "@/models/IBancos";
-// import { ICabeceraReciboCelular } from "@/models/ICabeceraReciboCelular";
-// import { IDetalleReciboCelular } from "@/models/IDetalleReciboCelular";
-
 import { ISincronizado } from "@/models/ISincronizado";
 import { and, asc, desc, eq, inArray, like, or, sql } from "drizzle-orm";
 import {
@@ -113,6 +25,7 @@ import {
   ISubirInformacion,
   ISubirInformacionEliminar,
 } from "@/models/ISubirInformacion";
+import { db } from "@/helper/db/db";
 
 export const dbSqliteService = {
   //   insertarVerificaciones: async (datos: ISincronizarVerificaciones[]) => {

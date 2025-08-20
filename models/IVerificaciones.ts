@@ -75,3 +75,7 @@ export interface IActualizarVerificacion {
 export interface IVerificacionesVdId {
   vdId: number;
 }
+
+export interface IVerificacionesEliminar {
+  vdId: number;
+}
