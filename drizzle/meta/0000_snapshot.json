@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "fb72b106-0a17-46e6-bd10-c6ca5aede5fa",
+  "id": "08c43e2e-8a75-4339-9426-1ef8079e7ca6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bitacora_sincronizado": {
@@ -17,6 +17,21 @@
         "fecha": {
           "name": "fecha",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sincronizado": {
+          "name": "sincronizado",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "idCobrador": {
+          "name": "idCobrador",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -73,8 +88,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "didependientesCliente": {
-          "name": "didependientesCliente",
+        "dependientesCliente": {
+          "name": "dependientesCliente",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -180,6 +195,13 @@
         },
         "fotoDireccion": {
           "name": "fotoDireccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "telefonoCliente": {
+          "name": "telefonoCliente",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -302,6 +324,30 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "tipos_verificacion": {
+      "name": "tipos_verificacion",
+      "columns": {
+        "vtId": {
+          "name": "vtId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "vtDescripcion": {
+          "name": "vtDescripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "verificacion_result_det": {
       "name": "verificacion_result_det",
       "columns": {
@@ -319,6 +365,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "fecha": {
+          "name": "fecha",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "vcImagenBase": {
           "name": "vcImagenBase",
           "type": "text",
@@ -328,6 +381,13 @@
         },
         "vcPeriodo": {
           "name": "vcPeriodo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nombre": {
+          "name": "nombre",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -416,6 +476,14 @@
         },
         "vrProcesado": {
           "name": "vrProcesado",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "pideActualizacion": {
+          "name": "pideActualizacion",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

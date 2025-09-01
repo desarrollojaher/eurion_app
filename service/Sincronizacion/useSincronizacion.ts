@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { useQueryClient } from "@tanstack/react-query";
 import { sincronizacionKeys } from "./sincronizacionKey";
 import { forEach } from "lodash";
+import { useSession } from "@/helper/provider/Auth";
 
 export const useSincronizacion = () => {
   const [index, setIndex] = useState(1);
@@ -16,6 +17,8 @@ export const useSincronizacion = () => {
   const [sincronizado, setSincronizado] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const { usuario } = useSession();
 
   const onCloseError = () => {
     setError(false);
@@ -268,9 +271,7 @@ export const useSincronizacion = () => {
       if (datos.length > 0) {
         await dbSqliteService.deleteVerificaciones();
         const ver = await dbSqliteService.obtenerVerificaciones();
-        const ids = ver
-          .map((item) => item.idCliente)
-          .filter((id): id is number => id !== null);
+        const ids = ver.map((item) => item.idCliente).filter((id): id is number => id !== null);
 
         await dbSqliteService.deleteClientes(ids);
         await dbSqliteService.deleteConyugue(ids);
@@ -294,8 +295,7 @@ export const useSincronizacion = () => {
 
       setIndex(2);
       setTabla("Tipos verificaciones");
-      const tipoVerificacion =
-        await sincronizacionApi.obtenerTipoVerificaciones();
+      const tipoVerificacion = await sincronizacionApi.obtenerTipoVerificaciones();
       await dbSqliteService.deleteTipoVerificaciones();
 
       await dbSqliteService.insertarTipoVerificaciones(tipoVerificacion);
@@ -303,6 +303,7 @@ export const useSincronizacion = () => {
 
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+        idCobrador: usuario?.usuId ?? -1,
       });
 
       queryClient.invalidateQueries({ queryKey: sincronizacionKeys.fechas() });
@@ -316,7 +317,7 @@ export const useSincronizacion = () => {
         setErrorMessage("No se pudo conectar con el servidor");
       } else {
         setErrorMessage(
-          `Hubo un error al descargar los datos en la tabla ${tabla} con el mensaje: ${JSON.stringify(error)} `,
+          `Hubo un error al descargar los datos en la tabla ${tabla} con el mensaje: ${JSON.stringify(error)} `
         );
       }
       setError(true);

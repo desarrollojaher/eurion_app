@@ -12,7 +12,7 @@ export const useSubirInformacionActualizacionesObtener = (
       ReturnType<(typeof subirInformacionKeys)["actualizaciones"]>
     >,
     "queryKey"
-  >
+  >,
 ) => {
   const obtenerInformacionActualizaciones = async () => {
     return await dbSqliteService.obtenerActualizacionesDireccion();

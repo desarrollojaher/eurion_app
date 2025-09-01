@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Switch, View } from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Separador from "@/components/commons/separador/Separador";
@@ -27,6 +27,8 @@ import { useGuardarVerificaciones } from "@/service/Verificaciones/useGuardarVer
 import { router } from "expo-router";
 import { useObtenerTiposVerificaciones } from "@/service/TiposVerificaciones/useObtenerTiposVerificaciones";
 import * as FileSystem from "expo-file-system";
+import { Text } from "react-native";
+import { AZUL, BLANCO } from "@/constants/Colors";
 
 interface PropsModalRealizarVerificacion {
   visible: boolean;
@@ -45,6 +47,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   const [calificacion, setCalificacion] = useState<IDatosSelect>();
   const [observaciones, setObservaciones] = useState<string>("");
   const [lodingGuardado, setLoadingGuardado] = useState(false);
+  const [actualizarDireccion, setActualizarDireccion] = useState(false);
 
   const { usuario } = useSession();
 
@@ -64,6 +67,10 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       })),
     [datosTipoVerificaciones],
   );
+
+  const toggleSwitch = useCallback(() => {
+    setActualizarDireccion((previousState) => !previousState);
+  }, []);
 
   const onOpenCamara = useCallback(() => {
     setVisibleCamara(true);
@@ -191,6 +198,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       vrLongitud: localizacion.coords.longitude,
       vrPeriodo: cliente.periodo,
       vtId: Number(calificacion.value),
+      pideActualizacion: actualizarDireccion ? 1 : 0,
       imagenes: imgs,
     };
 
@@ -207,6 +215,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       },
     });
   }, [
+    actualizarDireccion,
     calificacion,
     cliente.clienteId,
     cliente.idVerificacion,
@@ -254,6 +263,16 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
         onChangeSelect={handleChangeSelect}
         datos={datosTipo}
       />
+      <View style={styles.containerSwitch}>
+        <Text style={{ fontSize: convertirTamanoHorizontal(13) }}>
+          Actualizar Dirección
+        </Text>
+        <Switch
+          thumbColor={actualizarDireccion ? AZUL : BLANCO}
+          onValueChange={toggleSwitch}
+          value={actualizarDireccion}
+        />
+      </View>
       <TextInput
         text={""}
         tipo="text"
@@ -306,5 +325,10 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     justifyContent: "center",
+  },
+  containerSwitch: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 });

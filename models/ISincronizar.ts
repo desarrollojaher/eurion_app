@@ -128,6 +128,7 @@ export interface ISincronizarVerificacionesEnviar {
   fecha: string | null;
   vcImagenBase: string;
   vcPeriodo: string | null;
+  pideActualizacion: number | null;
 }
 
 export interface IVerificacionesEnviar {

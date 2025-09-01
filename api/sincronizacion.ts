@@ -1,7 +1,4 @@
-import {
-  ISincronizarVerificaciones,
-  IVerificacionesEnviar,
-} from "@/models/ISincronizar";
+import { ISincronizarVerificaciones } from "@/models/ISincronizar";
 import { get, post } from "./config";
 import { ITiposVerificaciones } from "@/models/ITiposVerificaciones";
 

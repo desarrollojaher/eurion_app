@@ -1,6 +1,16 @@
 import * as schema from "@/db/schema";
 import { ISincronizado } from "@/models/ISincronizado";
-import { and, asc, desc, eq, inArray, like, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  like,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacion,
@@ -1401,7 +1411,15 @@ export const dbSqliteService = {
     try {
       await db
         .delete(schema.verificacionTable)
-        .where(eq(schema.verificacionTable.procesado, 0));
+        .where(
+          notInArray(
+            schema.verificacionTable.idVerificacion,
+            db
+              .select({ vdId: schema.verificacionResultTable.vdId })
+              .from(schema.verificacionResultTable)
+              .where(eq(schema.verificacionResultTable.vrProcesado, 1)),
+          ),
+        );
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1918,6 +1936,7 @@ export const dbSqliteService = {
           fecha: schema.verificacionResultDetTable.fecha,
           vcImagenBase: schema.verificacionResultDetTable.vcImagenBase,
           vcPeriodo: schema.verificacionResultDetTable.vcPeriodo,
+          pideActualizacion: schema.verificacionResultTable.pideActualizacion,
         })
         .from(schema.verificacionResultTable)
         .leftJoin(

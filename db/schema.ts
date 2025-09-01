@@ -319,6 +319,8 @@ import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 export const bitacoraSincronizadoTable = sqliteTable("bitacora_sincronizado", {
   codigo: int().primaryKey({ autoIncrement: true }),
   fecha: text(),
+  sincronizado: int().default(0),
+  idCobrador: int(),
 });
 
 export const verificacionTable = sqliteTable(
@@ -431,6 +433,7 @@ export const verificacionResultTable = sqliteTable("verificacion_result", {
   vrLatitud: integer({ mode: "number" }),
   vrLongitud: integer({ mode: "number" }),
   vrProcesado: int().default(0),
+  pideActualizacion: int().default(0),
 });
 
 export const verificacionResultDetTable = sqliteTable(

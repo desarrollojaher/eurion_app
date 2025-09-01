@@ -1,1 +1,0 @@
-ALTER TABLE `cliente` RENAME COLUMN "didependientesCliente" TO "dependientesCliente";

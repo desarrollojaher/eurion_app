@@ -1,6 +1,8 @@
 CREATE TABLE `bitacora_sincronizado` (
 	`codigo` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`fecha` text
+	`fecha` text,
+	`sincronizado` integer DEFAULT 0,
+	`idCobrador` integer
 );
 --> statement-breakpoint
 CREATE TABLE `cliente` (
@@ -10,7 +12,7 @@ CREATE TABLE `cliente` (
 	`nombreCliente` text,
 	`apellidoCliente` text,
 	`estadoCivilCliente` text,
-	`didependientesCliente` integer,
+	`dependientesCliente` integer,
 	`referencias` text,
 	`observaciones` text,
 	`categoriaCliente` text,
@@ -25,7 +27,8 @@ CREATE TABLE `cliente` (
 	`celJefeCliente` text,
 	`direccionTrabajoCliente` text,
 	`fotoCliente` text,
-	`fotoDireccion` text
+	`fotoDireccion` text,
+	`telefonoCliente` text
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `cliente_idCliente_unique` ON `cliente` (`idCliente`);--> statement-breakpoint
@@ -45,11 +48,18 @@ CREATE TABLE `conyugue` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `conyugue_idCliente_unique` ON `conyugue` (`idCliente`);--> statement-breakpoint
+CREATE TABLE `tipos_verificacion` (
+	`vtId` integer,
+	`vtDescripcion` text
+);
+--> statement-breakpoint
 CREATE TABLE `verificacion_result_det` (
 	`vcId` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`vrId` integer,
+	`fecha` text,
 	`vcImagenBase` text,
 	`vcPeriodo` text,
+	`nombre` text,
 	`vrdProcesado` integer DEFAULT 0
 );
 --> statement-breakpoint
@@ -63,7 +73,8 @@ CREATE TABLE `verificacion_result` (
 	`vrFechaVerificacion` text,
 	`vrLatitud` integer,
 	`vrLongitud` integer,
-	`vrProcesado` integer DEFAULT 0
+	`vrProcesado` integer DEFAULT 0,
+	`pideActualizacion` integer DEFAULT 0
 );
 --> statement-breakpoint
 CREATE TABLE `verificacion` (
