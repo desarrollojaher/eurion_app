@@ -69,8 +69,10 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   );
 
   const toggleSwitch = useCallback(() => {
-    setActualizarDireccion((previousState) => !previousState);
-  }, []);
+    setActualizarDireccion(!actualizarDireccion);
+    console.log(actualizarDireccion);
+
+  }, [actualizarDireccion]);
 
   const onOpenCamara = useCallback(() => {
     setVisibleCamara(true);

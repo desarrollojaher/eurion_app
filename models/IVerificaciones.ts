@@ -64,7 +64,7 @@ export interface IVerificacionesGuardar {
   vrFechaVerificacion: string;
   vrLatitud: number;
   vrLongitud: number;
-  pideActualizacion?: number;
+  pideActualizacion: number;
   imagenes: IImagenesVerificaciones[];
 }
 

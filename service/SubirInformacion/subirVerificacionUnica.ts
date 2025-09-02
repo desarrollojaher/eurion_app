@@ -5,10 +5,7 @@ import { sincronizacionApi } from "@/api/sincronizacion";
 import { ISincronizarVerificacionesEnviar } from "@/models/ISincronizar";
 import { subirInformacionKeys } from "./subirInformacionKeys";
 import { Toast } from "toastify-react-native";
-import {
-  compressImage,
-  eliminarImagen,
-} from "@/helper/function/comprimirImagen";
+import { compressImage, eliminarImagen } from "@/helper/function/comprimirImagen";
 
 export const SubirVerificacionUnica = () => {
   const [loading, setLoading] = useState(false);
@@ -32,6 +29,7 @@ export const SubirVerificacionUnica = () => {
 
       const verificacion: ISincronizarVerificacionesEnviar[] =
         await dbSqliteService.obtenerVerificacionesSubidaUnica({ vdId: vdId });
+      console.log(verificacion);
 
       const formData = new FormData();
       const verificacionesSinImagen: any[] = [];
@@ -54,10 +52,7 @@ export const SubirVerificacionUnica = () => {
       const { vcImagenBase, ...resto } = verifica;
       verificacionesSinImagen.push(resto);
 
-      formData.append(
-        "verificaciones",
-        JSON.stringify(verificacionesSinImagen),
-      );
+      formData.append("verificaciones", JSON.stringify(verificacionesSinImagen));
 
       await sincronizacionApi.sincronizarVerificacionEnviar(formData);
 
@@ -79,9 +74,7 @@ export const SubirVerificacionUnica = () => {
       if (error.message === "Network Error") {
         setErrorMessage("No se pudo conectar con el servidor");
       } else {
-        setErrorMessage(
-          `Error en subir la verificacion:  ${error.response.data.message}`,
-        );
+        setErrorMessage(`Error en subir la verificacion:  ${error.response.data.message}`);
       }
       setError(true);
       setLoading(false);
