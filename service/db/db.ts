@@ -1398,9 +1398,10 @@ export const dbSqliteService = {
             db
               .select({ vdId: schema.verificacionResultTable.vdId })
               .from(schema.verificacionResultTable)
-              .where(eq(schema.verificacionResultTable.vrProcesado, 1))
+              .where(eq(schema.verificacionResultTable.vrProcesado, 0))
           )
         );
+
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1433,7 +1434,7 @@ export const dbSqliteService = {
     try {
       await db
         .delete(schema.clienteTable)
-        .where(inArray(schema.clienteTable.idCliente, idsParaEliminar));
+        .where(notInArray(schema.clienteTable.idCliente, idsParaEliminar));
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1446,9 +1447,11 @@ export const dbSqliteService = {
       await db
         .insert(schema.clienteTable)
         .values(datos)
-        .onConflictDoNothing({
+        .onConflictDoUpdate({
           target: [schema.clienteTable.idCliente],
+          set: { ...datos },
         });
+
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1461,7 +1464,7 @@ export const dbSqliteService = {
     try {
       await db
         .delete(schema.conyugueTable)
-        .where(inArray(schema.conyugueTable.idCliente, idsParaEliminar));
+        .where(notInArray(schema.conyugueTable.idCliente, idsParaEliminar));
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1474,8 +1477,9 @@ export const dbSqliteService = {
       await db
         .insert(schema.conyugueTable)
         .values(datos)
-        .onConflictDoNothing({
+        .onConflictDoUpdate({
           target: [schema.clienteTable.idCliente],
+          set: { ...datos },
         });
 
       return true;
@@ -1490,7 +1494,7 @@ export const dbSqliteService = {
     try {
       await db
         .delete(schema.viviendaTable)
-        .where(inArray(schema.viviendaTable.idCliente, idsParaEliminar));
+        .where(notInArray(schema.viviendaTable.idCliente, idsParaEliminar));
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1503,8 +1507,9 @@ export const dbSqliteService = {
       await db
         .insert(schema.viviendaTable)
         .values(datos)
-        .onConflictDoNothing({
+        .onConflictDoUpdate({
           target: [schema.clienteTable.idCliente],
+          set: { ...datos },
         });
 
       return true;
@@ -1569,6 +1574,7 @@ export const dbSqliteService = {
         )
         .where(and(...filtros))
         .orderBy(asc(schema.verificacionTable.fechaVerificacion));
+
       return datos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";

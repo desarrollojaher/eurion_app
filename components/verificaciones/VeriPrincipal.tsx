@@ -72,13 +72,13 @@ const VeriPrincipal = () => {
     if (item.fotoCliente) {
       imagenesLista.push({
         titulo: "FOTO CLIENTE",
-        url: item.fotoCliente.split(",")[1],
+        url: item.fotoCliente, //.split(",")[1],
       });
     }
     if (item.fotoDomicilio) {
       imagenesLista.push({
         titulo: "FOTO DOMICILIO",
-        url: item.fotoDomicilio.split(",")[1],
+        url: item.fotoDomicilio, //.split(",")[1],
       });
     }
 

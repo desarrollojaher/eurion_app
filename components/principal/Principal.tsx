@@ -33,7 +33,6 @@ const Principal = () => {
   const router = useRouter();
 
   const version = Constants.expoConfig?.version || "Versión no disponible";
-  console.log("Versión de la app:", version);
 
   const verificarInternetSincronizacion = useCallback(async () => {
     // const valor = await NetInfo.fetch();
