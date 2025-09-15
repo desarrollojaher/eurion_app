@@ -1,4 +1,7 @@
-import { ISincronizarVerificaciones } from "@/models/ISincronizar";
+import {
+  ISincronizarVerificaciones,
+  ISincronizarVerificacionesEnviar,
+} from "@/models/ISincronizar";
 import { get, post } from "./config";
 import { ITiposVerificaciones } from "@/models/ITiposVerificaciones";
 
@@ -108,12 +111,10 @@ export const sincronizacionApi = {
     );
     return res.data;
   },
-  sincronizarVerificacionEnviar: async (datos: FormData) => {
-    const res = await post("sincronizacion/recibirVerificacion", datos, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  sincronizarVerificacionEnviar: async (
+    datos: ISincronizarVerificacionesEnviar,
+  ) => {
+    const res = await post("sincronizacion/recibirVerificacion", datos);
     return res.data;
   },
 };

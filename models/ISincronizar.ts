@@ -1,6 +1,6 @@
 import { ICliente } from "./ICliente";
 import { IConyugue } from "./IConyugue";
-import { IImagenCliente, IImagenDomicilio } from "./IImagenes";
+import { IImagenCliente, IImagenDomicilio, IImagenS3 } from "./IImagenes";
 import { IVerificacion } from "./IVerificaciones";
 import { IVivienda } from "./IVivienda";
 
@@ -129,6 +129,8 @@ export interface ISincronizarVerificacionesEnviar {
   vcImagenBase: string;
   vcPeriodo: string | null;
   pideActualizacion: number | null;
+  clIdentificacion: string;
+  imagenes?: IImagenS3[];
 }
 
 export interface IVerificacionesEnviar {

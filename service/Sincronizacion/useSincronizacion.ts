@@ -80,7 +80,7 @@ export const useSincronizacion = () => {
       setLoading(false);
       setSincronizado(true);
     } catch (error: any) {
-      console.log(error);
+      console.log(error.message);
 
       if (error.message === "Network Error") {
         setErrorMessage("No se pudo conectar con el servidor");
