@@ -2,7 +2,7 @@
   "expo": {
     "name": "Eurion App",
     "slug": "eurionapp",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "scheme": "eurionapp",
@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/splash-icon.png",
         "backgroundColor": "#ffffff"
@@ -23,7 +23,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.byrongodoy.eurionapp"
+      "package": "com.jaher.eurionapp"
     },
     "web": {
       "bundler": "metro",
