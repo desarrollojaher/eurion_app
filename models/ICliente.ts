@@ -1,3 +1,4 @@
+import { IVivienda } from "./IVivienda";
 
 export interface IClienteParams {
   identificacion: string;
@@ -25,7 +26,7 @@ export interface ICliente {
   apellidoCliente: string;
   estadoCivilCliente: string;
   dependientesCliente: number;
-  referencias: string;
+  referencias: string | null;
   observaciones: string;
   categoriaCliente: string;
   scoreCliente: string;
@@ -41,4 +42,10 @@ export interface ICliente {
   fotoCliente: string;
   fotoDireccion: string;
   telefonoCliente: string;
+  personaId: number;
+}
+
+export interface IClientesGestion {
+  cliente: ICliente;
+  vivienda: IVivienda;
 }

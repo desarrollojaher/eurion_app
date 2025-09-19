@@ -1,4 +1,4 @@
-export interface IGestiones {
+export interface IGestionesAnterior {
   //nroDocumento: string;
   identificacionCliente: string;
   fechaAdicion: Date;
@@ -17,8 +17,31 @@ export interface IGestiones {
   detalleAdicional: string;
 }
 
-export interface IGestionesFiltro {
-  buscador: string;
-  zona: string;
-  tipo: string;
+/////////////////////////////////////////////////////////////////////////
+
+export interface IGestionesDetalles {
+  gcId: number;
+  caId: number;
+  crId: number;
+}
+export interface IGestiones {
+  idHojaRuta: number;
+  usuId: number;
+  clId: number;
+  nombreCliente: string;
+  gestiones: IGestionesDetalles[];
+}
+
+export interface IGestionesAnteriores {
+  gcId: number;
+  idCliente: number;
+  nombreCliente: string;
+  codComprobanteStock: string;
+  idCredito: number;
+  idFactura: number;
+  nombreGestiona: string;
+  fechaGestionado: string;
+  fechaProxGestion: string;
+  geObservacion: string;
+  estadoGestion: number;
 }

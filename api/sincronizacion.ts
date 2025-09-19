@@ -4,6 +4,13 @@ import {
 } from "@/models/ISincronizar";
 import { get, post } from "./config";
 import { ITiposVerificaciones } from "@/models/ITiposVerificaciones";
+import { IGestiones, IGestionesAnteriores } from "@/models/IGestiones";
+import { IClientesGestion } from "@/models/ICliente";
+import { IReferencia } from "@/models/IReferencia";
+import { IComprobante } from "@/models/IComprobante";
+import { ITipoGestion, ITipoGestionDetalle } from "@/models/ITiposGestiones";
+import { IDireccion } from "@/models/IDireccion";
+import { ITelefono } from "@/models/ITelefono";
 
 export const sincronizacionApi = {
   obtenerVerificaciones: async () => {
@@ -19,8 +26,39 @@ export const sincronizacionApi = {
     return res.data;
   },
   sincronizarGestiones: async () => {
-    const res = await get("sincronizacion/gestiones/obtener");
+    const res = await get<IGestiones[]>("sincronizacion/gestiones/obtener");
     return res.data;
   },
-  
+  sincronizarClientesGestiones: async () => {
+    const res = await get<IClientesGestion[]>("sincronizacion/clientes/obtener");
+    return res.data;
+  },
+  sincronizarReferencias: async () => {
+    const res = await get<IReferencia[]>("sincronizacion/referencias/obtener");
+    return res.data;
+  },
+  sincronizarComprobantes: async () => {
+    const res = await get<IComprobante[]>("sincronizacion/comprobantes/obtener");
+    return res.data;
+  },
+  sincronizarGestionesAnteriores: async () => {
+    const res = await get<IGestionesAnteriores[]>("sincronizacion/gestiones-anteriores/obtener");
+    return res.data;
+  },
+  sincronizarTipoGestionesCabecera: async () => {
+    const res = await get<ITipoGestion[]>("sincronizacion/tipo-gestion-cabecera/obtener");
+    return res.data;
+  },
+  sincronizarTipoGestionesDetalle: async () => {
+    const res = await get<ITipoGestionDetalle[]>("sincronizacion/tipo-gestion-detalle/obtener");
+    return res.data;
+  },
+  sincronizarDirecciones: async () => {
+    const res = await get<IDireccion[]>("sincronizacion/direcciones/obtener");
+    return res.data;
+  },
+  sicronizarTelefonos: async () => {
+    const res = await get<ITelefono[]>("sincronizacion/telefonos/obtener");
+    return res.data;
+  },
 };

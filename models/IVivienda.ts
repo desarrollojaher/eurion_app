@@ -6,7 +6,6 @@ export interface IVivienda {
   idCliente: number;
 }
 
-
 export interface IViviendaDetalles {
   direccion: string;
   zona: string;
