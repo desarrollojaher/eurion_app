@@ -4,23 +4,23 @@ import { tipoVerificacionKeys } from "./tipoVerificacionesKeys";
 import { dbSqliteService } from "../db/db";
 
 export const useObtenerTiposVerificaciones = (
-    queryOptions?: Omit<
-        UseQueryOptions<
-            ITiposVerificaciones[],
-            unknown,
-            ITiposVerificaciones[],
-            ReturnType<(typeof tipoVerificacionKeys)["tiposVerificaciones"]>
-        >,
-        "queryKey"
-    >
+  queryOptions?: Omit<
+    UseQueryOptions<
+      ITiposVerificaciones[],
+      unknown,
+      ITiposVerificaciones[],
+      ReturnType<(typeof tipoVerificacionKeys)["tiposVerificaciones"]>
+    >,
+    "queryKey"
+  >
 ) => {
-    const obtenerTipoVerificaciones = async () => {
-        return await dbSqliteService.obtenerTiposVerificacion();
-    };
+  const obtenerTipoVerificaciones = async () => {
+    return await dbSqliteService.obtenerTiposVerificacion();
+  };
 
-    return useQuery({
-        queryKey: ["tiposVerificacio", "tiposVerificaciones"],
-        queryFn: obtenerTipoVerificaciones,
-        ...queryOptions,
-    });
+  return useQuery({
+    queryKey: ["tiposVerificacio", "tiposVerificaciones"],
+    queryFn: obtenerTipoVerificaciones,
+    ...queryOptions,
+  });
 };

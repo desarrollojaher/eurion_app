@@ -19,6 +19,7 @@ export const useSubirGestionEliminarActualizaciones = (
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: dbSqliteService.eliminarActualizacionesDireccion,
+
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: subirInformacionKeys.actualizaciones(),
