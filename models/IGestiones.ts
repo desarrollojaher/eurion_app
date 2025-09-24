@@ -33,15 +33,55 @@ export interface IGestiones {
 }
 
 export interface IGestionesAnteriores {
-  gcId: number;
-  idCliente: number;
+  gcId: number | null;
+  idCliente: number | null;
+  nombreCliente: string | null;
+  codComprobanteStock: string | null;
+  idCredito: number | null;
+  idFactura: number | null;
+  nombreGestiona: string | null;
+  fechaGestionado: string | null;
+  fechaProxGestion: string | null;
+  geObservacion: string | null;
+  estadoGestion: number | null;
+}
+
+export interface IGestionesCabecera {
   nombreCliente: string;
-  codComprobanteStock: string;
-  idCredito: number;
-  idFactura: number;
-  nombreGestiona: string;
-  fechaGestionado: string;
-  fechaProxGestion: string;
-  geObservacion: string;
-  estadoGestion: number;
+  apellidoCliente: string;
+  identificacion: string;
+  direccionCliente: string;
+  deudaTotal: number;
+  deudaPendiente: number;
+  latitudCliente: number;
+  longitudCliente: number;
+  cliId: number;
+  idHojaRuta: number;
+}
+
+export interface IGestionCabeceraParams {
+  buscador: string;
+}
+
+export interface IGestionesRealizas {
+  gcIdCc: number;
+  gdId: number;
+  crLatitud?: number | null;
+  crLongitud?: number | null;
+  crObservaciones: string;
+  usIdGestiona?: number | null;
+  caId: number;
+  clId: number;
+  agId?: number | null;
+  crIdCredito: number;
+  cpFechaCompromiso?: string | null;
+  hdId?: number | null;
+  cpObservaciones?: string | null;
+  gcId: number;
+  crFechaProxGestion?: string | null;
+  trId: number;
+}
+
+export interface IGestionesAnterioresParams {
+  crId: number;
 }

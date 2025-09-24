@@ -10,13 +10,15 @@ export type ITiposGestionesObtener = Partial<ITiposGestiones>;
 //////////////////////////////////////////
 
 export interface ITipoGestion {
-  gcId: number;
-  gcDescripcion: string;
+  gcId: number | null;
+  gcDescripcion: string | null;
 }
 
 export interface ITipoGestionDetalle {
-  gdId: number;
-  gdDescripcion: string;
-  gcId: number;
-  gfCompromisoPago: string;
+  gdId: number | null;
+  gdDescripcion: string | null;
+  gcId: number | null;
+  gfCompromisoPago: string | null;
 }
+
+export type ITipoGestionDetalleParams = { gcId: number };

@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import { IGestiones } from "@/models/IGestiones";
+import { IGestionesCabecera } from "@/models/IGestiones";
 
 type IGestionStore = {
-  datos: IGestiones | null;
+  datos: IGestionesCabecera | null;
   eliminar: () => void;
-  setDatos: (dato: IGestiones) => void;
+  setDatos: (dato: IGestionesCabecera) => void;
 };
 
 export const useGestionStore = create<IGestionStore>()((set, get) => ({
   datos: null,
   eliminar: () => set(() => ({ datos: null })),
-  setDatos: (dato: IGestiones) => set(() => ({ datos: dato })),
+  setDatos: (dato: IGestionesCabecera) => set(() => ({ datos: dato })),
 }));

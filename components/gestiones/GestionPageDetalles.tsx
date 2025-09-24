@@ -22,21 +22,17 @@ const GestionPageDetalles = () => {
   const gestionDireccion =
     React.useRef<PropsGestionesPageDetallesDireccionRef>(null);
 
-  const tabs = useMemo(() => ["Cliente", "Documentos", "Actualización"], []);
+  const tabs = useMemo(() => ["Cliente", "Documentos"], []);
 
   const tabCorrespondiente = useMemo(() => {
     if (tabs[tab] === "Cliente") {
-      return (
-        <GestionPageDetallesCliente
-          identificacionCliente={datos?.identificacionCliente ?? ""}
-        />
-      );
+      return <GestionPageDetallesCliente clId={datos?.cliId ?? 0} />;
     } else if (tabs[tab] === "Documentos" && datos) {
       return <GestionesPageDetallesDocumenos datos={datos} />;
     } else if (tabs[tab] === "Actualización" && datos) {
-      return (
-        <GestionesPageDetallesDireccion datos={datos} ref={gestionDireccion} />
-      );
+      // return (
+      //   <GestionesPageDetallesDireccion datos={datos} ref={gestionDireccion} />
+      // );
     }
   }, [datos, tab, tabs]);
 
@@ -68,7 +64,7 @@ const GestionPageDetalles = () => {
   return (
     <View style={styles.containerGeneral}>
       <Header
-        title={datos?.apellidos + " " + datos?.nombres}
+        title={datos?.apellidoCliente + " " + datos?.nombreCliente}
         iconRight={
           <TouchableOpacity onPress={handleOpenModalGestion}>
             <Icon

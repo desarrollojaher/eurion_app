@@ -14,7 +14,7 @@ export const useGuardarVerificaciones = (
     any,
     IVerificacionesGuardar,
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({

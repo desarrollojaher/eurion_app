@@ -17,11 +17,9 @@ import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { formatCurrency } from "@/helper/function/numericas";
 import ModalAlertaSubirEliminar from "@/components/commons/modal/ModalAlertaSubirEliminar";
-import { useRecibosObtener } from "@/service/Recibos/useRecibosObtener";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
 import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
 import { IRecibosCabeceraListado } from "@/models/IRecibo";
-import { useRecibosEliminar } from "@/service/Recibos/useRecibosEliminar";
 
 const RecibosTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
@@ -29,14 +27,14 @@ const RecibosTab = () => {
     useState<IRecibosCabeceraListado | null>(null);
   const [tipoAlerta, setTipoAlerta] = useState<"subir" | "eliminar">("subir");
 
-  const { mutate: eliminarRecibo, isPending: isLoadingEliminar } =
-    useRecibosEliminar();
+  // const { mutate: eliminarRecibo, isPending: isLoadingEliminar } =
+  //   useRecibosEliminar();
 
-  const {
-    data: dataRecibos,
-    isLoading: isLoadingRecibos,
-    refetch: refetchRecibos,
-  } = useRecibosObtener();
+  // const {
+  //   data: dataRecibos,
+  //   isLoading: isLoadingRecibos,
+  //   refetch: refetchRecibos,
+  // } = useRecibosObtener();
 
   const handleTabDelete = useCallback((item: IRecibosCabeceraListado) => {
     setTipoAlerta("eliminar");
@@ -54,18 +52,18 @@ const RecibosTab = () => {
 
   const handleEliminar = useCallback(() => {
     if (reciboEliminar) {
-      eliminarRecibo(
-        { id: reciboEliminar.id },
-        {
-          onSuccess: () => {
-            setModalAlertaSubida(false);
-          },
-        }
-      );
+      // eliminarRecibo(
+      //   { id: reciboEliminar.id },
+      //   {
+      //     onSuccess: () => {
+      //       setModalAlertaSubida(false);
+      //     },
+      //   }
+      // );
     }
-  }, [eliminarRecibo, reciboEliminar]);
+  }, [reciboEliminar]);
 
-  const handleSubir = useCallback(() => {}, []);
+  const handleSubir = useCallback(() => { }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: IRecibosCabeceraListado }) => (
@@ -118,17 +116,17 @@ const RecibosTab = () => {
   return (
     <View>
       <FlatList
-        data={dataRecibos}
+        data={[]}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
         keyExtractor={(datos) => datos.id.toString()}
-        ListEmptyComponent={<EmptyList isLoading={isLoadingRecibos} />}
-        ListFooterComponent={<LoadingComponent isLoading={isLoadingRecibos} />}
+        ListEmptyComponent={<EmptyList isLoading={true} />}
+        ListFooterComponent={<LoadingComponent isLoading={true} />}
         refreshControl={
           <RefreshControl
-            refreshing={isLoadingRecibos}
-            onRefresh={refetchRecibos}
+            refreshing={true}
+           // onRefresh={refetchRecibos}
             colors={["#007AFF"]}
             tintColor="#007AFF"
           />
@@ -141,7 +139,7 @@ const RecibosTab = () => {
           tipo={tipoAlerta}
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
-          isLoading={isLoadingEliminar}
+          isLoading={false}
         />
       )}
     </View>

@@ -28,9 +28,7 @@ import {
 } from "lodash";
 import ModalAlertBack from "./modal/ModalAlertBack";
 import useBackButtonHandle from "@/hooks/useBackButtonHandle";
-import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
 import { format } from "date-fns";
-import { useRecibosGuardar } from "@/service/Recibos/useRecibosGuardar";
 import * as Location from "expo-location";
 import ModalLoading from "../commons/modal/ModalLoading";
 import ModalAlertaGurdar from "./modal/ModalAlertaGurdar";
@@ -120,32 +118,32 @@ const RecibosDetalles = () => {
 
   const { datos } = useReciboStore();
 
-  const { data: documentos } = useDocumentosCabeceraObtener({
-    identificacion: datos?.identificacionCliente ?? "",
-  });
-  const defaultValueRecibos = useMemo<IReciboEnviarDatos>(() => {
-    if (documentos && documentos.length > 0) {
-      const data = documentos.map<IReciboEnviar>((item) => ({
-        latitud: 0,
-        longitud: 0,
-        doctran: item.nroDocumento,
-        fechaComprobante: format(item.fecha, "dd-MM-yyyy HH:mm:ss"),
-        valores: [],
-        imagenes: null,
-        valorMora: null,
-        valorCobranza: null,
-        valorCancela: null,
-        observaciones: "",
-        identificacionCliente: datos?.identificacionCliente ?? "",
-      }));
-      const datosEnviar: IReciboEnviarDatos = {
-        datos: data,
-      };
+  // const { data: documentos } = useDocumentosCabeceraObtener({
+  //   identificacion: datos?.identificacionCliente ?? "",
+  // });
+  // const defaultValueRecibos = useMemo<IReciboEnviarDatos>(() => {
+  //   if (documentos && documentos.length > 0) {
+  //     const data = documentos.map<IReciboEnviar>((item) => ({
+  //       latitud: 0,
+  //       longitud: 0,
+  //       doctran: item.nroDocumento,
+  //       fechaComprobante: format(item.fecha, "dd-MM-yyyy HH:mm:ss"),
+  //       valores: [],
+  //       imagenes: null,
+  //       valorMora: null,
+  //       valorCobranza: null,
+  //       valorCancela: null,
+  //       observaciones: "",
+  //       identificacionCliente: datos?.identificacionCliente ?? "",
+  //     }));
+  //     const datosEnviar: IReciboEnviarDatos = {
+  //       datos: data,
+  //     };
 
-      return datosEnviar;
-    }
-    return { datos: [] };
-  }, [datos?.identificacionCliente, documentos]);
+  //     return datosEnviar;
+  //   }
+  //   return { datos: [] };
+  // }, [datos?.identificacionCliente, documentos]);
 
   const {
     control,
@@ -157,7 +155,7 @@ const RecibosDetalles = () => {
     getValues,
   } = useForm<IReciboEnviarDatos>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValueRecibos,
+    //efaultValues: defaultValueRecibos,
   });
 
   const { fields: datosDocumentos } = useFieldArray({
@@ -168,15 +166,15 @@ const RecibosDetalles = () => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
   const children = useMemo(() => {
-    if (tabs[tab] === "Cliente" && documentos) {
-      return (
-        <ReciboTabCliente
-          datosDocumentos={datosDocumentos}
-          control={control}
-          datos={documentos}
-          setValue={setValue}
-        />
-      );
+    if (tabs[tab] === "Cliente") {
+      // return (
+      //   <ReciboTabCliente
+      //     datosDocumentos={datosDocumentos}
+      //     control={control}
+      //     datos={documentos}
+      //     setValue={setValue}
+      //   />
+      // );
     } else if (tabs[tab] === "Recibo") {
       return (
         <ReciboTabRecibo
@@ -200,7 +198,7 @@ const RecibosDetalles = () => {
   }, [
     control,
     datosDocumentos,
-    documentos,
+
     getValues,
     setValue,
     tab,
@@ -208,8 +206,8 @@ const RecibosDetalles = () => {
     watch,
   ]);
 
-  const { mutate: guardarRecibos, isPending: isLoadingReciboGuardar } =
-    useRecibosGuardar();
+  // const { mutate: guardarRecibos, isPending: isLoadingReciboGuardar } =
+  //   useRecibosGuardar();
 
   const handleCompararObjetos = useCallback((valor1: any, valor2: any) => {
     if (
@@ -274,9 +272,9 @@ const RecibosDetalles = () => {
 
           if (
             (element.valorCancela ?? 0) +
-              (element.valorCobranza ?? 0) +
-              (element.valorMora ?? 0) >
-              0 &&
+            (element.valorCobranza ?? 0) +
+            (element.valorMora ?? 0) >
+            0 &&
             (element.valorCancela ?? 0) <= saldoVencido &&
             (element.valorCobranza ?? 0) <= gastosCobranza &&
             (element.valorMora ?? 0) <= interesMora
@@ -402,7 +400,7 @@ const RecibosDetalles = () => {
       )}
       {(loadingRecibo || isLoadingReciboGuardar) && (
         <ModalLoading
-          onClose={() => {}}
+          onClose={() => { }}
           visible={loadingRecibo || isLoadingReciboGuardar}
         />
       )}

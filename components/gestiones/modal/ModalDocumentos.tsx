@@ -7,7 +7,6 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { useDocumentosCompletoObtener } from "@/service/Documentos/useDocumentosCompletoObtener";
 import { formatCurrency } from "@/helper/function/numericas";
 import { format, parseISO } from "date-fns";
 import Separador from "@/components/commons/separador/Separador";
@@ -23,20 +22,16 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
   visible,
   data,
 }) => {
-  const { data: datosDocumentos } = useDocumentosCompletoObtener({
-    nroDocumento: data,
-  });
+
   return (
     <ModalCustom
       onClose={onClose}
       visible={visible}
-      titulo={(datosDocumentos && datosDocumentos[0].nroDocumento) ?? ""}
+      titulo={""}
     >
       <HeaderCard
         labelLeft="Saldo Vencido"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].saldoVencido ?? 0)) ??
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}
@@ -45,7 +40,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Cuotas Pagadas"
-        labelRight={(datosDocumentos && datosDocumentos[0].cuotasPagadas) ?? ""}
+        labelRight={""}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
@@ -53,7 +48,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Cuotas Pendientes"
         labelRight={
-          (datosDocumentos && datosDocumentos[0].cuotasPendientes) ?? ""
+          ""
         }
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
@@ -62,12 +57,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Fecha Vencimiento"
         labelRight={
-          (datosDocumentos &&
-            datosDocumentos[0].fechaVencimiento &&
-            format(
-              parseISO(datosDocumentos[0].fechaVencimiento),
-              "dd-MM-yyyy"
-            )) ??
+          
           ""
         }
         styleLeft={styles.styleLabelLeft}
@@ -77,12 +67,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Fecha Ultimo Pago"
         labelRight={
-          (datosDocumentos &&
-            datosDocumentos[0].fechaUltimoPago &&
-            format(
-              parseISO(datosDocumentos[0].fechaUltimoPago),
-              "dd-MM-yyyy"
-            )) ??
+         
           ""
         }
         styleLeft={styles.styleLabelLeft}
@@ -92,8 +77,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Valor cuota"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].valorCuota ?? 0)) ??
+        
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}
@@ -103,8 +87,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Saldo Vencido"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].saldoVencido ?? 0)) ??
+          
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}
@@ -114,8 +97,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Intereses Mora"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].interesMora ?? 0)) ??
+          
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}
@@ -125,8 +107,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Gastos Cobranzas"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].gastosDeCobranza ?? 0)) ??
+          
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}
@@ -136,8 +117,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Saldo Capital"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].saldoDelCredito ?? 0)) ??
+          
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}
@@ -147,8 +127,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Deuda Total"
         labelRight={
-          (datosDocumentos &&
-            formatCurrency(datosDocumentos[0].deudaTotal ?? 0)) ??
+          
           "$ 0"
         }
         styleLeft={styles.styleLabelLeft}

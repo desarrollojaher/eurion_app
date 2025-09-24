@@ -32,8 +32,6 @@ import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { IDireccionCelularGcobranza } from "@/models/IDireccionCelularGcobranza";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IGestiones } from "@/models/IGestiones";
-import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
-import { useGuardarGestionesActualizacionDireccion } from "@/service/gestiones/useGuardarGestionesActualizacionDireccion";
 import { format } from "date-fns";
 import ModalLoading from "../commons/modal/ModalLoading";
 import ModalTelefonos from "./modal/ModalTelefonos";
@@ -75,7 +73,7 @@ const schema = z.object({
       z.object({
         titulo: z.string(),
         url: z.string(),
-      })
+      }),
     )
     .nullish(),
 });
@@ -100,10 +98,10 @@ const GestionesPageDetallesDireccion = forwardRef<
   } = useForm<IDireccionCelularGcobranza>({
     resolver: zodResolver(schema),
     defaultValues: {
-      latitud: datos.latitud,
-      longitud: datos.longitud,
-      identificacionCliente: datos.identificacionCliente,
-      direccionIngresada: datos.direccion,
+      // latitud: datos.latitud,
+      // longitud: datos.longitud,
+      // identificacionCliente: datos.identificacionCliente,
+      // direccionIngresada: datos.direccion,
     },
   });
 
@@ -120,12 +118,12 @@ const GestionesPageDetallesDireccion = forwardRef<
   const [modalTelefono, setModalTelefono] = useState(false);
   const [guardar, setGuardar] = useState(false);
 
-  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
-    identificacion: datos.identificacionCliente,
-  });
+  // const { data: datosDocumentos } = useDocumentosCabeceraObtener({
+  //   identificacion: datos.identificacionCliente,
+  // });
 
-  const { mutate: guardarDireccion } =
-    useGuardarGestionesActualizacionDireccion();
+  // const { mutate: guardarDireccion } =
+  //   useGuardarGestionesActualizacionDireccion();
 
   const handleOpenCamara = useCallback(() => {
     setModalCamara(true);
@@ -138,14 +136,14 @@ const GestionesPageDetallesDireccion = forwardRef<
     (data: IImagenCompleta[]) => {
       append(data);
     },
-    [append]
+    [append],
   );
 
   const handleRemoveImage = useCallback(
     (indexElemento: number) => {
       remove(indexElemento);
     },
-    [remove]
+    [remove],
   );
 
   const handleObtenerDireccionGps = useCallback(async () => {
@@ -161,29 +159,26 @@ const GestionesPageDetallesDireccion = forwardRef<
     }
   }, [setValue]);
 
-  const onSucess = useCallback(
-    (data: IDireccionCelularGcobranza) => {
-      setGuardar(true);
-      const dataAux = cloneDeep(data);
-      dataAux.fecha = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-      guardarDireccion(dataAux, {
-        onSuccess: () => {
-          reset({
-            direccionIngresada: "",
-            indicacionesAdicionales: "",
-            latitud: datos.latitud,
-            longitud: datos.longitud,
-            imagenes: [],
-          });
-          setGuardar(false);
-        },
-        onError: () => {
-          setGuardar(false);
-        },
-      });
-    },
-    [datos.latitud, datos.longitud, guardarDireccion, reset]
-  );
+  const onSucess = useCallback((data: IDireccionCelularGcobranza) => {
+    setGuardar(true);
+    const dataAux = cloneDeep(data);
+    dataAux.fecha = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    // guardarDireccion(dataAux, {
+    //   onSuccess: () => {
+    //     reset({
+    //       direccionIngresada: "",
+    //       indicacionesAdicionales: "",
+    //       latitud: datos.latitud,
+    //       longitud: datos.longitud,
+    //       imagenes: [],
+    //     });
+    //     setGuardar(false);
+    //   },
+    //   onError: () => {
+    //     setGuardar(false);
+    //   },
+    // });
+  }, []);
   const onError = useCallback((error: any) => {
     console.log(error);
   }, []);
@@ -200,10 +195,10 @@ const GestionesPageDetallesDireccion = forwardRef<
   }, []);
 
   useEffect(() => {
-    if (datosDocumentos && datosDocumentos.length > 0) {
-      setValue("nroDocumento", datosDocumentos[0].nroDocumento);
-    }
-  }, [datosDocumentos, setValue]);
+    // if (datosDocumentos && datosDocumentos.length > 0) {
+    //   setValue("nroDocumento", datosDocumentos[0].nroDocumento);
+    // }
+  }, [setValue]);
 
   return (
     <View style={styles.containerGeneral}>
@@ -245,7 +240,7 @@ const GestionesPageDetallesDireccion = forwardRef<
               direction="column"
               placeholder="Telefono"
               styleHeader={styles.styleTextHeader}
-              defaultValueText={datos.telefono}
+              defaultValueText={"55"}
               readOnly
               isError={!!errors.indicacionesAdicionales}
               labelError={errors.indicacionesAdicionales?.message}
@@ -334,7 +329,7 @@ const GestionesPageDetallesDireccion = forwardRef<
         <ModalTelefonos
           onClose={handleCloseTelefono}
           visible={modalTelefono}
-          cedula={datos.identificacionCliente}
+          cedula={'0255'}
         />
       )}
     </View>

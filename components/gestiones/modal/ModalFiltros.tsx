@@ -4,7 +4,6 @@ import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Select, { IDatosSelect } from "@/components/commons/select/Select";
 import { convertirTamanoVertical } from "@/helper/function/renderizadoImagen";
 import { find, map } from "lodash";
-import { useObtenerZonas } from "@/service/Zona/useObtenerZonas";
 
 interface PropsModalFiltros {
   visible: boolean;
@@ -23,7 +22,7 @@ const ModalFiltros: React.FC<PropsModalFiltros> = ({
   tipo,
   zona,
 }) => {
-  const { data: zonasData } = useObtenerZonas();
+  // const { data: zonasData } = useObtenerZonas();
 
   const zonaFiltro = useMemo(() => {
     const datos: IDatosSelect[] = [
@@ -32,15 +31,15 @@ const ModalFiltros: React.FC<PropsModalFiltros> = ({
         value: "todos",
       },
     ];
-    map(zonasData, (item) => {
-      const elemento: IDatosSelect = {
-        label: item.nombres ?? "",
-        value: item.codigo ?? "",
-      };
-      datos.push(elemento);
-    });
+    // map(zonasData, (item) => {
+    //   const elemento: IDatosSelect = {
+    //     label: item.nombres ?? "",
+    //     value: item.codigo ?? "",
+    //   };
+    //   datos.push(elemento);
+    // });
     return datos;
-  }, [zonasData]);
+  }, []);
 
   const handleChangeZona = useCallback(
     (data: IDatosSelect) => {

@@ -12,7 +12,6 @@ import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
 import InputCustom from "../commons/input/InputCustom";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AZUL, GRIS, NEGRO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
@@ -30,69 +29,65 @@ import ModalFiltros from "./modal/ModalFiltros";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import { router } from "expo-router";
-import { useObtenerGestionesCabecera } from "@/service/gestiones/useObtenerGestionesCabecera";
-import { IGestiones } from "@/models/IGestiones";
+import { IGestionesCabecera } from "@/models/IGestiones";
 import EmptyList from "../commons/FlatList/EmptyList";
 import LoadingComponent from "../commons/FlatList/LoadingComponent";
 import { formatCurrency } from "@/helper/function/numericas";
 import { useDebounce } from "@/hooks/debounce";
 import { useGestionStore } from "@/helper/store/storeGestiones";
+import { useObtenerGestiones } from "@/service/Gestiones/useObtenerGestiones";
 
 const GestionesPagePrincipal = () => {
-  const [modalFiltros, setModalFiltros] = useState(false);
+  // const [modalFiltros, setModalFiltros] = useState(false);
   const [modalCarrucel, setModalCarrucel] = useState(false);
   const [modalGestionar, setModalGestionar] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
-  const [gestion, setGestion] = useState<IGestiones | null>(null);
+  const [gestion, setGestion] = useState<IGestionesCabecera | null>(null);
   const [buscador, setBuscador] = useState("");
-  const [zona, setZona] = useState("todos");
-  const [tipo, setTipo] = useState("todos");
+  // const [zona, setZona] = useState("todos");
+  // const [tipo, setTipo] = useState("todos");
 
   const debouncedInputValue = useDebounce(buscador, 1000);
 
   const {
-    data: datosGestiones,
-    isLoading: isLoadingGestiones,
-    refetch: refechGestiones,
-  } = useObtenerGestionesCabecera({
-    buscador: debouncedInputValue,
-    tipo: tipo,
-    zona: zona,
-  });
+    data: dataGestionesCabecera,
+    isLoading: isLoadingGestionesCabecera,
+    refetch: refetchGestionesCabecera,
+  } = useObtenerGestiones({ buscador: debouncedInputValue });
 
   const { setDatos } = useGestionStore();
 
-  const handleOpenImagenes = useCallback((data: IGestiones) => {
-    const imagenesLista: IImagenCompleta[] = [];
-    if (data.imagenCliente) {
-      imagenesLista.push({
-        titulo: "FOTO CLIENTE",
-        url: data.imagenCliente.split(",")[1],
-      });
-    }
-    if (data.imagenDomicilio) {
-      imagenesLista.push({
-        titulo: "FOTO DOMICILIO",
-        url: data.imagenDomicilio.split(",")[1],
-      });
-    }
+  const handleOpenImagenes = useCallback((data: IGestionesCabecera) => {
+    const imagenesLista: IGestionesCabecera[] = [];
+    // if (data.imagenCliente) {
+    //   imagenesLista.push({
+    //     titulo: "FOTO CLIENTE",
+    //     url: data.imagenCliente.split(",")[1],
+    //   });
+    // }
+    // if (data.imagenDomicilio) {
+    //   imagenesLista.push({
+    //     titulo: "FOTO DOMICILIO",
+    //     url: data.imagenDomicilio.split(",")[1],
+    //   });
+    // }
 
-    setImagenes(imagenesLista);
-    setModalCarrucel(true);
+    // setImagenes(imagenesLista);
+    // setModalCarrucel(true);
   }, []);
-  const handleAbrirGps = useCallback((data: IGestiones) => {
+  const handleAbrirGps = useCallback((data: IGestionesCabecera) => {
     Linking.openURL(
-      `geo:${data.latitud},${data.longitud}?q=${data.latitud},${data.longitud}`
+      `geo:${data.latitudCliente},${data.longitudCliente}?q=${data.latitudCliente},${data.longitudCliente}`,
     );
   }, []);
 
-  const handleOpenModalFiltros = useCallback(() => {
-    setModalFiltros(true);
-  }, []);
+  // const handleOpenModalFiltros = useCallback(() => {
+  //   setModalFiltros(true);
+  // }, []);
 
-  const handleCloseModalFiltros = useCallback(() => {
-    setModalFiltros(false);
-  }, []);
+  // const handleCloseModalFiltros = useCallback(() => {
+  //   setModalFiltros(false);
+  // }, []);
 
   const handleCloseModalCarrucel = useCallback(() => {
     setModalCarrucel(false);
@@ -107,32 +102,32 @@ const GestionesPagePrincipal = () => {
   }, []);
 
   const handleCambiarPagina = useCallback(
-    (item: IGestiones) => {
+    (item: IGestionesCabecera) => {
       setDatos(item);
       router.push("/principal/gestiones/gestiones-detalles");
     },
-    [setDatos]
+    [setDatos],
   );
 
   const handleSelecionar = useCallback(
-    (item: IGestiones) => {
+    (item: IGestionesCabecera) => {
       setGestion(item);
       handleOpenModalGestion();
     },
-    [handleOpenModalGestion]
+    [handleOpenModalGestion],
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IGestiones; index: number }) => (
+    ({ item, index }: { item: IGestionesCabecera; index: number }) => (
       <Card style={styles.cardStyle}>
         <TouchableOpacity onPress={() => handleCambiarPagina(item)}>
           <HeaderCard labelRight="Ruta" />
           <Separador />
           <TextCard
-            titulo={`${item.apellidos} ${item.nombres}`}
-            subtitulo={item.identificacionCliente}
+            titulo={`${item.apellidoCliente} ${item.nombreCliente}`}
+            subtitulo={item.identificacion}
           />
-          <Text style={styles.styleText}>{item.direccion}</Text>
+          <Text style={styles.styleText}>{item.direccionCliente}</Text>
           <Separador />
           <HeaderCard
             labelLeft="DEUDA TOTAL"
@@ -143,7 +138,9 @@ const GestionesPagePrincipal = () => {
           />
           <HeaderCard
             labelLeft="VENCIDO"
-            labelRight={formatCurrency(Number(item?.saldoVencido ?? "0")) ?? ""}
+            labelRight={
+              formatCurrency(Number(item?.deudaPendiente ?? "0")) ?? ""
+            }
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
@@ -155,13 +152,8 @@ const GestionesPagePrincipal = () => {
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
-          <HeaderCard
-            labelLeft="ZONA"
-            labelRight={item.zonaNombre}
-            styleContainer={styles.rowCardStyle}
-            styleLeft={styles.labelCardLeft}
-            styleRight={styles.labelCardRight}
-          />
+
+          <Separador />
           <View style={styles.containerIcons}>
             <Pressable onPress={() => handleOpenImagenes(item)}>
               <FontAwesome5 name="images" color={NEGRO} size={30} />
@@ -176,7 +168,7 @@ const GestionesPagePrincipal = () => {
         </TouchableOpacity>
       </Card>
     ),
-    [handleAbrirGps, handleCambiarPagina, handleOpenImagenes, handleSelecionar]
+    [handleAbrirGps, handleCambiarPagina, handleOpenImagenes, handleSelecionar],
   );
 
   return (
@@ -196,34 +188,30 @@ const GestionesPagePrincipal = () => {
             />
           }
         />
-        <TouchableOpacity
-          style={styles.buttonFiltro}
-          onPress={handleOpenModalFiltros}
-        >
-          <FontAwesome name="filter" size={24} color={AZUL} />
-        </TouchableOpacity>
       </View>
       <View style={styles.styleContainerCard}>
         <FlatList
-          data={datosGestiones}
+          data={dataGestionesCabecera}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(datos) => datos.identificacionCliente}
-          ListEmptyComponent={<EmptyList isLoading={isLoadingGestiones} />}
+          keyExtractor={(datos) => datos.identificacion}
+          ListEmptyComponent={
+            <EmptyList isLoading={isLoadingGestionesCabecera} />
+          }
           ListFooterComponent={
-            <LoadingComponent isLoading={isLoadingGestiones} />
+            <LoadingComponent isLoading={isLoadingGestionesCabecera} />
           }
           refreshControl={
             <RefreshControl
-              refreshing={isLoadingGestiones}
-              onRefresh={refechGestiones}
+              refreshing={isLoadingGestionesCabecera}
+              onRefresh={refetchGestionesCabecera}
               colors={["#007AFF"]}
               tintColor="#007AFF"
             />
           }
         />
       </View>
-      {modalFiltros && (
+      {/* {modalFiltros && (
         <ModalFiltros
           onClose={handleCloseModalFiltros}
           visible={modalFiltros}
@@ -232,7 +220,7 @@ const GestionesPagePrincipal = () => {
           setTipo={setTipo}
           tipo={tipo}
         />
-      )}
+      )} */}
       {modalCarrucel && (
         <ModalCarrucelImagenes
           data={imagenes}
@@ -259,7 +247,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   containerHeader: {
-    flexDirection: "row",
     marginHorizontal: convertirTamanoHorizontal(35),
     marginVertical: convertirTamanoVertical(30),
     height: convertirTamanoVertical(60),
@@ -274,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   styleInput: {
-    flex: 1,
+    width: "100%",
   },
   styleContainerCard: {
     flex: 1,

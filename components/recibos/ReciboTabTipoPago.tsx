@@ -12,9 +12,7 @@ import {
 } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import CardReciboTabTipoPago from "./render/CardReciboTabTipoPago";
-import { useRecibosFormaPago } from "@/service/Recibos/useRecibosFormaPago";
 import { IDatosSelect } from "../commons/select/Select";
-import { useRecibosTarjetaCredito } from "@/service/Recibos/useRecibosTarjetaCredito";
 import LottieAnimation from "../commons/lottie/LottieAnimation";
 import { BLANCO } from "@/constants/Colors";
 
@@ -31,30 +29,29 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
   control,
   getValues,
 }) => {
-  const { data: dataFormasPagos } = useRecibosFormaPago();
-  const { data: dataTarjetaCredito } = useRecibosTarjetaCredito();
+
 
   const formasPago = useMemo(() => {
     const datos: IDatosSelect[] = [];
-    dataFormasPagos?.map((item) => {
-      datos.push({
-        label: item.nombre ?? "",
-        value: item.codFormaPago ?? "",
-      });
-    });
+    // dataFormasPagos?.map((item) => {
+    //   datos.push({
+    //     label: item.nombre ?? "",
+    //     value: item.codFormaPago ?? "",
+    //   });
+    // });
     return datos;
-  }, [dataFormasPagos]);
+  }, []);
 
   const tarjetasCredito = useMemo(() => {
     const datos: IDatosSelect[] = [];
-    dataTarjetaCredito?.map((item) => {
-      datos.push({
-        label: item.nomTarjeta ?? "",
-        value: item.codTarjeta ?? "",
-      });
-    });
+    // dataTarjetaCredito?.map((item) => {
+    //   datos.push({
+    //     label: item.nomTarjeta ?? "",
+    //     value: item.codTarjeta ?? "",
+    //   });
+    // });
     return datos;
-  }, [dataTarjetaCredito]);
+  }, []);
 
   const itemsCambios = useMemo(() => {
     if (datosDocumentos.length > 0) {
@@ -86,13 +83,12 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
         control={control}
         formasPago={formasPago}
         tarjetasCredito={tarjetasCredito}
-        dataTarjetaCredito={dataTarjetaCredito}
+        dataTarjetaCredito={[]}
         datosDocumentos={datosDocumentos}
       />
     ),
     [
       control,
-      dataTarjetaCredito,
       datosDocumentos,
       formasPago,
       tarjetasCredito,

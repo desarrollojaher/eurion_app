@@ -9,14 +9,13 @@ import {
 import { GRIS } from "@/constants/Colors";
 import ModalDocumentos from "./modal/ModalDocumentos";
 
-import { IGestiones } from "@/models/IGestiones";
+import { IGestionesCabecera } from "@/models/IGestiones";
 import { formatCurrency } from "@/helper/function/numericas";
-import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
 import { IDocumentosCabecera } from "@/models/IDocumentos";
 import { format } from "date-fns";
 
 interface PropsGestionesPageDetallesDocumenos {
-  datos: IGestiones;
+  datos: IGestionesCabecera;
 }
 const GestionesPageDetallesDocumenos: React.FC<
   PropsGestionesPageDetallesDocumenos
@@ -25,9 +24,9 @@ const GestionesPageDetallesDocumenos: React.FC<
   const [documentoSeleccionado, setDocumentoSeleccionado] =
     useState<string>("");
 
-  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
-    identificacion: datos.identificacionCliente,
-  });
+  // const { data: datosDocumentos } = useDocumentosCabeceraObtener({
+  //   identificacion: datos.identificacionCliente,
+  // });
 
   const handleOpenDocumeno = useCallback((nroDocumento: string) => {
     setDocumentoSeleccionado(nroDocumento);
@@ -86,19 +85,19 @@ const GestionesPageDetallesDocumenos: React.FC<
       >
         <HeaderCard
           labelLeft="Saldo Vencido"
-          labelRight={formatCurrency(datos.saldoVencido)}
+          labelRight={formatCurrency(2)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
         <HeaderCard
           labelLeft="Deuda Total"
-          labelRight={formatCurrency(datos.deudaTotal)}
+          labelRight={formatCurrency(3)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
       </Card>
       <FlatList
-        data={datosDocumentos}
+        data={[]}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}

@@ -29,10 +29,10 @@ export const verificacionTable = sqliteTable(
         table.idVerificacion,
         table.idCliente,
         table.periodo,
-        table.tipoVerificacion
+        table.tipoVerificacion,
       ),
     };
-  }
+  },
 );
 
 export const clienteTable = sqliteTable(
@@ -49,10 +49,10 @@ export const clienteTable = sqliteTable(
     referencias: text(),
     observaciones: text(),
     categoriaCliente: text(),
-    scoreCliente: int(),
+    scoreCliente: text(),
     ocupacionLaboralCliente: text(),
     empresaLaboraCliente: text(),
-    antiguedadCliente: text(),
+    antiguedadCliente: int(),
     cargoCliente: text(),
     nombreJefeCliente: text(),
     ingresosCliente: integer({ mode: "number" }),
@@ -67,7 +67,7 @@ export const clienteTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  }
+  },
 );
 
 export const conyugueTable = sqliteTable(
@@ -90,13 +90,13 @@ export const conyugueTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  }
+  },
 );
 
 export const viviendaTable = sqliteTable(
   "vivienda",
   {
-    tipoVivienda: int(),
+    tipoVivienda: text(),
     nombreDuenoVivienda: text(),
     telefonoDuenoVivienda: text(),
     contruccionVivienda: text(),
@@ -106,7 +106,7 @@ export const viviendaTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  }
+  },
 );
 
 export const verificacionResultTable = sqliteTable("verificacion_result", {
@@ -123,35 +123,47 @@ export const verificacionResultTable = sqliteTable("verificacion_result", {
   pideActualizacion: int().default(0),
 });
 
-export const verificacionResultDetTable = sqliteTable("verificacion_result_det", {
-  vcId: int().primaryKey({ autoIncrement: true }),
-  vrId: int(),
-  fecha: text(),
-  vcImagenBase: text(),
-  vcPeriodo: text(),
-  nombre: text(),
-  vrdProcesado: int().default(0),
-});
+export const verificacionResultDetTable = sqliteTable(
+  "verificacion_result_det",
+  {
+    vcId: int().primaryKey({ autoIncrement: true }),
+    vrId: int(),
+    fecha: text(),
+    vcImagenBase: text(),
+    vcPeriodo: text(),
+    nombre: text(),
+    vrdProcesado: int().default(0),
+  },
+);
 
 export const tiposVerificacionTable = sqliteTable("tipos_verificacion", {
   vtId: int(),
   vtDescripcion: text(),
 });
 
-export const gestiones = sqliteTable("gestiones", {
-  idHojaRuta: int(),
-  usuId: int(),
-  clId: int(),
-  nombreCliente: text(),
-});
+export const gestionesTable = sqliteTable(
+  "gestiones",
+  {
+    idHojaRuta: int(),
+    usuId: int(),
+    clId: int(),
+    nombreCliente: text(),
+    gestionado: int().default(0),
+  },
+  (table) => {
+    return {
+      uniqueConstraint: unique().on(table.clId),
+    };
+  },
+);
 
-export const gestionesDetalles = sqliteTable("gestiones_detalles", {
+export const gestionesDetallesTable = sqliteTable("gestiones_detalles", {
   gcId: int(),
   caId: int(),
   crId: int(),
 });
 
-export const referencias = sqliteTable("referencias", {
+export const referenciasTable = sqliteTable("referencias", {
   clId: int(),
   peIdReferencia: int(),
   identificacionReferencia: text(),
@@ -168,7 +180,7 @@ export const referencias = sqliteTable("referencias", {
   telfCasaReferencia: text(),
 });
 
-export const documentos = sqliteTable("documentos", {
+export const documentosTable = sqliteTable("documentos", {
   idFactura: int(),
   fechaFactura: text(),
   tipoComprobante: text(),
@@ -183,14 +195,15 @@ export const documentos = sqliteTable("documentos", {
   interesGastoCobranza: integer({ mode: "number" }),
   cuotasPagadas: int(),
   cuotasPorPagar: int(),
+  clId: int(),
 });
 
-export const documentosDet = sqliteTable("documentos_det", {
+export const documentosDetTable = sqliteTable("documentos_det", {
   idArticulo: int(),
   nombreArticulo: text(),
 });
 
-export const gestionesAnteriores = sqliteTable("gestiones_anteriores", {
+export const gestionesAnterioresTable = sqliteTable("gestiones_anteriores", {
   gcId: int(),
   idCliente: int(),
   nombreCliente: text(),
@@ -204,19 +217,25 @@ export const gestionesAnteriores = sqliteTable("gestiones_anteriores", {
   estadoGestion: int(),
 });
 
-export const tiposGestionesCabecera = sqliteTable("tipos_gestiones_cabecera", {
-  gcId: int(),
-  gcDescripcion: text(),
-});
+export const tiposGestionesCabeceraTable = sqliteTable(
+  "tipos_gestiones_cabecera",
+  {
+    gcId: int(),
+    gcDescripcion: text(),
+  },
+);
 
-export const tiposGestionesDetalles = sqliteTable("tipos_gestiones_detalles", {
-  gdId: int(),
-  gdDescripcion: text(),
-  gcId: int(),
-  gfCompromisoPago: text(),
-});
+export const tiposGestionesDetallesTable = sqliteTable(
+  "tipos_gestiones_detalles",
+  {
+    gdId: int(),
+    gdDescripcion: text(),
+    gcId: int(),
+    gfCompromisoPago: text(),
+  },
+);
 
-export const direcciones = sqliteTable("direcciones", {
+export const direccionesTable = sqliteTable("direcciones", {
   diId: int(),
   peId: int(),
   diDireccion: text(),
@@ -232,7 +251,7 @@ export const direcciones = sqliteTable("direcciones", {
   diCobranza: text(),
 });
 
-export const telefonos = sqliteTable("telefonos", {
+export const telefonosTable = sqliteTable("telefonos", {
   teId: int(),
   peId: int(),
   teTelefono: text(),
@@ -240,3 +259,31 @@ export const telefonos = sqliteTable("telefonos", {
   tipoTelefono: text(),
   tePrincipal: text(),
 });
+
+export const tiposReferenciaTable = sqliteTable("tipos_referencia", {
+  trId: int(),
+  trReferencia: text(),
+});
+
+export const gestionesCobranzasResultados = sqliteTable(
+  "gestiones_cobranzas_resultados",
+  {
+    gcIdCc: int(),
+    gdId: int(),
+    crLatitud: integer({ mode: "number" }),
+    crLongitud: integer({ mode: "number" }),
+    crObservaciones: text(),
+    usIdGestiona: int(),
+    crEstadoSync: text().default("PENDIENTE"),
+    caId: int(),
+    clId: int(),
+    agId: int(),
+    crIdCredito: int(),
+    cpFechaCompromiso: text(),
+    hdId: int(),
+    cpObservaciones: text(),
+    gcId: int(),
+    crFechaProxGestion: text(),
+    trId: int(),
+  },
+);

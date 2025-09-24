@@ -14,7 +14,6 @@ import TextCard from "../commons/card/TextCard";
 import { router } from "expo-router";
 import { IRecibosCabecera } from "@/models/IRecibo";
 import { useReciboStore } from "@/helper/store/storeRecibos";
-import { useObtenerRecibosCabecera } from "@/service/Recibos/useObtenerRecibosCabecera";
 import { formatCurrency } from "@/helper/function/numericas";
 import { useDebounce } from "@/hooks/debounce";
 import EmptyList from "../commons/FlatList/EmptyList";
@@ -28,13 +27,13 @@ const RecibosPrincipal = () => {
 
   const debounce = useDebounce(filtro, 500);
 
-  const {
-    data: dataRecibos,
-    isLoading: isLoadingRecibos,
-    refetch: refechRecibos,
-  } = useObtenerRecibosCabecera({
-    nombreCliente: debounce,
-  });
+  // const {
+  //   data: dataRecibos,
+  //   isLoading: isLoadingRecibos,
+  //   refetch: refechRecibos,
+  // } = useObtenerRecibosCabecera({
+  //   nombreCliente: debounce,
+  // });
 
   const redireccionar = useCallback(
     (datos: IRecibosCabecera) => {
@@ -83,7 +82,7 @@ const RecibosPrincipal = () => {
       />
 
       <View style={styles.containerLista}>
-        <FlatList
+        {/* <FlatList
           data={dataRecibos}
           renderItem={renderItem}
           contentContainerStyle={styles.containerFlatList}
@@ -101,7 +100,7 @@ const RecibosPrincipal = () => {
               tintColor="#007AFF"
             />
           }
-        />
+        /> */}
       </View>
     </View>
   );

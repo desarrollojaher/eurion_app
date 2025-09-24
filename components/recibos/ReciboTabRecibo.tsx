@@ -16,7 +16,6 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
-import { useRecibosFormaPago } from "@/service/Recibos/useRecibosFormaPago";
 import LottieAnimation from "../commons/lottie/LottieAnimation";
 import { BLANCO } from "@/constants/Colors";
 
@@ -39,7 +38,7 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
   const [index, setIndex] = useState(0);
   const imagenes = watch(`datos.${index}.imagenes`);
 
-  const { data: dataFormasPagos } = useRecibosFormaPago();
+  // const { data: dataFormasPagos } = useRecibosFormaPago();
 
   const itemsCambios = useMemo(() => {
     if (datosDocumentos.length > 0) {
@@ -89,11 +88,11 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         watch={watch}
         handleOpenModalCamara={handleOpenModalCamara}
         control={control}
-        dataFormasPagos={dataFormasPagos}
+        dataFormasPagos={[]}
         datosDocumentos={datosDocumentos}
       />
     ),
-    [control, dataFormasPagos, datosDocumentos, handleOpenModalCamara, watch]
+    [control, datosDocumentos, handleOpenModalCamara, watch]
   );
 
   return (

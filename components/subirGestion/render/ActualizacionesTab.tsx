@@ -15,7 +15,6 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { GRIS, GRIS_CLARO, NEGRO } from "@/constants/Colors";
-import { useSubirInformacionActualizacionesObtener } from "@/service/SubirInformacion/useSubirInformacionActualizacionesObtener";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
 import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
 import { ISubirInformacionActualizaciones } from "@/models/ISubirInformacion";
@@ -33,11 +32,11 @@ const ActualizacionesTab = () => {
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
   const [modalCarrucel, setModalCarrucel] = useState(false);
 
-  const {
-    data: dataActualizaciones,
-    isLoading,
-    refetch,
-  } = useSubirInformacionActualizacionesObtener();
+  // const {
+  //   data: dataActualizaciones,
+  //   isLoading,
+  //   refetch,
+  // } = useSubirInformacionActualizacionesObtener();
 
   const { mutate: eliminarActualizacion, isPending: isLoadingElimina } =
     useSubirGestionEliminarActualizaciones();
@@ -134,17 +133,17 @@ const ActualizacionesTab = () => {
   return (
     <View>
       <FlatList
-        data={dataActualizaciones}
+        data={[]}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
         keyExtractor={(datos) => datos.identificacionCliente ?? ""}
-        ListEmptyComponent={<EmptyList isLoading={isLoading} />}
-        ListFooterComponent={<LoadingComponent isLoading={isLoading} />}
+        ListEmptyComponent={<EmptyList isLoading={false} />}
+        ListFooterComponent={<LoadingComponent isLoading={false} />}
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refetch}
+            refreshing={false}
+            //onRefresh={refetch}
             colors={["#007AFF"]}
             tintColor="#007AFF"
           />

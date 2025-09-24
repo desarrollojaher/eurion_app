@@ -70,6 +70,75 @@ export const useSincronizacion = () => {
       await dbSqliteService.insertarTipoVerificaciones(tipoVerificacion);
       setCantidadDatos(tipoVerificacion.length);
 
+      setIndex(3);
+      setTabla("Gestiones");
+      const getiones = await sincronizacionApi.sincronizarGestiones();
+      setCantidadDatos(getiones.length);
+      await dbSqliteService.eliminarGestiones();
+      await dbSqliteService.sincronizarGestiones(getiones);
+
+      setIndex(4);
+      setTabla("Clientes Gestiones");
+      const clientesGestiones = await sincronizacionApi.sincronizarClientesGestiones();
+      setCantidadDatos(clientesGestiones.length);
+      await dbSqliteService.sincronizarClientesGestiones(clientesGestiones);
+
+      setIndex(5);
+      setTabla("Sincronizar Referencias");
+      const referencias = await sincronizacionApi.sincronizarReferencias();
+      setCantidadDatos(referencias.length);
+      await dbSqliteService.eliminarReferencias();
+      await dbSqliteService.sincronizarReferecias(referencias);
+
+      setIndex(6);
+      setTabla("Sincronizar Documentos");
+      const documentos = await sincronizacionApi.sincronizarComprobantes();
+      setCantidadDatos(documentos.length);
+      await dbSqliteService.eliminarComprobantes();
+      await dbSqliteService.sincronizarComprobantes(documentos);
+
+      setIndex(7);
+      setTabla("Sincronizar Tipos Gestiones cabecera");
+      const tiposGestionesCabecera = await sincronizacionApi.sincronizarTipoGestionesCabecera();
+      setCantidadDatos(tiposGestionesCabecera.length);
+      await dbSqliteService.eliminarTiposGestionesCabecera();
+      await dbSqliteService.sincronizarTiposGestionesCabecera(tiposGestionesCabecera);
+
+      setIndex(8);
+      setTabla("Sincronizar Tipos Gestiones detalle");
+      const tiposGestionesDetalle = await sincronizacionApi.sincronizarTipoGestionesDetalle();
+      setCantidadDatos(tiposGestionesDetalle.length);
+      await dbSqliteService.eliminarTiposGestionesDetalle();
+      await dbSqliteService.sincronizarTiposGestionesDetalle(tiposGestionesDetalle);
+
+      setIndex(9);
+      setTabla("Sincronizar Direcciones");
+      const direcciones = await sincronizacionApi.sincronizarDirecciones();
+      setCantidadDatos(direcciones.length);
+      await dbSqliteService.eliminarDirecciones();
+      await dbSqliteService.sincronizarDirecciones(direcciones);
+
+      setIndex(10);
+      setTabla("Sincronizar Telefonos");
+      const telefonos = await sincronizacionApi.sincronizarTelefonos();
+      setCantidadDatos(telefonos.length);
+      await dbSqliteService.eliminarTelefonos();
+      await dbSqliteService.sincronizarTelefonos(telefonos);
+
+      setIndex(10);
+      setTabla("Sincronizar Tipos Referencias");
+      const tiposReferencias = await sincronizacionApi.sincronizarTiposReferencias();
+      setCantidadDatos(telefonos.length);
+      await dbSqliteService.eliminarTiposReferencia();
+      await dbSqliteService.sincronizarTiposReferencia(tiposReferencias);
+
+      setIndex(11);
+      setTabla("Sincronizar Gestiones Pasadas");
+      const gestionesPasadas = await sincronizacionApi.sincronizarGestionesAnteriores();
+      setCantidadDatos(gestionesPasadas.length);
+      await dbSqliteService.eliminarGestionesPasadas();
+      await dbSqliteService.sincronizarGestionesAnteriores(gestionesPasadas);
+
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
         idCobrador: usuario?.usuId ?? -1,

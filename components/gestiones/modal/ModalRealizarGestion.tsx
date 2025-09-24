@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import Select, { IDatosSelect } from "@/components/commons/select/Select";
 import {
@@ -9,70 +9,62 @@ import {
 import TextInput from "@/components/commons/card/TextInput";
 import ButtonCustom from "@/components/commons/button/ButtonCustom";
 import { NEGRO } from "@/constants/Colors";
-import { useTipoGestionObtener } from "@/service/TipoGestiones/useTipoGestionObtener";
-import { cloneDeep, find, map, set } from "lodash";
-import { IGestiones } from "@/models/IGestiones";
-import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
+import { cloneDeep, find } from "lodash";
+import { IGestionesCabecera, IGestionesRealizas } from "@/models/IGestiones";
 import z from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IGestionesCelularCrear } from "@/models/IGestionesCelular";
-import { format } from "date-fns";
-import { useGuardarGestiones } from "@/service/gestiones/useGuardarGestiones";
+import { useTipoGestionesCabeceraObtener } from "@/service/TipoGestiones/useTipoGestionesCabeceraObtener";
+import { ITipoGestion, ITipoGestionDetalle } from "@/models/ITiposGestiones";
+import { useTipoGestionesDetalleObtener } from "@/service/TipoGestiones/useTipoGestionesDetalleObtener";
+import { useTiposReferenciaObtener } from "@/service/TiposReferencia/useTiposReferenciaObtener";
+import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesObtener";
+import { Toast } from "toastify-react-native";
+import { getUbicacion } from "@/helper/function/ubicacion";
+import { useSession } from "@/helper/provider/Auth";
+import { useGuardarGestion } from "@/service/Gestiones/useGuardarGestion";
 import { router } from "expo-router";
 
 const schema = z.object({
-  nroDocumento: z.string({
+  gcIdCc: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
-  fechaGestion: z
+  gdId: z.number({
+    required_error: "Obligatorio",
+    invalid_type_error: "Obligatorio",
+  }),
+  crLatitud: z.number().nullish(),
+  crLongitud: z.number().nullish(),
+  crObservaciones: z
     .string({
       required_error: "Obligatorio",
       invalid_type_error: "Obligatorio",
     })
-    .nullish(),
-  observaciones: z.string({
+    .min(1, "La observación es requerida"),
+  usIdGestiona: z.number().nullish(),
+  caId: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
-  fechaProximaGestion: z
-    .string({
-      required_error: "Obligatorio",
-      invalid_type_error: "Obligatorio",
-    })
-    .nullish(),
-  codigoTipoGestion: z.string({
+  clId: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
-  identificacionCliente: z.string({
+  agId: z.number().nullish(),
+  crIdCredito: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
-  observacionesProximaGestion: z
-    .string({
-      required_error: "Obligatorio",
-      invalid_type_error: "Obligatorio",
-    })
-    .nullish(),
-  codigoTipoGestionProxima: z.string({
+  cpFechaCompromiso: z.string().nullish(),
+  hdId: z.number().nullish(),
+  cpObservaciones: z.string().nullish(),
+  gcId: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
-  latitud: z.number({
-    required_error: "Obligatorio",
-    invalid_type_error: "Obligatorio",
-  }),
-  longitud: z.number({
-    required_error: "Obligatorio",
-    invalid_type_error: "Obligatorio",
-  }),
-  sincronizado: z.number({
-    required_error: "Obligatorio",
-    invalid_type_error: "Obligatorio",
-  }),
-  tipoReferencia: z.string({
+  crFechaProxGestion: z.string().nullish(),
+  trId: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
@@ -81,7 +73,7 @@ const schema = z.object({
 interface PropsModalRealizarGestion {
   visible: boolean;
   onClose: () => void;
-  datos: IGestiones;
+  datos: IGestionesCabecera;
   seccion?: "cabecera" | "detalles";
 }
 
@@ -97,79 +89,178 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
-  } = useForm<IGestionesCelularCrear>({
+  } = useForm<IGestionesRealizas>({
     resolver: zodResolver(schema),
     defaultValues: {
-      identificacionCliente: datos.identificacionCliente,
-      sincronizado: 0,
-      latitud: datos.latitud,
-      longitud: datos.longitud,
+      crLatitud: null,
+      crLongitud: null,
+      clId: datos.cliId,
+      hdId: datos.idHojaRuta,
     },
   });
 
-  const tipoGestion = watch("codigoTipoGestion");
+  const [seleccionCabecera, setSeleccionCabecera] = useState<ITipoGestion>();
+  const [seleccionDetalle, setSeleccionDetalle] =
+    useState<ITipoGestionDetalle>();
 
-  const { data: tipoGestiones } = useTipoGestionObtener();
-  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
-    identificacion: datos.identificacionCliente,
-  });
-  const { mutate: gardarGestiones, isPending: isLoadingGestiones } =
-    useGuardarGestiones();
+  const [guardandoGestion, setGuardandoGestion] = useState(false);
 
-  const tipoReferencia = useMemo(() => {
-    return [
-      { label: "CLIENTE", value: "CLIENTE" },
-      { label: "FAMILIAR", value: "FAMILIAR" },
-      { label: "TIPO REFERENCIA", value: "TIPOREFERENCIA" },
-    ];
-  }, []);
+  const { data: dataTiposGestionesCabecera } =
+    useTipoGestionesCabeceraObtener();
 
-  const tipoGestionesFiltro = useMemo(() => {
-    const datos: IDatosSelect[] = [];
-    map(tipoGestiones, (item) => {
-      const elemento: IDatosSelect = {
-        label: item.descripcion ?? "",
-        value: item.codigo ?? "",
-      };
-      datos.push(elemento);
-    });
-    return datos;
-  }, [tipoGestiones]);
+  const { data: dataTiposGestionesDetalles } = useTipoGestionesDetalleObtener(
+    {
+      gcId: seleccionCabecera?.gcId ?? 0,
+    },
+    { enabled: seleccionCabecera?.gcId !== undefined },
+  );
 
-  const documentos = useMemo(() => {
-    const datos: IDatosSelect[] = [];
-    map(datosDocumentos, (item) => {
-      const elemento: IDatosSelect = {
-        label: item.nroDocumento ?? "",
-        value: item.nroDocumento ?? "",
-      };
-      datos.push(elemento);
-    });
-    return datos;
-  }, [datosDocumentos]);
+  const { data: dataTiposReferencias } = useTiposReferenciaObtener();
+
+  const { data: dataComprobantes } = useComprobantesObtener(
+    { clId: datos.cliId },
+    { enabled: datos.cliId !== undefined },
+  );
+
+  const { mutate: guardarGestion, isPending: isLoadingGuardarGestion } =
+    useGuardarGestion();
+
+  const { usuario } = useSession();
+
+  const tiposReferencias = useMemo(() => {
+    return dataTiposReferencias
+      ? dataTiposReferencias?.map((item) => {
+          return {
+            label: item.trReferencia ?? "",
+            value: item.trId?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataTiposReferencias]);
+
+  const tipoGestionCabecera = useMemo(() => {
+    return dataTiposGestionesCabecera
+      ? dataTiposGestionesCabecera?.map((item) => {
+          return {
+            label: item.gcDescripcion ?? "",
+            value: item.gcId?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataTiposGestionesCabecera]);
+
+  const tipoGestionDetalle = useMemo(() => {
+    return dataTiposGestionesDetalles
+      ? dataTiposGestionesDetalles?.map((item) => {
+          return {
+            label: item.gdDescripcion ?? "",
+            value: item.gdId?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataTiposGestionesDetalles]);
+
+  const comprobantes = useMemo(() => {
+    return dataComprobantes
+      ? dataComprobantes?.map((item) => {
+          return {
+            label: `${item.tipoComprobante} ${item.idCredito}`,
+            value: item.idCredito?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataComprobantes]);
 
   const handleChanceTipoGestion = useCallback(
     (value: IDatosSelect) => {
-      setValue("codigoTipoGestion", value.value);
-      setValue("codigoTipoGestionProxima", value.value);
-      setValue("fechaProximaGestion", null);
+      const gestion = find(dataTiposGestionesCabecera, (item) => {
+        return item.gcId === Number(value.value);
+      });
+      setValue("gcIdCc", Number(value.value));
+      setValue("gdId", -1);
+      if (gestion) {
+        setSeleccionCabecera(gestion);
+      }
     },
-    [setValue]
+    [dataTiposGestionesCabecera, setValue],
+  );
+
+  const handleChanceTipoGestionDetalle = useCallback(
+    (value: IDatosSelect) => {
+      const gestion = find(dataTiposGestionesDetalles, (item) => {
+        return item.gdId === Number(value.value);
+      });
+      setValue("gdId", Number(value.value));
+      if (gestion) {
+        setSeleccionDetalle(gestion);
+      }
+    },
+    [dataTiposGestionesDetalles, setValue],
+  );
+
+  const handleChanceTipoReferencia = useCallback(
+    (value: IDatosSelect) => {
+      setValue("trId", Number(value.value));
+    },
+    [setValue],
   );
 
   const handleChanceFactura = useCallback(
     (value: IDatosSelect) => {
-      setValue("nroDocumento", value.value);
+      const fac = find(dataComprobantes, (item) => {
+        return item.idCredito === Number(value.value);
+      });
+      setValue("crIdCredito", Number(value.value));
+      if (fac && fac?.gcId && fac?.caId) {
+        setValue("gcId", fac?.gcId);
+        setValue("caId", fac?.caId);
+      }
     },
-    [setValue]
+    [dataComprobantes, setValue],
   );
 
   const onSuccess = useCallback(
-    (data: IGestionesCelularCrear) => {
+    async (data: IGestionesRealizas) => {
+      setGuardandoGestion(true);
       let dataAux = cloneDeep(data);
-      dataAux.fechaGestion = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-      gardarGestiones(dataAux, {
+
+      const localizacion = await getUbicacion();
+
+      const tipoGestion = find(dataTiposGestionesDetalles, (item) => {
+        return item.gdId === dataAux.gdId;
+      });
+
+      if (!tipoGestion) {
+        Toast.error("No existe el tipo gestion");
+        setGuardandoGestion(false);
+        return;
+      }
+
+      if (tipoGestion.gfCompromisoPago === "S") {
+        dataAux.cpObservaciones = data.cpObservaciones;
+        dataAux.crObservaciones = "";
+        if (!dataAux.cpFechaCompromiso) {
+          Toast.error("Seleccione una fecha de compromiso");
+          setGuardandoGestion(false);
+          return;
+        }
+      } else {
+        dataAux.cpFechaCompromiso = null;
+      }
+
+      if (!localizacion) {
+        Toast.error("El GPS no tiene permiso");
+        setGuardandoGestion(false);
+        return;
+      }
+      dataAux.crLatitud = localizacion.coords.latitude;
+      dataAux.crLongitud = localizacion.coords.longitude;
+      dataAux.usIdGestiona = usuario?.usuId ?? -1;
+
+      console.log(dataAux);
+
+      setGuardandoGestion(false);
+      guardarGestion(dataAux, {
         onSuccess: () => {
           if (seccion === "detalles") {
             router.back();
@@ -179,7 +270,14 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
         },
       });
     },
-    [gardarGestiones, onClose, reset, seccion]
+    [
+      dataTiposGestionesDetalles,
+      guardarGestion,
+      onClose,
+      reset,
+      seccion,
+      usuario,
+    ],
   );
   const onError = useCallback((error: any) => {
     console.log("Error al enviar los datos:", error);
@@ -188,59 +286,48 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
   return (
     <ModalCustom onClose={onClose} visible={visible} titulo="Realizar Gestión">
       <View style={styles.container}>
-        <Text>Gestion</Text>
-        <Select
-          datos={tipoGestionesFiltro}
-          styleContainer={styles.styleSelect}
-          onSelect={handleChanceTipoGestion}
-          isError={!!errors.codigoTipoGestion}
-          labelError={errors.codigoTipoGestion?.message}
-        />
-      </View>
-
-      <View style={styles.container}>
-        <Text>Factura</Text>
+        <Text>Tipo Gestion</Text>
         <Controller
           control={control}
-          name="nroDocumento"
+          name="gcIdCc"
           render={({ field: { value } }) => (
             <Select
-              defaultValue={find(documentos, (item) => item.value === value)}
-              datos={documentos}
+              datos={tipoGestionCabecera}
               styleContainer={styles.styleSelect}
-              onSelect={handleChanceFactura}
-              isError={!!errors.nroDocumento}
-              labelError={errors.nroDocumento?.message}
+              defaultValue={find(tipoGestionCabecera, (item) => {
+                return Number(item.value) === value;
+              })}
+              onSelect={handleChanceTipoGestion}
+              isError={!!errors.gcIdCc}
+              labelError={errors.gcIdCc?.message}
             />
           )}
         />
       </View>
-
       <View style={styles.container}>
-        <Text>Tipo referencia</Text>
+        <Text>Tipo Gestion Detalle</Text>
         <Controller
-          name="tipoReferencia"
           control={control}
-          render={({ field: { value, onChange } }) => (
+          name="gdId"
+          render={({ field: { value } }) => (
             <Select
-              datos={tipoReferencia}
+              datos={tipoGestionDetalle}
               styleContainer={styles.styleSelect}
-              defaultValue={find(
-                tipoReferencia,
-                (item) => item.value === value
-              )}
-              onSelect={(e) => onChange(e.value)}
+              defaultValue={find(tipoGestionDetalle, (item) => {
+                return Number(item.value) === value;
+              })}
+              onSelect={handleChanceTipoGestionDetalle}
+              isError={!!errors.gdId}
+              labelError={errors.gdId?.message}
             />
           )}
         />
       </View>
-
-      {find(tipoGestiones, (item) => item.codigo === tipoGestion)?.pideFecha ===
-        1 && (
+      {seleccionDetalle && seleccionDetalle.gfCompromisoPago === "S" && (
         <View style={styles.container}>
           <Controller
             control={control}
-            name="fechaProximaGestion"
+            name="cpFechaCompromiso"
             render={({ field: { value, onChange } }) => (
               <TextInput
                 text="Fecha Próximo Pago"
@@ -257,37 +344,49 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
           />
         </View>
       )}
-
-      {/* <View style={styles.container}>
-        <TextInput
-          text="Telefono"
-          tipo="text"
-          direction="column"
-          placeholder="Telefono"
-          defaultValueText={datos.telefono ?? ""}
-          styleContainer={styles.containerObservaciones}
-          styleHeader={styles.textHeader}
-          styleTextInput={styles.styleInput}
-          readOnly
+      <View style={styles.container}>
+        <Text>Tipo Referencia</Text>
+        <Controller
+          control={control}
+          name="trId"
+          render={({ field: { value } }) => (
+            <Select
+              datos={tiposReferencias}
+              styleContainer={styles.styleSelect}
+              defaultValue={find(tiposReferencias, (item) => {
+                return Number(item.value) === value;
+              })}
+              onSelect={handleChanceTipoReferencia}
+              isError={!!errors.trId}
+              labelError={errors.trId?.message}
+            />
+          )}
+        />
+      </View>
+      <View style={styles.container}>
+        <Text>Factura</Text>
+        <Controller
+          control={control}
+          name="crIdCredito"
+          render={({ field: { value } }) => (
+            <Select
+              datos={comprobantes}
+              styleContainer={styles.styleSelect}
+              onSelect={handleChanceFactura}
+              defaultValue={find(comprobantes, (item) => {
+                return Number(item.value) === value;
+              })}
+              isError={!!errors.crIdCredito}
+              labelError={errors.crIdCredito?.message}
+            />
+          )}
         />
       </View>
 
       <View style={styles.container}>
-        <TextInput
-          text="Nuevo numero"
-          tipo="text"
-          direction="column"
-          placeholder="Nuevo numero"
-          styleContainer={styles.containerObservaciones}
-          styleHeader={styles.textHeader}
-          styleTextInput={styles.styleInput}
-        />
-      </View> */}
-
-      <View style={styles.container}>
         <Controller
           control={control}
-          name="observaciones"
+          name="crObservaciones"
           render={({ field: { onChange, value } }) => (
             <TextInput
               onChangeText={onChange}
@@ -299,8 +398,8 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
               multiline
               styleContainer={styles.containerObservaciones}
               styleTextInput={styles.styleInput}
-              isError={!!errors.observaciones}
-              labelError={errors.observaciones?.message}
+              isError={!!errors.crObservaciones}
+              labelError={errors.crObservaciones?.message}
             />
           )}
         />
@@ -309,8 +408,8 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
         <ButtonCustom
           label="Guardar"
           onPress={handleSubmit(onSuccess, onError)}
-          disabled={isLoadingGestiones}
-          isLoading={isLoadingGestiones}
+          disabled={guardandoGestion || isLoadingGuardarGestion}
+          isLoading={guardandoGestion || isLoadingGuardarGestion}
         />
       </View>
     </ModalCustom>

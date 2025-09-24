@@ -5,102 +5,125 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import TextCardIcon from "../commons/card/TextCardIcon";
-import Icon from "react-native-vector-icons/FontAwesome5";
 import HeaderCard from "../commons/card/HeaderCard";
 import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import ModalClientes from "./modal/ModalClientes";
 import ModalVivienda from "./modal/ModalVivienda";
-import { useClienteObtener } from "@/service/Cliente/useClienteObtener";
-import { useClienteConyugueObtener } from "@/service/Cliente/useClienteConyugueObtener";
-import { useClienteGaranteObtener } from "@/service/Cliente/useClienteGaranteObtener";
 import { ICliente, IClienteGaranteCobranza } from "@/models/ICliente";
 import { IClienteConyugue } from "@/models/IConyugue";
-import { useClienteViviendaObtener } from "@/service/Cliente/useClienteViviendaObtener";
 import { IDireccionGcobranza } from "@/models/IDireccion";
 import Select, { IDatosSelect } from "../commons/select/Select";
 import { find } from "lodash";
-import { useObtenerGestionesPasadas } from "@/service/gestiones/useObtenerGestionesPasadas";
 import { IGestionesCelularPasadas } from "@/models/IGestionesCelular";
 import { format } from "date-fns";
-import { useDocumentosCabeceraObtener } from "@/service/Documentos/useDocumentosCabeceraObtener";
 import Separador from "../commons/separador/Separador";
+import { useGestionesPasadas } from "@/service/Gestiones/useGestionesPasadas";
+import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesObtener";
+import { IGestionesAnteriores } from "@/models/IGestiones";
 
 interface PropsGestionPageDetallesCliente {
-  identificacionCliente: string;
+  clId: number;
 }
 const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
-  identificacionCliente,
+  clId,
 }) => {
   const [modalClientes, setModalClientes] = useState(false);
   const [modalVivienda, setModalVivienda] = useState(false);
-  const [documetoSeleccionado, setDocumentoSeleccionado] = useState<string>("");
 
   const [cliente, setCliente] = useState<Partial<ICliente> | null>(null);
 
   const [vivienda, setVivienda] = useState<IDireccionGcobranza | null>(null);
 
-  const { data: datosCliente } = useClienteObtener({
-    identificacion: identificacionCliente,
-  });
+  const [documento, setDocumento] = useState<IDatosSelect | null>(null);
 
-  const { data: datosClienteConyugue } = useClienteConyugueObtener({
-    identificacion: identificacionCliente,
-  });
+  const { data: dataComprobantes } = useComprobantesObtener({ clId: clId });
 
-  const { data: datosClienteGarante } = useClienteGaranteObtener({
-    identificacion: identificacionCliente,
-  });
+  const { data: datosGestionesAnteriores } = useGestionesPasadas(
+    {
+      crId: Number(documento?.value ?? "0"),
+    },
+    {
+      enabled: !!documento && !!documento?.value,
+    },
+  );
 
-  const { data: datosClienteVivienda } = useClienteViviendaObtener({
-    identificacion: identificacionCliente,
-  });
+  console.log(dataComprobantes);
+  
 
-  const { data: datosDocumentos } = useDocumentosCabeceraObtener({
-    identificacion: identificacionCliente,
-  });
+  const comprobantes = useMemo(() => {
+    return dataComprobantes
+      ? dataComprobantes?.map((item) => {
+          return {
+            label: `${item.tipoComprobante} ${item.idCredito}`,
+            value: item.idCredito?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataComprobantes]);
 
-  const { data: dataGestionesPasadas } = useObtenerGestionesPasadas({
-    nroDocumento: documetoSeleccionado,
-  });
+  console.log(datosGestionesAnteriores);
 
-  const datosDocumentosCabecera = useMemo<IDatosSelect[]>(() => {
-    if (datosDocumentos && datosDocumentos.length > 0) {
-      setDocumentoSeleccionado(datosDocumentos[0].nroDocumento);
-      return datosDocumentos.map((item) => {
-        return {
-          label: item.nroDocumento,
-          value: item.nroDocumento,
-        };
-      });
-    } else {
-      return [];
-    }
-  }, [datosDocumentos]);
+  // const { data: datosCliente } = useClienteObtener({
+  //   identificacion: identificacionCliente,
+  // });
+
+  // const { data: datosClienteConyugue } = useClienteConyugueObtener({
+  //   identificacion: identificacionCliente,
+  // });
+
+  // const { data: datosClienteGarante } = useClienteGaranteObtener({
+  //   identificacion: identificacionCliente,
+  // });
+
+  // const { data: datosClienteVivienda } = useClienteViviendaObtener({
+  //   identificacion: identificacionCliente,
+  // });
+
+  // const { data: datosDocumentos } = useDocumentosCabeceraObtener({
+  //   identificacion: identificacionCliente,
+  // });
+
+  // const { data: dataGestionesPasadas } = useObtenerGestionesPasadas({
+  //   nroDocumento: documetoSeleccionado,
+  // });
+
+  // const datosDocumentosCabecera = useMemo<IDatosSelect[]>(() => {
+  //   if (datosDocumentos && datosDocumentos.length > 0) {
+  //     setDocumentoSeleccionado(datosDocumentos[0].nroDocumento);
+  //     return datosDocumentos.map((item) => {
+  //       return {
+  //         label: item.nroDocumento,
+  //         value: item.nroDocumento,
+  //       };
+  //     });
+  //   } else {
+  //     return [];
+  //   }
+  // }, [datosDocumentos]);
 
   const handleOpenCliente = useCallback((datos: ICliente | null) => {
     setCliente(datos);
     setModalClientes(true);
   }, []);
   const handleOpenConyugue = useCallback((dato: IClienteConyugue) => {
-    setCliente({
-      apellido: dato.apellido,
-      identificacion: dato.identificacion,
-      nombres: dato.nombres,
-      observacion: dato.ocupacionLaboral,
-      referencias: dato.referencias,
-    });
+    // setCliente({
+    //   apellido: dato.apellido,
+    //   identificacion: dato.identificacion,
+    //   nombres: dato.nombres,
+    //   observacion: dato.ocupacionLaboral,
+    //   referencias: dato.referencias,
+    // });
     setModalClientes(true);
   }, []);
 
   const handleOpenGarante = useCallback((dato: IClienteGaranteCobranza) => {
-    setCliente({
-      identificacion: dato.identificacion,
-      nombres: dato.nombres,
-      telefono: dato.telefono,
-      observacion: dato.trabajaEn,
-      referencias: dato.detalleDireccion,
-    });
+    // setCliente({
+    //   identificacion: dato.identificacion,
+    //   nombres: dato.nombres,
+    //   telefono: dato.telefono,
+    //   observacion: dato.trabajaEn,
+    //   referencias: dato.detalleDireccion,
+    // });
     setModalClientes(true);
   }, []);
 
@@ -118,45 +141,45 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   }, []);
 
   const handleSeleccionarDocumento = useCallback((dato: IDatosSelect) => {
-    setDocumentoSeleccionado(dato.value);
+    setDocumento(dato);
   }, []);
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IGestionesCelularPasadas; index: number }) => (
+    ({ item, index }: { item: IGestionesAnteriores; index: number }) => (
       <Card width={convertirTamanoHorizontal(370)}>
         <HeaderCard
-          labelRight={format(item.fechaGestion, "dd-MM-yyyy HH:mm:ss")}
+          labelRight={format(item.fechaGestionado ?? "", "dd-MM-yyyy HH:mm:ss")}
           styleRight={styles.styleHeaderCardRigth}
         />
         <HeaderCard
           labelLeft="Observación"
-          labelRight={item.observacion}
+          labelRight={item.geObservacion}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
         <Separador color={GRIS_CLARO} />
-        <HeaderCard
+        {/* <HeaderCard
           labelLeft="Tipo Gestión"
-          labelRight={item.tipoGestion}
+          labelRight={item.}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
-        <Separador color={GRIS_CLARO} />
+        <Separador color={GRIS_CLARO} /> */}
         <HeaderCard
           labelLeft="Gestor"
-          labelRight="ARBITO DIAS ROLANDO MARTIN"
+          labelRight={item.nombreGestiona}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
       </Card>
     ),
-    []
+    [],
   );
 
   return (
     <View style={styles.containerDetalles}>
       <Card width={convertirTamanoHorizontal(370)}>
-        {datosCliente && datosCliente.length > 0 && (
+        {/* {datosCliente && datosCliente.length > 0 && (
           <TextCardIcon
             icon={
               <Icon
@@ -213,16 +236,16 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
             textCabecera="Vivienda"
             onPress={() => handleOpenVivienda(datosClienteVivienda[0])}
           />
-        )}
+        )} */}
       </Card>
-      {datosDocumentosCabecera && datosDocumentosCabecera.length > 1 && (
+      {comprobantes && comprobantes.length > 1 && (
         <Card>
           <Select
-            datos={datosDocumentosCabecera}
+            datos={comprobantes}
             styleContainer={styles.styleContainer}
             defaultValue={find(
-              datosDocumentosCabecera,
-              (item) => item.label === documetoSeleccionado
+              comprobantes,
+              (item) => item.label === documento?.label,
             )}
             onSelect={handleSeleccionarDocumento}
           />
@@ -230,7 +253,7 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
       )}
 
       <FlatList
-        data={dataGestionesPasadas}
+        data={datosGestionesAnteriores}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}

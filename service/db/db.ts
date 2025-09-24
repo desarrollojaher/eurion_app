@@ -1,6 +1,16 @@
 import * as schema from "@/db/schema";
 import { ISincronizado } from "@/models/ISincronizado";
-import { and, asc, desc, eq, like, notInArray, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  like,
+  notInArray,
+  or,
+  sql,
+  sum,
+} from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacion,
@@ -12,7 +22,7 @@ import {
   IVerificacionesGuardar,
   IVerificacionesVdId,
 } from "@/models/IVerificaciones";
-import { ICliente } from "@/models/ICliente";
+import { ICliente, IClientesGestion } from "@/models/ICliente";
 import { IConyugue } from "@/models/IConyugue";
 import { IVivienda } from "@/models/IVivienda";
 import {
@@ -26,6 +36,28 @@ import {
   ISubirInformacionEliminar,
 } from "@/models/ISubirInformacion";
 import { db } from "@/helper/db/db";
+import {
+  IGestionCabeceraParams,
+  IGestiones,
+  IGestionesAnteriores,
+  IGestionesAnterioresParams,
+  IGestionesCabecera,
+  IGestionesRealizas,
+} from "@/models/IGestiones";
+import { IReferencia } from "@/models/IReferencia";
+import {
+  IComprobante,
+  IComprobanteObtener,
+  IComprobanteObtenerParams,
+} from "@/models/IComprobante";
+import {
+  ITipoGestion,
+  ITipoGestionDetalle,
+  ITipoGestionDetalleParams,
+} from "@/models/ITiposGestiones";
+import { IDireccion } from "@/models/IDireccion";
+import { ITelefono } from "@/models/ITelefono";
+import { ITipoReferencia } from "@/models/ITipoReferencia";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -389,7 +421,7 @@ export const dbSqliteService = {
 
   obtenerTiposVerificacion: async () => {
     try {
-      const tipoVerificaicones: ITiposVerificaciones = await db
+      const tipoVerificaicones: ITiposVerificaciones[] = await db
         .select()
         .from(schema.tiposVerificacionTable);
       return tipoVerificaicones;
@@ -438,7 +470,7 @@ export const dbSqliteService = {
           vdId: data.vdId,
           vrComentario: data.veComentario,
           vrFechaVerificacion: data.vrFechaVerificacion,
-          vrId: data.vrId,
+          vrId: data.vrId !== null ? data.vrId : undefined,
           vrLatitud: data.vrLatitud,
           vrLongitud: data.vrLongitud,
           vrProcesado: 0,
@@ -653,6 +685,442 @@ export const dbSqliteService = {
       await db.run("COMMIT");
     } catch (error: any) {
       await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarGestiones: async (data: IGestiones[]) => {
+    try {
+      await db
+        .insert(schema.gestionesTable)
+        .values(data)
+        .onConflictDoNothing({
+          target: [schema.gestionesTable.clId],
+        });
+      for (let i = 0; i < data.length; i++) {
+        await db
+          .insert(schema.gestionesDetallesTable)
+          .values(data[i].gestiones);
+      }
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  eliminarGestiones: async () => {
+    try {
+      await db
+        .delete(schema.gestionesTable)
+        .where(eq(schema.gestionesTable.gestionado, 0));
+      await db.delete(schema.gestionesDetallesTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  sincronizarClientesGestiones: async (data: IClientesGestion[]) => {
+    try {
+      for (let i = 0; i < data.length; i++) {
+        await db
+          .insert(schema.clienteTable)
+          .values(data[i].cliente)
+          .onConflictDoUpdate({
+            target: [schema.clienteTable.idCliente],
+            set: { ...data[i].cliente },
+          });
+        await db.insert(schema.viviendaTable).values(data[i].vivienda);
+      }
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarReferecias: async (data: IReferencia[]) => {
+    try {
+      await db.insert(schema.referenciasTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarReferencias: async () => {
+    try {
+      await db.delete(schema.referenciasTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarComprobantes: async (data: IComprobante[]) => {
+    try {
+      await db.insert(schema.documentosTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarComprobantes: async () => {
+    try {
+      await db.delete(schema.documentosTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarGestionesAnteriores: async (data: IGestionesAnteriores[]) => {
+    try {
+      await db.insert(schema.gestionesAnterioresTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarGestionesAnteriores: async () => {
+    try {
+      await db.delete(schema.gestionesAnterioresTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarTiposGestionesCabecera: async (data: ITipoGestion[]) => {
+    try {
+      await db.insert(schema.tiposGestionesCabeceraTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarTiposGestionesCabecera: async () => {
+    try {
+      await db.delete(schema.tiposGestionesCabeceraTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarTiposGestionesDetalle: async (data: ITipoGestionDetalle[]) => {
+    try {
+      await db.insert(schema.tiposGestionesDetallesTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarTiposGestionesDetalle: async () => {
+    try {
+      await db.delete(schema.tiposGestionesDetallesTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarDirecciones: async (data: IDireccion[]) => {
+    try {
+      await db.insert(schema.direccionesTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarDirecciones: async () => {
+    try {
+      await db.delete(schema.direccionesTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarTelefonos: async (data: ITelefono[]) => {
+    try {
+      await db.insert(schema.telefonosTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarTelefonos: async () => {
+    try {
+      await db.delete(schema.telefonosTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarTiposReferencia: async (data: ITipoReferencia[]) => {
+    try {
+      await db.insert(schema.tiposReferenciaTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarTiposReferencia: async () => {
+    try {
+      await db.delete(schema.tiposReferenciaTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  sincronizarGestionesAnteriores: async (data: IGestionesAnteriores[]) => {
+    try {
+      await db.insert(schema.gestionesAnterioresTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarGestionesPasadas: async () => {
+    try {
+      await db.delete(schema.gestionesAnterioresTable);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerGestionesCabecera: async (params: IGestionCabeceraParams) => {
+    try {
+      const gestiones: IGestionesCabecera[] = await db
+        .select({
+          nombreCliente: schema.clienteTable.nombreCliente,
+          apellidoCliente: schema.clienteTable.apellidoCliente,
+          identificacion: schema.clienteTable.identificacionCliente,
+          direccionCliente: schema.direccionesTable.diDireccion,
+          deudaTotal: sum(schema.documentosTable.crSaldoCapital),
+          deudaPendiente: sum(schema.documentosTable.crSaldoCredito),
+          latitudCliente: schema.direccionesTable.diLatitud,
+          longitudCliente: schema.direccionesTable.diLongitud,
+          cliId: schema.clienteTable.idCliente,
+          idHojaRuta: schema.gestionesTable.idHojaRuta,
+        })
+        .from(schema.gestionesTable)
+        .leftJoin(
+          schema.clienteTable,
+          eq(schema.clienteTable.idCliente, schema.gestionesTable.clId),
+        )
+        .leftJoin(
+          schema.direccionesTable,
+          eq(schema.direccionesTable.peId, schema.clienteTable.personaId),
+        )
+        .leftJoin(
+          schema.documentosTable,
+          eq(schema.documentosTable.clId, schema.clienteTable.idCliente),
+        )
+        .where(
+          and(
+            eq(schema.direccionesTable.diCobranza, "S"),
+            eq(schema.gestionesTable.gestionado, 0),
+            or(
+              like(schema.clienteTable.apellidoCliente, `%${params.buscador}%`),
+              like(schema.clienteTable.nombreCliente, `%${params.buscador}%`),
+            ),
+          ),
+        )
+        .groupBy(schema.clienteTable.idCliente);
+
+      return gestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerTiposGestionesCabecera: async () => {
+    try {
+      const tiposGestiones: ITipoGestion[] = await db
+        .select({
+          gcId: schema.tiposGestionesCabeceraTable.gcId,
+          gcDescripcion: schema.tiposGestionesCabeceraTable.gcDescripcion,
+        })
+        .from(schema.tiposGestionesCabeceraTable);
+      return tiposGestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerTiposGestionesDetalles: async (params: ITipoGestionDetalleParams) => {
+    try {
+      const tiposGestiones: ITipoGestionDetalle[] = await db
+        .select({
+          gcId: schema.tiposGestionesDetallesTable.gcId,
+          gdId: schema.tiposGestionesDetallesTable.gdId,
+          gdDescripcion: schema.tiposGestionesDetallesTable.gdDescripcion,
+          gfCompromisoPago: schema.tiposGestionesDetallesTable.gfCompromisoPago,
+        })
+        .from(schema.tiposGestionesDetallesTable)
+        .where(eq(schema.tiposGestionesDetallesTable.gcId, params.gcId));
+      return tiposGestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerTiposReferencia: async () => {
+    try {
+      const tiposReferencia: ITipoReferencia[] = await db
+        .select({
+          trId: schema.tiposReferenciaTable.trId,
+          trReferencia: schema.tiposReferenciaTable.trReferencia,
+        })
+        .from(schema.tiposReferenciaTable);
+      return tiposReferencia;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerFacturas: async (params: IComprobanteObtenerParams) => {
+    try {
+      const facturas: IComprobanteObtener[] = await db
+        .select({
+          idFactura: schema.documentosTable.idFactura,
+          fechaFactura: schema.documentosTable.fechaFactura,
+          tipoComprobante: schema.documentosTable.tipoComprobante,
+          idCredito: schema.documentosTable.idCredito,
+          nroCuotas: schema.documentosTable.nroCuotas,
+          valorCuota: schema.documentosTable.valorCuota,
+          valorTotalCredito: schema.documentosTable.valorTotalCredito,
+          crSaldoCapital: schema.documentosTable.crSaldoCapital,
+          crSaldoInteres: schema.documentosTable.crSaldoInteres,
+          crSaldoCredito: schema.documentosTable.crSaldoCredito,
+          interesGastoMora: schema.documentosTable.interesGastoMora,
+          interesGastoCobranza: schema.documentosTable.interesGastoCobranza,
+          cuotasPagadas: schema.documentosTable.cuotasPagadas,
+          cuotasPorPagar: schema.documentosTable.cuotasPorPagar,
+          clId: schema.documentosTable.clId,
+          caId: schema.gestionesDetallesTable.caId,
+          gcId: schema.gestionesDetallesTable.gcId,
+        })
+        .from(schema.documentosTable)
+        .leftJoin(
+          schema.gestionesDetallesTable,
+          eq(
+            schema.documentosTable.idCredito,
+            schema.gestionesDetallesTable.crId,
+          ),
+        )
+        .where(eq(schema.documentosTable.clId, params.clId));
+      return facturas;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  guardarGestiones: async (data: IGestionesRealizas) => {
+    try {
+      await db.run("BEGIN TRANSACTION");
+      await db.insert(schema.gestionesCobranzasResultados).values(data);
+      await db
+        .update(schema.gestionesTable)
+        .set({ gestionado: 1 })
+        .where(eq(schema.gestionesTable.clId, data.clId));
+      await db.run("COMMIT");
+    } catch (error: any) {
+      await db.run("ROLLBACK");
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerGestionesPasadas: async (params: IGestionesAnterioresParams) => {
+    try {
+      const gestiones: IGestionesAnteriores[] = await db
+        .select({
+          gcId: schema.gestionesAnterioresTable.gcId,
+          idCliente: schema.gestionesAnterioresTable.idCredito,
+          nombreCliente: schema.gestionesAnterioresTable.nombreCliente,
+          codComprobanteStock:
+            schema.gestionesAnterioresTable.codComprobanteStock,
+          idCredito: schema.gestionesAnterioresTable.idCredito,
+          idFactura: schema.gestionesAnterioresTable.idFactura,
+          nombreGestiona: schema.gestionesAnterioresTable.nombreGestiona,
+          fechaGestionado: schema.gestionesAnterioresTable.fechaGestionado,
+          fechaProxGestion: schema.gestionesAnterioresTable.fechaProxGestion,
+          geObservacion: schema.gestionesAnterioresTable.geObservacion,
+          estadoGestion: schema.gestionesAnterioresTable.estadoGestion,
+        })
+        .from(schema.gestionesAnterioresTable)
+        .where(eq(schema.gestionesAnterioresTable.idCredito, params.crId));
+      return gestiones;
+    } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
         mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
