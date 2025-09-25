@@ -1,4 +1,5 @@
 export interface IProducto {
-  idArticulo: number;
-  nombreArticulo: string;
+  idArticulo: number | null;
+  nombreArticulo: string | null;
+  crId: number | null;
 }

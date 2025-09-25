@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import { IRecibosCabecera } from "@/models/IRecibo";
+import { IDocumentosRecibos } from "@/models/IDocumentos";
 
 type IRecibosStore = {
-  datos: IRecibosCabecera | null;
+  datos: IDocumentosRecibos | null;
   eliminar: () => void;
-  setDatos: (dato: IRecibosCabecera) => void;
+  setDatos: (dato: IDocumentosRecibos) => void;
 };
 
 export const useReciboStore = create<IRecibosStore>()((set, get) => ({
   datos: null,
   eliminar: () => set(() => ({ datos: null })),
-  setDatos: (dato: IRecibosCabecera) => set(() => ({ datos: dato })),
+  setDatos: (dato: IDocumentosRecibos) => set(() => ({ datos: dato })),
 }));

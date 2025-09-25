@@ -18,14 +18,7 @@ export interface IDocumentos {
 
 export interface IRecibosEnviarDetalles {
   tipoPago: string;
-  numeroDocumento?: string | null;
-  fechaVencimiento?: string | null;
-  emisor?: string | null;
-  numeroCuenta?: string | null;
-  propieario?: string | null;
-  numeroCheque?: string | null;
   valor?: number | null | any;
-  banco?: string | null;
 }
 
 export interface IReciboEnviar {
@@ -71,4 +64,4 @@ export interface IRecibosCabeceraListado {
 
 export type IRecibosEliminarParams = {
   id: number;
-}
+};

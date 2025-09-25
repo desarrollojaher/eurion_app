@@ -139,6 +139,13 @@ export const useSincronizacion = () => {
       await dbSqliteService.eliminarGestionesPasadas();
       await dbSqliteService.sincronizarGestionesAnteriores(gestionesPasadas);
 
+       setIndex(12);
+      setTabla("Sincronizar Formas Pago");
+      const formasPago = await sincronizacionApi.sincronizarFormasPago();
+      setCantidadDatos(formasPago.length);
+      await dbSqliteService.eliminarFormasPago();
+      await dbSqliteService.sincronizarFormasPago(formasPago);
+
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
         idCobrador: usuario?.usuId ?? -1,

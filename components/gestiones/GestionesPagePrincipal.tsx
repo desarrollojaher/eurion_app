@@ -25,7 +25,6 @@ import TextCard from "../commons/card/TextCard";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
-import ModalFiltros from "./modal/ModalFiltros";
 import ModalCarrucelImagenes from "../commons/carousel/ModalCarrucelImagenes";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import { router } from "expo-router";
@@ -38,14 +37,11 @@ import { useGestionStore } from "@/helper/store/storeGestiones";
 import { useObtenerGestiones } from "@/service/Gestiones/useObtenerGestiones";
 
 const GestionesPagePrincipal = () => {
-  // const [modalFiltros, setModalFiltros] = useState(false);
   const [modalCarrucel, setModalCarrucel] = useState(false);
   const [modalGestionar, setModalGestionar] = useState(false);
   const [imagenes, setImagenes] = useState<IImagenCompleta[]>([]);
   const [gestion, setGestion] = useState<IGestionesCabecera | null>(null);
   const [buscador, setBuscador] = useState("");
-  // const [zona, setZona] = useState("todos");
-  // const [tipo, setTipo] = useState("todos");
 
   const debouncedInputValue = useDebounce(buscador, 1000);
 
@@ -80,14 +76,6 @@ const GestionesPagePrincipal = () => {
       `geo:${data.latitudCliente},${data.longitudCliente}?q=${data.latitudCliente},${data.longitudCliente}`,
     );
   }, []);
-
-  // const handleOpenModalFiltros = useCallback(() => {
-  //   setModalFiltros(true);
-  // }, []);
-
-  // const handleCloseModalFiltros = useCallback(() => {
-  //   setModalFiltros(false);
-  // }, []);
 
   const handleCloseModalCarrucel = useCallback(() => {
     setModalCarrucel(false);
@@ -211,16 +199,6 @@ const GestionesPagePrincipal = () => {
           }
         />
       </View>
-      {/* {modalFiltros && (
-        <ModalFiltros
-          onClose={handleCloseModalFiltros}
-          visible={modalFiltros}
-          setZona={setZona}
-          zona={zona}
-          setTipo={setTipo}
-          tipo={tipo}
-        />
-      )} */}
       {modalCarrucel && (
         <ModalCarrucelImagenes
           data={imagenes}
@@ -250,15 +228,6 @@ const styles = StyleSheet.create({
     marginHorizontal: convertirTamanoHorizontal(35),
     marginVertical: convertirTamanoVertical(30),
     height: convertirTamanoVertical(60),
-  },
-  buttonFiltro: {
-    backgroundColor: "white",
-    borderRadius: convertirTamanoHorizontal(25),
-    padding: convertirTamanoHorizontal(10),
-    marginLeft: convertirTamanoHorizontal(10),
-    width: convertirTamanoHorizontal(55),
-    justifyContent: "center",
-    alignItems: "center",
   },
   styleInput: {
     width: "100%",

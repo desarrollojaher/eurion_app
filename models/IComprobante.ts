@@ -27,3 +27,7 @@ export type IComprobanteObtener = Omit<IComprobante, "productos"> & {
 export interface IComprobanteObtenerParams {
   clId: number;
 }
+
+export interface IComprobanteDetalleParams{
+  crId: number
+}

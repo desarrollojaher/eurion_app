@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import Card from "@/components/commons/card/Card";
 import HeaderCard from "@/components/commons/card/HeaderCard";
@@ -28,17 +28,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
 import { formatCurrency } from "@/helper/function/numericas";
 import { find, findIndex, sumBy } from "lodash";
-import { ITarjetaCredito } from "@/models/ITarjetaCredito";
+import { IFormaPago } from "@/models/IFormaPago";
 
 const schemaTiposPago = z.object({
-  banco: z.string().nullish(),
-  tipoPago: z.string().min(1, "El tipo de pago es requerido"),
-  numeroDocumento: z.string().nullish(),
-  fechaVencimiento: z.string().nullish(),
-  emisor: z.string().nullish(),
-  numeroCuenta: z.string().nullish(),
-  propieario: z.string().nullish(),
-  numeroCheque: z.string().nullish(),
+  tipoPago: z
+    .string({
+      required_error: "Obligatorio",
+      invalid_type_error: "Obligatorio",
+    })
+    .min(1, "El tipo de pago es requerido"),
   valor: z.preprocess((val): number | null | undefined => {
     if (val === undefined || val === null) {
       return val;
@@ -57,9 +55,8 @@ interface PropsCardReciboTabTipoPago {
   watch: UseFormWatch<IReciboEnviarDatos>;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
   formasPago: IDatosSelect[];
-  tarjetasCredito: IDatosSelect[];
-  dataTarjetaCredito: ITarjetaCredito[] | undefined;
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
+  dataFormasPago: IFormaPago[] | undefined;
 }
 
 const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
@@ -67,14 +64,47 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   watch,
   control,
   formasPago,
-  tarjetasCredito,
-  dataTarjetaCredito,
   datosDocumentos,
+  dataFormasPago,
 }) => {
+  const defaultValue = useMemo<IRecibosEnviarDetalles>(
+    () => ({
+      tipoPago: "",
+      valor: null,
+    }),
+    [],
+  );
+
+  const {
+    control: controlTiposPagos,
+    handleSubmit: handleSubmitTipoPagos,
+    formState: { errors: errorsTipoDatos },
+    setError: setErrorTiposPagos,
+    reset: resetTiposPagos,
+    setValue: setValueTiposPagos,
+  } = useForm<IRecibosEnviarDetalles>({
+    resolver: zodResolver(schemaTiposPago),
+    defaultValues: defaultValue,
+  });
+
+  const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
+
+  const pideFoto = useMemo(() => {
+    const f = find(
+      dataFormasPago,
+      (item) => item.fpId === Number(tipoPago?.value),
+    );
+    if (f) {
+      return f.fpSolicitaDetalle;
+    } else {
+      return false;
+    }
+  }, [dataFormasPago, tipoPago?.value]);
+
   const index = useMemo(() => {
     const index = findIndex(
       datosDocumentos,
-      (items) => items.doctran === item.doctran
+      (items) => items.doctran === item.doctran,
     );
     return index;
   }, [datosDocumentos, item.doctran]);
@@ -98,138 +128,13 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     return valor;
   }, [valorCancela, valorCobranza, valorMora]);
 
-  const defaultValue = useMemo<IRecibosEnviarDetalles>(
-    () => ({
-      tipoPago: formasPago[0].value,
-      valor: null,
-      emisor: null,
-      fechaVencimiento: null,
-      numeroCHE: null,
-      numeroCuenta: null,
-      numeroDocumento: null,
-      propieario: null,
-      numeroCheque: null,
-      banco: null,
-    }),
-    [formasPago]
-  );
-
-  const {
-    control: controlTiposPagos,
-    handleSubmit: handleSubmitTipoPagos,
-    formState: { errors: errorsTipoDatos },
-    setError: setErrorTiposPagos,
-    reset: resetTiposPagos,
-    setValue: setValueTiposPagos,
-  } = useForm<IRecibosEnviarDetalles>({
-    resolver: zodResolver(schemaTiposPago),
-    defaultValues: defaultValue,
-  });
-
-  const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
-
   const handleChangeSelectTipo = useCallback((data: IDatosSelect) => {
     setTipoPago(data);
   }, []);
 
-  const handleChangeEmisor = useCallback(
-    (e: IDatosSelect) => {
-      setValueTiposPagos(`emisor`, e.value);
-      const banco = find(
-        dataTarjetaCredito,
-        (item) => e.value === item.codTarjeta
-      );
-      setValueTiposPagos(`banco`, banco?.codBanco);
-    },
-    [dataTarjetaCredito, setValueTiposPagos]
-  );
-
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
       console.log(data);
-
-      if (data.tipoPago === "EFE") {
-        if (!data.valor || (data.valor && data.valor <= 0)) {
-          setErrorTiposPagos("valor", {
-            message: "Debe ingresar un valor válido",
-          });
-          return;
-        }
-      }
-      if (data.tipoPago === "CHE") {
-        let errores = false;
-        if (!data.valor || data.valor <= 0) {
-          setErrorTiposPagos("valor", {
-            message: "Debe ingresar un valor válido",
-          });
-          errores = true;
-        }
-        if (!data.fechaVencimiento || data.fechaVencimiento === "") {
-          setErrorTiposPagos("fechaVencimiento", {
-            message: "Debe ingresar una fecha",
-          });
-          errores = true;
-        }
-        if (!data.emisor || data.emisor === "") {
-          setErrorTiposPagos("emisor", {
-            message: "Debe seleccionar un emisor",
-          });
-          errores = true;
-        }
-        if (!data.numeroCuenta || data.numeroCuenta === "") {
-          setErrorTiposPagos("numeroCuenta", {
-            message: "Debe ingresar un numero de cuenta",
-          });
-          errores = true;
-        }
-        if (!data.propieario || data.propieario === "") {
-          setErrorTiposPagos("propieario", {
-            message: "Debe ingresar un numero de propietario",
-          });
-          errores = true;
-        }
-        if (!data.numeroCheque || data.numeroCheque === "") {
-          setErrorTiposPagos("numeroCheque", {
-            message: "Debe ingresar un numero de CHE",
-          });
-          errores = true;
-        }
-        if (errores) return;
-      }
-      if (data.tipoPago === "TCR") {
-        let errores = false;
-        if (!data.valor || data.valor <= 0) {
-          setErrorTiposPagos("valor", {
-            message: "Debe ingresar un valor válido",
-          });
-          errores = true;
-        }
-        if (!data.fechaVencimiento || data.fechaVencimiento === "") {
-          setErrorTiposPagos("fechaVencimiento", {
-            message: "Debe ingresar una fecha",
-          });
-          errores = true;
-        }
-        if (!data.emisor || data.emisor === "") {
-          setErrorTiposPagos("emisor", {
-            message: "Debe seleccionar un emisor",
-          });
-          errores = true;
-        }
-        if (!data.numeroDocumento || data.numeroDocumento === "") {
-          setErrorTiposPagos("numeroDocumento", {
-            message: "Debe ingresar un numero de documento",
-          });
-          errores = true;
-        }
-        if (!data.numeroCuenta || data.numeroCuenta === "") {
-          setErrorTiposPagos("numeroCuenta", {
-            message: "Debe ingresar un numero de cuenta",
-          });
-          errores = true;
-        }
-        if (errores) return;
-      }
 
       if (valorTotal > 0) {
         if (data.valor === null || data.valor === "") {
@@ -246,11 +151,11 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
         Toast.success("Tipo de pago agregado");
       } else {
         Toast.error(
-          "Debe ingresar un valor a pagar en clientes para este comprobante"
+          "Debe ingresar un valor a pagar en clientes para este comprobante",
         );
       }
     },
-    [append, resetTiposPagos, setErrorTiposPagos, valorIngresado, valorTotal]
+    [append, resetTiposPagos, valorIngresado, valorTotal],
   );
 
   const onError = useCallback((error: any) => {
@@ -306,122 +211,15 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
               handleChangeSelectTipo(e);
               onChange(e.value);
             }}
-            defaultValue={value}
+            defaultValue={value ?? ""}
             isError={!!errorsTipoDatos.tipoPago}
             labelError={errorsTipoDatos.tipoPago?.message}
           />
         )}
       />
+      {pideFoto && <Text>Tomar Imagen</Text>}
       <Separador />
-      {tipoPago?.value === "TCR" && (
-        <Controller
-          name="numeroDocumento"
-          control={controlTiposPagos}
-          render={({ field: { value, onChange } }) => (
-            <TextInput
-              text="# DOCUMENTO"
-              tipo="text"
-              placeholder="# documento"
-              defaultValueText={value ?? undefined}
-              onChangeText={onChange}
-              styleTextInput={styles.styleInput}
-              isError={!!errorsTipoDatos.numeroDocumento}
-              labelError={errorsTipoDatos.numeroDocumento?.message}
-            />
-          )}
-        />
-      )}
-      {(tipoPago?.value === "TCR" || tipoPago?.value === "CHE") && (
-        <Controller
-          name="emisor"
-          control={controlTiposPagos}
-          render={({ field: { value } }) => (
-            <TextInput
-              text="EMISOR"
-              tipo="select"
-              datos={tarjetasCredito}
-              placeholder="Emisor"
-              defaultValue={value ?? undefined}
-              onChangeSelect={(e) => handleChangeEmisor(e)}
-              isError={!!errorsTipoDatos.emisor}
-              labelError={errorsTipoDatos.emisor?.message}
-            />
-          )}
-        />
-      )}
-      {(tipoPago?.value === "TCR" || tipoPago?.value === "CHE") && (
-        <Controller
-          name="fechaVencimiento"
-          control={controlTiposPagos}
-          render={({ field: { value, onChange } }) => (
-            <TextInput
-              text="FECHA VENCIMIENTO"
-              tipo="date"
-              placeholder="Fecha vencimiento"
-              styleTextInput={styles.styleInput}
-              defaultValueText={value ?? undefined}
-              onChangeText={onChange}
-              isError={!!errorsTipoDatos.fechaVencimiento}
-              labelError={errorsTipoDatos.fechaVencimiento?.message}
-            />
-          )}
-        />
-      )}
 
-      {(tipoPago?.value === "TCR" || tipoPago?.value === "CHE") && (
-        <Controller
-          name="numeroCuenta"
-          control={controlTiposPagos}
-          render={({ field: { value, onChange } }) => (
-            <TextInput
-              text="# CUENTA"
-              tipo="text"
-              placeholder="Numero cuenta"
-              styleTextInput={styles.styleInput}
-              defaultValueText={value ?? undefined}
-              onChangeText={onChange}
-              isError={!!errorsTipoDatos.numeroCuenta}
-              labelError={errorsTipoDatos.numeroCuenta?.message}
-            />
-          )}
-        />
-      )}
-      {tipoPago?.value === "CHE" && (
-        <Controller
-          name="propieario"
-          control={controlTiposPagos}
-          render={({ field: { value, onChange } }) => (
-            <TextInput
-              text="# PROPIETARIO"
-              tipo="text"
-              placeholder="propietario"
-              styleTextInput={styles.styleInput}
-              defaultValueText={value ?? undefined}
-              onChangeText={onChange}
-              isError={!!errorsTipoDatos.propieario}
-              labelError={errorsTipoDatos.propieario?.message}
-            />
-          )}
-        />
-      )}
-      {tipoPago?.value === "CHE" && (
-        <Controller
-          name="numeroCheque"
-          control={controlTiposPagos}
-          render={({ field: { value, onChange } }) => (
-            <TextInput
-              text="# CHEQUE"
-              tipo="text"
-              placeholder="numero cheque"
-              styleTextInput={styles.styleInput}
-              defaultValueText={value ?? undefined}
-              onChangeText={onChange}
-              isError={!!errorsTipoDatos.numeroCheque}
-              labelError={errorsTipoDatos.numeroCheque?.message}
-            />
-          )}
-        />
-      )}
       <ButtonCustom
         label="Agregar"
         style={styles.styleButton}

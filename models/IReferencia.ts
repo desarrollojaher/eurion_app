@@ -1,16 +1,20 @@
 export interface IReferencia {
+  clId: number | null;
+  peIdReferencia: number | null;
+  identificacionReferencia: string | null;
+  idTipoReferencia: number | null;
+  tipoReferencia: string | null;
+  apellidosReferencia: string | null;
+  nombresReferencia: string | null;
+  actividadEconomicaReferencia: string | null;
+  empresaReferencia: string | null;
+  cargoReferencia: string | null;
+  rucEmpresaReferencia: null | string;
+  telfCelularReferencia: string | null;
+  telfTrabajoReferencia: string | null;
+  telfCasaReferencia: null | string;
+}
+
+export interface IReferenciaParams {
   clId: number;
-  peIdReferencia: number;
-  identificacionReferencia: string;
-  idTipoReferencia: number;
-  tipoReferencia: string;
-  apellidosReferencia: string;
-  nombresReferencia: string;
-  actividadEconomicaReferencia: string;
-  empresaReferencia: string;
-  cargoReferencia: string;
-  rucEmpresaReferencia: null;
-  telfCelularReferencia: string;
-  telfTrabajoReferencia: string;
-  telfCasaReferencia: null;
 }

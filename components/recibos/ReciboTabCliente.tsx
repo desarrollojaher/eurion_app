@@ -4,13 +4,13 @@ import { FlatList } from "react-native";
 import { convertirTamanoVertical } from "@/helper/function/renderizadoImagen";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import { Control, FieldArrayWithId, UseFormSetValue } from "react-hook-form";
-import { IDocumentosCabecera } from "@/models/IDocumentos";
 import CardReciboTabCliente from "./render/CardReciboTabCliente";
+import { IComprobanteObtener } from "@/models/IComprobante";
 
 interface PropsRecibiTabCliente {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
-  datos: IDocumentosCabecera[];
+  datos: IComprobanteObtener[];
   setValue: UseFormSetValue<IReciboEnviarDatos>;
 }
 
@@ -30,7 +30,7 @@ const ReciboTabCliente: React.FC<PropsRecibiTabCliente> = ({
         setValue={setValue}
       />
     ),
-    [control, datos]
+    [control, datos, setValue],
   );
 
   return (

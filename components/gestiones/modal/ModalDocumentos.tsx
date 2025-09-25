@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import ModalCustom from "@/components/commons/modal/ModalCustom";
 import HeaderCard from "@/components/commons/card/HeaderCard";
 import { GRIS, GRIS_CLARO } from "@/constants/Colors";
@@ -7,14 +7,16 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { formatCurrency } from "@/helper/function/numericas";
-import { format, parseISO } from "date-fns";
 import Separador from "@/components/commons/separador/Separador";
+import { IComprobanteObtener } from "@/models/IComprobante";
+import { formatCurrency } from "@/helper/function/numericas";
+import { format } from "date-fns";
+import { useComprobantesDetallesObtener } from "@/service/Comprobantes/useComprobantesDetallesObtener";
 
 interface PropsModalDocumetos {
   visible: boolean;
   onClose: () => void;
-  data: string;
+  data: IComprobanteObtener;
 }
 
 const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
@@ -22,114 +24,102 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
   visible,
   data,
 }) => {
+  const { data: dataDetalles } = useComprobantesDetallesObtener({
+    crId: data.idCredito ?? 0,
+  });
 
+  const productos = useMemo(() => {
+    return dataDetalles
+      ?.map((item) => {
+        return item.nombreArticulo;
+      })
+      .join(" - ");
+  }, [dataDetalles]);
   return (
-    <ModalCustom
-      onClose={onClose}
-      visible={visible}
-      titulo={""}
-    >
+    <ModalCustom onClose={onClose} visible={visible} titulo={""}>
       <HeaderCard
         labelLeft="Saldo Vencido"
-        labelRight={
-          "$ 0"
-        }
+        labelRight={formatCurrency(data.crSaldoCapital ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Cuotas Pagadas"
-        labelRight={""}
+        labelRight={data.cuotasPagadas?.toString() ?? "0"}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Cuotas Pendientes"
-        labelRight={
-          ""
-        }
+        labelRight={data.cuotasPorPagar?.toString() ?? "0"}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
       <HeaderCard
-        labelLeft="Fecha Vencimiento"
-        labelRight={
-          
-          ""
-        }
+        labelLeft="Fecha Factura"
+        labelRight={format(data.fechaFactura ?? "", "dd-MM-yyyy HH:mm:ss")}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
-      <HeaderCard
+      {/* <HeaderCard
         labelLeft="Fecha Ultimo Pago"
-        labelRight={
-         
-          ""
-        }
+        labelRight={""}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
-      <Separador color={GRIS_CLARO} />
+      <Separador color={GRIS_CLARO} /> */}
       <HeaderCard
         labelLeft="Valor cuota"
-        labelRight={
-        
-          "$ 0"
-        }
+        labelRight={formatCurrency(data.valorCuota ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
-      <HeaderCard
+      {/* <HeaderCard
         labelLeft="Saldo Vencido"
-        labelRight={
-          
-          "$ 0"
-        }
+        labelRight={"$ 0"}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
-      <Separador color={GRIS_CLARO} />
+      <Separador color={GRIS_CLARO} /> */}
       <HeaderCard
         labelLeft="Intereses Mora"
-        labelRight={
-          
-          "$ 0"
-        }
+        labelRight={formatCurrency(data.interesGastoMora ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Gastos Cobranzas"
-        labelRight={
-          
-          "$ 0"
-        }
+        labelRight={formatCurrency(data.interesGastoCobranza ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Saldo Capital"
-        labelRight={
-          
-          "$ 0"
-        }
+        labelRight={formatCurrency(data.crSaldoCapital ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
       <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Deuda Total"
-        labelRight={
-          
-          "$ 0"
-        }
+        labelRight={formatCurrency(
+          (data.crSaldoCapital ?? 0) +
+            (data.interesGastoCobranza ?? 0) +
+            (data.interesGastoMora ?? 0),
+        )}
+        styleLeft={styles.styleLabelLeft}
+        styleRight={styles.styleLabelRigth}
+      />
+      <HeaderCard
+        labelLeft="Productos"
+        labelRight={productos ?? ""}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />

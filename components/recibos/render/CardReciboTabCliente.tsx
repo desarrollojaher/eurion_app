@@ -13,12 +13,12 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import { GRIS } from "@/constants/Colors";
-import { IDocumentosCabecera } from "@/models/IDocumentos";
+import { IComprobanteObtener } from "@/models/IComprobante";
 
 interface PropsCardReciboTabCliente {
   item: IReciboEnviar;
   index: number;
-  datos: IDocumentosCabecera[];
+  datos: IComprobanteObtener[];
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
   setValue: UseFormSetValue<IReciboEnviarDatos>;
 }
@@ -34,56 +34,61 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
   const [errorCancelar, setErrorCancelar] = useState<boolean>(false);
 
   const valor = useMemo(
-    () => find(datos, (valor) => item?.doctran === valor.nroDocumento),
-    [datos, item?.doctran]
+    () =>
+      find(
+        datos,
+        (valor) =>
+          item?.doctran === `${valor.tipoComprobante} ${valor.idCredito}`,
+      ),
+    [datos, item?.doctran],
   );
 
   const handleChangeMora = useCallback(
     (cantidad: string) => {
       setValue(`datos.${index}.valorMora`, cantidad);
       if (
-        valor &&
-        valor?.interesMora <
-          Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
+        (valor && valor?.interesGastoMora) ??
+        0 < Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
       ) {
         setErrorMora(true);
       } else {
         setErrorMora(false);
       }
     },
-    [index, setValue, valor]
+    [index, setValue, valor],
   );
 
   const handleChangeCobranza = useCallback(
     (cantidad: string) => {
       setValue(`datos.${index}.valorCobranza`, cantidad);
       if (
-        valor &&
-        valor?.gastosCobranza <
-          Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
+        (valor && valor?.interesGastoCobranza) ??
+        0 < Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
       ) {
         setErrorCobranza(true);
       } else {
         setErrorCobranza(false);
       }
     },
-    [index, setValue, valor]
+    [index, setValue, valor],
   );
 
   const handleChangeCancelar = useCallback(
     (cantidad: string) => {
       setValue(`datos.${index}.valorCancela`, cantidad);
+
       if (
         valor &&
-        valor?.saldoVencido <
+        valor.crSaldoCapital &&
+        valor.crSaldoCapital >=
           Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
       ) {
-        setErrorCancelar(true);
-      } else {
         setErrorCancelar(false);
+      } else {
+        setErrorCancelar(true);
       }
     },
-    [index, setValue, valor]
+    [index, setValue, valor],
   );
 
   return (
@@ -96,19 +101,23 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
       <Separador />
       <HeaderCard
         labelLeft="Deuda Total"
-        labelRight={formatCurrency(valor?.deudaTotal ?? 0)}
+        labelRight={formatCurrency(
+          (valor?.crSaldoCapital ?? 0) +
+            (valor?.interesGastoCobranza ?? 0) +
+            (valor?.interesGastoMora ?? 0),
+        )}
       />
       <HeaderCard
         labelLeft="Saldo vencido"
-        labelRight={formatCurrency(valor?.saldoVencido ?? 0)}
+        labelRight={formatCurrency(valor?.crSaldoCapital ?? 0)}
       />
       <HeaderCard
         labelLeft="Interes por mora"
-        labelRight={formatCurrency(valor?.interesMora ?? 0)}
+        labelRight={formatCurrency(valor?.interesGastoMora ?? 0)}
       />
       <HeaderCard
         labelLeft="Gastos cobranza"
-        labelRight={formatCurrency(valor?.gastosCobranza ?? 0)}
+        labelRight={formatCurrency(valor?.interesGastoCobranza ?? 0)}
       />
       <Controller
         name={`datos.${index}.valorMora`}

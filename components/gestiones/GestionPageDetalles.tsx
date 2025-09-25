@@ -8,9 +8,7 @@ import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
 import ModalRealizarGestion from "./modal/ModalRealizarGestion";
 import GestionPageDetallesCliente from "./GestionPageDetallesCliente";
 import GestionesPageDetallesDocumenos from "./GestionesPageDetallesDocumenos";
-import GestionesPageDetallesDireccion, {
-  PropsGestionesPageDetallesDireccionRef,
-} from "./GestionesPageDetallesDireccion";
+import { PropsGestionesPageDetallesDireccionRef } from "./GestionesPageDetallesDireccion";
 import { useGestionStore } from "@/helper/store/storeGestiones";
 
 const GestionPageDetalles = () => {

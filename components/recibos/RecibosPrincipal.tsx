@@ -12,13 +12,14 @@ import Card from "../commons/card/Card";
 import HeaderCard from "../commons/card/HeaderCard";
 import TextCard from "../commons/card/TextCard";
 import { router } from "expo-router";
-import { IRecibosCabecera } from "@/models/IRecibo";
 import { useReciboStore } from "@/helper/store/storeRecibos";
-import { formatCurrency } from "@/helper/function/numericas";
 import { useDebounce } from "@/hooks/debounce";
 import EmptyList from "../commons/FlatList/EmptyList";
 import LoadingComponent from "../commons/FlatList/LoadingComponent";
 import { RefreshControl } from "react-native";
+import { useObtenerRecibosCabecera } from "@/service/Recibos/useReciboCabeceraObtener";
+import { IDocumentosRecibos } from "@/models/IDocumentos";
+import { formatCurrency } from "@/helper/function/numericas";
 
 const RecibosPrincipal = () => {
   const [filtro, setFiltro] = useState("");
@@ -27,29 +28,27 @@ const RecibosPrincipal = () => {
 
   const debounce = useDebounce(filtro, 500);
 
-  // const {
-  //   data: dataRecibos,
-  //   isLoading: isLoadingRecibos,
-  //   refetch: refechRecibos,
-  // } = useObtenerRecibosCabecera({
-  //   nombreCliente: debounce,
-  // });
+  const {
+    data: dataRecibos,
+    isLoading: isLoadingRecibos,
+    refetch: refechRecibos,
+  } = useObtenerRecibosCabecera({ buscador: debounce });
 
   const redireccionar = useCallback(
-    (datos: IRecibosCabecera) => {
+    (datos: IDocumentosRecibos) => {
       setDatos(datos);
       router.push("/principal/recibos/recibos-detalles");
     },
-    [setDatos]
+    [setDatos],
   );
 
   const renderItem = useCallback(
-    ({ item, index }: { item: IRecibosCabecera; index: number }) => (
+    ({ item, index }: { item: IDocumentosRecibos; index: number }) => (
       <Card>
         <TouchableOpacity onPress={() => redireccionar(item)}>
           <TextCard
-            titulo={`${item.apellidos} ${item.nombres}`}
-            subtitulo={item.identificacionCliente}
+            titulo={`${item.apellidoCliente} ${item.nombreCliente}`}
+            subtitulo={item.identificacion}
           />
 
           <HeaderCard
@@ -62,7 +61,7 @@ const RecibosPrincipal = () => {
         </TouchableOpacity>
       </Card>
     ),
-    [redireccionar]
+    [redireccionar],
   );
 
   return (
@@ -82,12 +81,12 @@ const RecibosPrincipal = () => {
       />
 
       <View style={styles.containerLista}>
-        {/* <FlatList
+        <FlatList
           data={dataRecibos}
           renderItem={renderItem}
           contentContainerStyle={styles.containerFlatList}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(datos) => datos.identificacionCliente}
+          keyExtractor={(datos) => datos.identificacion}
           ListEmptyComponent={<EmptyList isLoading={isLoadingRecibos} />}
           ListFooterComponent={
             <LoadingComponent isLoading={isLoadingRecibos} />
@@ -100,7 +99,7 @@ const RecibosPrincipal = () => {
               tintColor="#007AFF"
             />
           }
-        /> */}
+        />
       </View>
     </View>
   );

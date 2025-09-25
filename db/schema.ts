@@ -201,6 +201,7 @@ export const documentosTable = sqliteTable("documentos", {
 export const documentosDetTable = sqliteTable("documentos_det", {
   idArticulo: int(),
   nombreArticulo: text(),
+  crId: int(),
 });
 
 export const gestionesAnterioresTable = sqliteTable("gestiones_anteriores", {
@@ -287,3 +288,9 @@ export const gestionesCobranzasResultados = sqliteTable(
     trId: int(),
   },
 );
+
+export const formasPagoTable = sqliteTable("formas_pago", {
+  fpId: int(),
+  fpNombre: text(),
+  fpSolicitaDetalle: text(),
+});

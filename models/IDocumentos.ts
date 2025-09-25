@@ -35,3 +35,12 @@ export type IDocumentosCabecera = {
 export type IDocumentoPasadoParams = {
   nroDocumento: string;
 };
+
+export interface IDocumentosRecibos {
+  nombreCliente: string;
+  apellidoCliente: string;
+  identificacion: string;
+  deudaTotal: number;
+  deudaPendiente: number;
+  cliId: number;
+}

@@ -51,7 +51,7 @@ export interface IGestionesCabecera {
   apellidoCliente: string;
   identificacion: string;
   direccionCliente: string;
-  deudaTotal: number;
+  deudaTotal: number | null;
   deudaPendiente: number;
   latitudCliente: number;
   longitudCliente: number;

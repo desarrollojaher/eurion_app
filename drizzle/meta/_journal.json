@@ -8,6 +8,20 @@
       "when": 1758723843087,
       "tag": "0000_dark_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1758754889074,
+      "tag": "0001_woozy_anthem",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1758833228865,
+      "tag": "0002_gigantic_changeling",
+      "breakpoints": true
     }
   ]
 }

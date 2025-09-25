@@ -20,6 +20,10 @@ import Separador from "../commons/separador/Separador";
 import { useGestionesPasadas } from "@/service/Gestiones/useGestionesPasadas";
 import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesObtener";
 import { IGestionesAnteriores } from "@/models/IGestiones";
+import { useReferenciasObtener } from "@/service/Referecias/useRefereciasObtener";
+import { IReferencia } from "@/models/IReferencia";
+import TextCard from "../commons/card/TextCard";
+import EmptyList from "../commons/FlatList/EmptyList";
 
 interface PropsGestionPageDetallesCliente {
   clId: number;
@@ -35,10 +39,14 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   const [vivienda, setVivienda] = useState<IDireccionGcobranza | null>(null);
 
   const [documento, setDocumento] = useState<IDatosSelect | null>(null);
+  const [referencia, setReferencia] = useState<IReferencia | null>(null);
 
   const { data: dataComprobantes } = useComprobantesObtener({ clId: clId });
 
-  const { data: datosGestionesAnteriores } = useGestionesPasadas(
+  const {
+    data: datosGestionesAnteriores,
+    isLoading: isLoadingGestionesAnteriores,
+  } = useGestionesPasadas(
     {
       crId: Number(documento?.value ?? "0"),
     },
@@ -47,8 +55,18 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
     },
   );
 
-  console.log(dataComprobantes);
-  
+  const { data: obtenerReferencias } = useReferenciasObtener({ clId: clId });
+
+  const referencias = useMemo(() => {
+    return obtenerReferencias
+      ? obtenerReferencias?.map((item) => {
+          return {
+            label: item.tipoReferencia ?? "",
+            value: item.peIdReferencia?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [obtenerReferencias]);
 
   const comprobantes = useMemo(() => {
     return dataComprobantes
@@ -60,46 +78,6 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
         })
       : [];
   }, [dataComprobantes]);
-
-  console.log(datosGestionesAnteriores);
-
-  // const { data: datosCliente } = useClienteObtener({
-  //   identificacion: identificacionCliente,
-  // });
-
-  // const { data: datosClienteConyugue } = useClienteConyugueObtener({
-  //   identificacion: identificacionCliente,
-  // });
-
-  // const { data: datosClienteGarante } = useClienteGaranteObtener({
-  //   identificacion: identificacionCliente,
-  // });
-
-  // const { data: datosClienteVivienda } = useClienteViviendaObtener({
-  //   identificacion: identificacionCliente,
-  // });
-
-  // const { data: datosDocumentos } = useDocumentosCabeceraObtener({
-  //   identificacion: identificacionCliente,
-  // });
-
-  // const { data: dataGestionesPasadas } = useObtenerGestionesPasadas({
-  //   nroDocumento: documetoSeleccionado,
-  // });
-
-  // const datosDocumentosCabecera = useMemo<IDatosSelect[]>(() => {
-  //   if (datosDocumentos && datosDocumentos.length > 0) {
-  //     setDocumentoSeleccionado(datosDocumentos[0].nroDocumento);
-  //     return datosDocumentos.map((item) => {
-  //       return {
-  //         label: item.nroDocumento,
-  //         value: item.nroDocumento,
-  //       };
-  //     });
-  //   } else {
-  //     return [];
-  //   }
-  // }, [datosDocumentos]);
 
   const handleOpenCliente = useCallback((datos: ICliente | null) => {
     setCliente(datos);
@@ -144,6 +122,16 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
     setDocumento(dato);
   }, []);
 
+  const handleSeleccionarReferencia = useCallback(
+    (dato: IDatosSelect) => {
+      const ref = find(obtenerReferencias, (item) => {
+        return item.peIdReferencia == Number(dato.value);
+      });
+      setReferencia(ref ?? null);
+    },
+    [obtenerReferencias],
+  );
+
   const renderItem = useCallback(
     ({ item, index }: { item: IGestionesAnteriores; index: number }) => (
       <Card width={convertirTamanoHorizontal(370)}>
@@ -179,70 +167,65 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   return (
     <View style={styles.containerDetalles}>
       <Card width={convertirTamanoHorizontal(370)}>
-        {/* {datosCliente && datosCliente.length > 0 && (
-          <TextCardIcon
-            icon={
-              <Icon
-                name="expand-arrows-alt"
-                size={convertirTamanoHorizontal(20)}
-              />
-            }
-            textDetalle={
-              datosCliente[0].apellido + " " + datosCliente[0].nombres
-            }
-            textCabecera="Cliente"
-            onPress={() => handleOpenCliente(datosCliente[0])}
-          />
-        )}
-        {datosClienteConyugue &&
-          datosClienteConyugue.length > 0 &&
-          datosClienteConyugue[0].nombres !== " " && (
-            <TextCardIcon
-              icon={
-                <Icon
-                  name="expand-arrows-alt"
-                  size={convertirTamanoHorizontal(20)}
-                />
-              }
-              textDetalle={datosClienteConyugue[0].nombres ?? ""}
-              textCabecera="Conyugue"
-              onPress={() => handleOpenConyugue(datosClienteConyugue[0])}
-            />
+        <Select
+          datos={referencias}
+          styleContainer={styles.styleContainer}
+          placeholder="Seleccione Referencia"
+          defaultValue={find(
+            referencias,
+            (item) => item.label === referencia?.identificacionReferencia,
           )}
-
-        {datosClienteGarante && datosClienteGarante.length > 0 && (
-          <TextCardIcon
-            icon={
-              <Icon
-                name="expand-arrows-alt"
-                size={convertirTamanoHorizontal(20)}
-              />
-            }
-            textDetalle={datosClienteGarante[0].nombres ?? ""}
-            textCabecera="Garante"
-            onPress={() => handleOpenGarante(datosClienteGarante[0])}
-          />
-        )}
-
-        {datosClienteVivienda && datosClienteVivienda.length > 0 && (
-          <TextCardIcon
-            icon={
-              <Icon
-                name="expand-arrows-alt"
-                size={convertirTamanoHorizontal(20)}
-              />
-            }
-            textDetalle={datosClienteVivienda[0].direccion ?? ""}
-            textCabecera="Vivienda"
-            onPress={() => handleOpenVivienda(datosClienteVivienda[0])}
-          />
-        )} */}
+          onSelect={handleSeleccionarReferencia}
+        />
       </Card>
+      {referencia && (
+        <Card>
+          <TextCard
+            titulo="Identificación"
+            subtitulo={referencia?.identificacionReferencia ?? ""}
+            styleContainer={styles.styleContainerInfo}
+            styleText={styles.styleRigthText}
+            styleHeader={styles.styleLeftText}
+          />
+          <TextCard
+            titulo="Apellidos"
+            subtitulo={referencia?.apellidosReferencia ?? ""}
+            styleContainer={styles.styleContainerInfo}
+            styleText={styles.styleRigthText}
+            styleHeader={styles.styleLeftText}
+          />
+
+          <TextCard
+            titulo="Nombres"
+            subtitulo={referencia?.nombresReferencia ?? ""}
+            styleContainer={styles.styleContainerInfo}
+            styleText={styles.styleRigthText}
+            styleHeader={styles.styleLeftText}
+          />
+
+          <TextCard
+            titulo="Actividad Económica"
+            subtitulo={referencia?.actividadEconomicaReferencia ?? ""}
+            styleContainer={styles.styleContainerInfo}
+            styleText={styles.styleRigthText}
+            styleHeader={styles.styleLeftText}
+          />
+
+          <TextCard
+            titulo="Telefono"
+            subtitulo={referencia?.telfCelularReferencia ?? ""}
+            styleContainer={styles.styleContainerInfo}
+            styleText={styles.styleRigthText}
+            styleHeader={styles.styleLeftText}
+          />
+        </Card>
+      )}
       {comprobantes && comprobantes.length > 1 && (
         <Card>
           <Select
             datos={comprobantes}
             styleContainer={styles.styleContainer}
+            placeholder="Seleccione Comprobante"
             defaultValue={find(
               comprobantes,
               (item) => item.label === documento?.label,
@@ -257,6 +240,9 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <EmptyList isLoading={isLoadingGestionesAnteriores} />
+        }
       />
       {modalClientes && cliente && (
         <ModalClientes
@@ -306,5 +292,17 @@ const styles = StyleSheet.create({
   styleContainer: {
     height: convertirTamanoVertical(40),
     width: convertirTamanoHorizontal(350),
+  },
+  styleContainerInfo: {
+    width: convertirTamanoHorizontal(350),
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  styleLeftText: {
+    width: convertirTamanoHorizontal(150),
+  },
+  styleRigthText: {
+    width: convertirTamanoHorizontal(200),
+    lineHeight: convertirTamanoVertical(25),
   },
 });

@@ -32,6 +32,7 @@ import { format } from "date-fns";
 import * as Location from "expo-location";
 import ModalLoading from "../commons/modal/ModalLoading";
 import ModalAlertaGurdar from "./modal/ModalAlertaGurdar";
+import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesObtener";
 
 const schema = z.object({
   datos: z.array(
@@ -55,7 +56,7 @@ const schema = z.object({
               .number()
               .min(1, "El valor debe ser mayor a cero")
               .nullish(),
-          })
+          }),
         )
         .nullish(),
       valorMora: z.preprocess((val): number | null | undefined => {
@@ -100,10 +101,10 @@ const schema = z.object({
           z.object({
             url: z.string(),
             titulo: z.string(),
-          })
+          }),
         )
         .nullish(),
-    })
+    }),
   ),
 });
 
@@ -118,32 +119,35 @@ const RecibosDetalles = () => {
 
   const { datos } = useReciboStore();
 
-  // const { data: documentos } = useDocumentosCabeceraObtener({
-  //   identificacion: datos?.identificacionCliente ?? "",
-  // });
-  // const defaultValueRecibos = useMemo<IReciboEnviarDatos>(() => {
-  //   if (documentos && documentos.length > 0) {
-  //     const data = documentos.map<IReciboEnviar>((item) => ({
-  //       latitud: 0,
-  //       longitud: 0,
-  //       doctran: item.nroDocumento,
-  //       fechaComprobante: format(item.fecha, "dd-MM-yyyy HH:mm:ss"),
-  //       valores: [],
-  //       imagenes: null,
-  //       valorMora: null,
-  //       valorCobranza: null,
-  //       valorCancela: null,
-  //       observaciones: "",
-  //       identificacionCliente: datos?.identificacionCliente ?? "",
-  //     }));
-  //     const datosEnviar: IReciboEnviarDatos = {
-  //       datos: data,
-  //     };
+  const { data: documentos } = useComprobantesObtener({
+    clId: datos?.cliId ?? -1,
+  });
+  const defaultValueRecibos = useMemo<IReciboEnviarDatos>(() => {
+    if (documentos && documentos.length > 0) {
+      const data = documentos.map<IReciboEnviar>((item) => ({
+        latitud: 0,
+        longitud: 0,
+        doctran: `${item.tipoComprobante} ${item.idCredito}`,
+        fechaComprobante: format(
+          item.fechaFactura ?? "",
+          "dd-MM-yyyy HH:mm:ss",
+        ),
+        valores: [],
+        imagenes: null,
+        valorMora: null,
+        valorCobranza: null,
+        valorCancela: null,
+        observaciones: "",
+        identificacionCliente: datos?.identificacion ?? "",
+      }));
+      const datosEnviar: IReciboEnviarDatos = {
+        datos: data,
+      };
 
-  //     return datosEnviar;
-  //   }
-  //   return { datos: [] };
-  // }, [datos?.identificacionCliente, documentos]);
+      return datosEnviar;
+    }
+    return { datos: [] };
+  }, [datos, documentos]);
 
   const {
     control,
@@ -167,14 +171,14 @@ const RecibosDetalles = () => {
 
   const children = useMemo(() => {
     if (tabs[tab] === "Cliente") {
-      // return (
-      //   <ReciboTabCliente
-      //     datosDocumentos={datosDocumentos}
-      //     control={control}
-      //     datos={documentos}
-      //     setValue={setValue}
-      //   />
-      // );
+      return (
+        <ReciboTabCliente
+          datosDocumentos={datosDocumentos}
+          control={control}
+          datos={documentos ?? []}
+          setValue={setValue}
+        />
+      );
     } else if (tabs[tab] === "Recibo") {
       return (
         <ReciboTabRecibo
@@ -198,7 +202,7 @@ const RecibosDetalles = () => {
   }, [
     control,
     datosDocumentos,
-
+    documentos,
     getValues,
     setValue,
     tab,
@@ -232,104 +236,94 @@ const RecibosDetalles = () => {
     return null;
   }, []);
 
-  const onSuccess = useCallback(
-    async (data: IReciboEnviarDatos) => {
-      setModalAlertaGuardar(false);
-      setIsLoadingRecibo(true);
-      let noExiste = false;
-      for (let index = 0; index < data.datos.length; index++) {
-        const element = data.datos[index];
-        const ob = defaultValueRecibos.datos[index];
-        const clavesComunes = intersection(
-          Object.keys(element),
-          Object.keys(ob)
-        );
-        const objetoFiltrado1 = pick(element, clavesComunes);
-        const objetoFiltrado2 = pick(ob, clavesComunes);
-        const sonIguales = isEqualWith(
-          objetoFiltrado1,
-          objetoFiltrado2,
-          handleCompararObjetos
-        );
-        if (!sonIguales) {
-          noExiste = true;
-          console.log(element.imagenes);
+  const onSuccess = useCallback(async (data: IReciboEnviarDatos) => {
+    setModalAlertaGuardar(false);
+    setIsLoadingRecibo(true);
+    let noExiste = false;
+    // for (let index = 0; index < data.datos.length; index++) {
+    //   const element = data.datos[index];
+    //   const ob = defaultValueRecibos.datos[index];
+    //   const clavesComunes = intersection(
+    //     Object.keys(element),
+    //     Object.keys(ob),
+    //   );
+    //   const objetoFiltrado1 = pick(element, clavesComunes);
+    //   const objetoFiltrado2 = pick(ob, clavesComunes);
+    //   const sonIguales = isEqualWith(
+    //     objetoFiltrado1,
+    //     objetoFiltrado2,
+    //     handleCompararObjetos,
+    //   );
+    //   if (!sonIguales) {
+    //     noExiste = true;
+    //     console.log(element.imagenes);
 
-          if (element.imagenes?.length === 0) {
-            Toast.error(
-              `El recibo de la factura ${element.doctran} no tiene imagenes`
-            );
-            break;
-          }
-          const dato = find(
-            documentos,
-            (item) => item.nroDocumento === element.doctran
-          );
+    //     if (element.imagenes?.length === 0) {
+    //       Toast.error(
+    //         `El recibo de la factura ${element.doctran} no tiene imagenes`,
+    //       );
+    //       break;
+    //     }
+    //     const dato = find(
+    //       documentos,
+    //       (item) => item.nroDocumento === element.doctran,
+    //     );
 
-          const saldoVencido = dato ? dato.saldoVencido : 0;
-          const gastosCobranza = dato ? dato.gastosCobranza : 0;
-          const interesMora = dato ? dato.interesMora : 0;
+    //     const saldoVencido = dato ? dato.saldoVencido : 0;
+    //     const gastosCobranza = dato ? dato.gastosCobranza : 0;
+    //     const interesMora = dato ? dato.interesMora : 0;
 
-          if (
-            (element.valorCancela ?? 0) +
-            (element.valorCobranza ?? 0) +
-            (element.valorMora ?? 0) >
-            0 &&
-            (element.valorCancela ?? 0) <= saldoVencido &&
-            (element.valorCobranza ?? 0) <= gastosCobranza &&
-            (element.valorMora ?? 0) <= interesMora
-          ) {
-            if (element.valores && element.valores?.length > 0) {
-              const sumaTotal =
-                (element.valorCancela ?? 0) +
-                (element.valorCobranza ?? 0) +
-                (element.valorMora ?? 0);
-              const sumaTiposComprobantes = sumBy(element.valores, (item) =>
-                Number(item.valor)
-              );
-              if (sumaTotal === sumaTiposComprobantes) {
-                const location = await handleObtenerDireccionGps();
-                const dataAux = cloneDeep(element);
-                dataAux.latitud = location?.coords.latitude ?? 0;
-                dataAux.longitud = location?.coords.longitude ?? 0;
-                guardarRecibos(dataAux, {
-                  onSuccess: () => {
-                    setIsLoadingRecibo(false);
-                    reset(defaultValueRecibos);
-                    setTab(0);
-                  },
-                  onError: () => {
-                    setIsLoadingRecibo(false);
-                  },
-                });
-              } else {
-                Toast.error(
-                  `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`
-                );
-              }
-            } else {
-              Toast.error("Ingrese tipos de comprobantes");
-            }
-          } else {
-            Toast.error("Ingrese los valores correctos");
-          }
-        }
-      }
+    //     if (
+    //       (element.valorCancela ?? 0) +
+    //         (element.valorCobranza ?? 0) +
+    //         (element.valorMora ?? 0) >
+    //         0 &&
+    //       (element.valorCancela ?? 0) <= saldoVencido &&
+    //       (element.valorCobranza ?? 0) <= gastosCobranza &&
+    //       (element.valorMora ?? 0) <= interesMora
+    //     ) {
+    //       if (element.valores && element.valores?.length > 0) {
+    //         const sumaTotal =
+    //           (element.valorCancela ?? 0) +
+    //           (element.valorCobranza ?? 0) +
+    //           (element.valorMora ?? 0);
+    //         const sumaTiposComprobantes = sumBy(element.valores, (item) =>
+    //           Number(item.valor),
+    //         );
+    //         if (sumaTotal === sumaTiposComprobantes) {
+    //           const location = await handleObtenerDireccionGps();
+    //           const dataAux = cloneDeep(element);
+    //           dataAux.latitud = location?.coords.latitude ?? 0;
+    //           dataAux.longitud = location?.coords.longitude ?? 0;
+    //           guardarRecibos(dataAux, {
+    //             onSuccess: () => {
+    //               setIsLoadingRecibo(false);
+    //               reset(defaultValueRecibos);
+    //               setTab(0);
+    //             },
+    //             onError: () => {
+    //               setIsLoadingRecibo(false);
+    //             },
+    //           });
+    //         } else {
+    //           Toast.error(
+    //             `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`,
+    //           );
+    //         }
+    //       } else {
+    //         Toast.error("Ingrese tipos de comprobantes");
+    //       }
+    //     } else {
+    //       Toast.error("Ingrese los valores correctos");
+    //     }
+    //   }
+    // }
 
-      if (!noExiste) {
-        Toast.error("Debe ingresar valores en un comprobante");
-      }
-      setIsLoadingRecibo(false);
-    },
-    [
-      defaultValueRecibos,
-      documentos,
-      guardarRecibos,
-      handleCompararObjetos,
-      handleObtenerDireccionGps,
-      reset,
-    ]
-  );
+    if (!noExiste) {
+      Toast.error("Debe ingresar valores en un comprobante");
+    }
+    setIsLoadingRecibo(false);
+  }, []);
 
   const onError = useCallback((error: any) => {
     console.log("Erores ==> ", error);
@@ -361,11 +355,11 @@ const RecibosDetalles = () => {
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
-      () => setKeyboardVisible(true)
+      () => setKeyboardVisible(true),
     );
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
-      () => setKeyboardVisible(false)
+      () => setKeyboardVisible(false),
     );
 
     return () => {
@@ -380,7 +374,7 @@ const RecibosDetalles = () => {
   return (
     <View style={styles.containerGeneral}>
       <Header
-        title={`${datos?.apellidos} ${datos?.nombres}`}
+        title={`${datos?.apellidoCliente} ${datos?.nombreCliente}`}
         handleTapIconRight={handleOpenModalGuardar}
         iconRight={
           <Icon
@@ -398,12 +392,12 @@ const RecibosDetalles = () => {
       {modalAlerta && (
         <ModalAlertBack onClose={handleCloseModal} visible={modalAlerta} />
       )}
-      {(loadingRecibo || isLoadingReciboGuardar) && (
+      {/* {(loadingRecibo || isLoadingReciboGuardar) && (
         <ModalLoading
-          onClose={() => { }}
+          onClose={() => {}}
           visible={loadingRecibo || isLoadingReciboGuardar}
         />
-      )}
+      )} */}
       {modalAlertaGuardar && (
         <ModalAlertaGurdar
           onClose={handleCloseModalGuardar}

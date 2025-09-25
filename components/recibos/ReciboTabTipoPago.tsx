@@ -15,6 +15,7 @@ import CardReciboTabTipoPago from "./render/CardReciboTabTipoPago";
 import { IDatosSelect } from "../commons/select/Select";
 import LottieAnimation from "../commons/lottie/LottieAnimation";
 import { BLANCO } from "@/constants/Colors";
+import { useFormaPagoObtener } from "@/service/FormasPago/useFormaPagoObtener";
 
 interface PropsReciboTabTipoPago {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
@@ -29,29 +30,17 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
   control,
   getValues,
 }) => {
-
-
+  const { data: dataFormasPago } = useFormaPagoObtener();
   const formasPago = useMemo(() => {
     const datos: IDatosSelect[] = [];
-    // dataFormasPagos?.map((item) => {
-    //   datos.push({
-    //     label: item.nombre ?? "",
-    //     value: item.codFormaPago ?? "",
-    //   });
-    // });
+    dataFormasPago?.map((item) => {
+      datos.push({
+        label: item.fpNombre ?? "",
+        value: item.fpId?.toString() ?? "",
+      });
+    });
     return datos;
-  }, []);
-
-  const tarjetasCredito = useMemo(() => {
-    const datos: IDatosSelect[] = [];
-    // dataTarjetaCredito?.map((item) => {
-    //   datos.push({
-    //     label: item.nomTarjeta ?? "",
-    //     value: item.codTarjeta ?? "",
-    //   });
-    // });
-    return datos;
-  }, []);
+  }, [dataFormasPago]);
 
   const itemsCambios = useMemo(() => {
     if (datosDocumentos.length > 0) {
@@ -82,18 +71,11 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
         watch={watch}
         control={control}
         formasPago={formasPago}
-        tarjetasCredito={tarjetasCredito}
-        dataTarjetaCredito={[]}
         datosDocumentos={datosDocumentos}
+        dataFormasPago={dataFormasPago}
       />
     ),
-    [
-      control,
-      datosDocumentos,
-      formasPago,
-      tarjetasCredito,
-      watch,
-    ]
+    [control, dataFormasPago, datosDocumentos, formasPago, watch],
   );
 
   return (

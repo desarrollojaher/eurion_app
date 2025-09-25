@@ -6,13 +6,22 @@ import { GRIS, NEGRO } from "@/constants/Colors";
 interface PropsTextCard {
   titulo: string;
   subtitulo?: string;
+  styleContainer?: any;
+  styleHeader?: any;
+  styleText?: any;
 }
 
-const TextCard: React.FC<PropsTextCard> = ({ titulo, subtitulo }) => {
+const TextCard: React.FC<PropsTextCard> = ({
+  titulo,
+  subtitulo,
+  styleContainer,
+  styleHeader,
+  styleText,
+}) => {
   return (
-    <View>
-      <Text style={styles.styleTitulo}>{titulo}</Text>
-      <Text style={styles.styleSubtitulo}>{subtitulo}</Text>
+    <View style={[styleContainer]}>
+      <Text style={[styles.styleTitulo, styleHeader]}>{titulo}</Text>
+      <Text style={[styles.styleSubtitulo, styleText]}>{subtitulo}</Text>
     </View>
   );
 };

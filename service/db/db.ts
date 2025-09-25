@@ -44,9 +44,10 @@ import {
   IGestionesCabecera,
   IGestionesRealizas,
 } from "@/models/IGestiones";
-import { IReferencia } from "@/models/IReferencia";
+import { IReferencia, IReferenciaParams } from "@/models/IReferencia";
 import {
   IComprobante,
+  IComprobanteDetalleParams,
   IComprobanteObtener,
   IComprobanteObtenerParams,
 } from "@/models/IComprobante";
@@ -58,6 +59,9 @@ import {
 import { IDireccion } from "@/models/IDireccion";
 import { ITelefono } from "@/models/ITelefono";
 import { ITipoReferencia } from "@/models/ITipoReferencia";
+import { IProducto } from "@/models/IProducto";
+import { IDocumentosRecibos } from "@/models/IDocumentos";
+import { IFormaPago } from "@/models/IFormaPago";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -770,6 +774,9 @@ export const dbSqliteService = {
   sincronizarComprobantes: async (data: IComprobante[]) => {
     try {
       await db.insert(schema.documentosTable).values(data);
+      for (let i = 0; i < data.length; i++) {
+        await db.insert(schema.documentosDetTable).values(data[i].productos);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -781,6 +788,7 @@ export const dbSqliteService = {
   eliminarComprobantes: async () => {
     try {
       await db.delete(schema.documentosTable);
+      await db.delete(schema.documentosDetTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -921,9 +929,9 @@ export const dbSqliteService = {
     }
   },
 
-  sincronizarGestionesAnteriores: async (data: IGestionesAnteriores[]) => {
+  eliminarGestionesPasadas: async () => {
     try {
-      await db.insert(schema.gestionesAnterioresTable).values(data);
+      await db.delete(schema.gestionesAnterioresTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -932,9 +940,20 @@ export const dbSqliteService = {
     }
   },
 
-  eliminarGestionesPasadas: async () => {
+    sincronizarFormasPago: async (data: IFormaPago[]) => {
     try {
-      await db.delete(schema.gestionesAnterioresTable);
+      await db.insert(schema.formasPagoTable).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarFormasPago: async () => {
+    try {
+      await db.delete(schema.formasPagoTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -950,8 +969,13 @@ export const dbSqliteService = {
           apellidoCliente: schema.clienteTable.apellidoCliente,
           identificacion: schema.clienteTable.identificacionCliente,
           direccionCliente: schema.direccionesTable.diDireccion,
-          deudaTotal: sum(schema.documentosTable.crSaldoCapital),
-          deudaPendiente: sum(schema.documentosTable.crSaldoCredito),
+          deudaTotal: sum(schema.documentosTable.valorTotalCredito),
+          deudaPendiente: sql`
+          SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.crSaldoInteres}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.interesGastoCobranza}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.interesGastoMora}, 0))
+          `,
           latitudCliente: schema.direccionesTable.diLatitud,
           longitudCliente: schema.direccionesTable.diLongitud,
           cliId: schema.clienteTable.idCliente,
@@ -1120,6 +1144,92 @@ export const dbSqliteService = {
         .from(schema.gestionesAnterioresTable)
         .where(eq(schema.gestionesAnterioresTable.idCredito, params.crId));
       return gestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerReferencias: async (params: IReferenciaParams) => {
+    try {
+      const referencias: IReferencia[] = await db
+        .select()
+        .from(schema.referenciasTable)
+        .where(eq(schema.referenciasTable.clId, params.clId));
+      return referencias;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerProductos: async (params: IComprobanteDetalleParams) => {
+    try {
+      const productos: IProducto[] = await db
+        .select()
+        .from(schema.documentosDetTable)
+        .where(eq(schema.documentosDetTable.crId, params.crId));
+      return productos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerDocumentoRecibos: async (params: IGestionCabeceraParams) => {
+    try {
+      const recibos: IDocumentosRecibos[] = await db
+        .select({
+          nombreCliente: schema.clienteTable.nombreCliente,
+          apellidoCliente: schema.clienteTable.apellidoCliente,
+          identificacion: schema.clienteTable.identificacionCliente,
+          deudaTotal: sql`SUM(COALESCE(${schema.documentosTable.valorTotalCredito}, 0))`,
+          deudaPendiente: sql`
+          SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.crSaldoInteres}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.interesGastoCobranza}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.interesGastoMora}, 0))
+          `,
+          cliId: schema.clienteTable.idCliente,
+        })
+        .from(schema.gestionesTable)
+        .leftJoin(
+          schema.clienteTable,
+          eq(schema.clienteTable.idCliente, schema.gestionesTable.clId),
+        )
+        .leftJoin(
+          schema.documentosTable,
+          eq(schema.documentosTable.clId, schema.clienteTable.idCliente),
+        )
+        .where(
+          and(
+            or(
+              like(schema.clienteTable.apellidoCliente, `%${params.buscador}%`),
+              like(schema.clienteTable.nombreCliente, `%${params.buscador}%`),
+            ),
+          ),
+        )
+        .groupBy(schema.clienteTable.idCliente);
+
+      return recibos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerFormasPago: async () => {
+    try {
+      const formasPago: IFormaPago[] = await db
+        .select()
+        .from(schema.formasPagoTable);
+      return formasPago;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =

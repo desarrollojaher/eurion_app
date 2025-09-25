@@ -1,0 +1,1 @@
+ALTER TABLE `documentos_det` ADD `crId` integer;

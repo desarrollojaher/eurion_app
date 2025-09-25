@@ -1,3 +1,7 @@
 export const formatCurrency = (value: number) => {
-  return `$ ${value.toFixed(2)}`;
+  if (value !== undefined && value !== null) {
+    return `$ ${value.toFixed(2)}`;
+  } else {
+    return `$ 0.00`;
+  }
 };

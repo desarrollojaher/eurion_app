@@ -41,22 +41,25 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
   // const { data: dataFormasPagos } = useRecibosFormaPago();
 
   const itemsCambios = useMemo(() => {
+    console.log(datosDocumentos);
+
     if (datosDocumentos.length > 0) {
-      const d: IReciboEnviar[] = [];
-      for (let index = 0; index < datosDocumentos.length; index++) {
-        const datos = getValues(`datos.${index}`);
-        if (
-          (datos.valorCancela !== null && datos.valorCancela !== "") ||
-          (datos.valorCobranza !== null && datos.valorCobranza !== "") ||
-          (datos.valorMora !== null && datos.valorMora !== "")
-        ) {
-          d.push(datos);
-        }
-      }
-      return d;
+      // const d: IReciboEnviar[] = [];
+      // for (let index = 0; index < datosDocumentos.length; index++) {
+      //   const datos = getValues(`datos.${index}`);
+      //   if (
+      //     (datos.valorCancela !== null && datos.valorCancela !== "") ||
+      //     (datos.valorCobranza !== null && datos.valorCobranza !== "") ||
+      //     (datos.valorMora !== null && datos.valorMora !== "")
+      //   ) {
+      //     d.push(datos);
+      //   }
+      // }
+      // return d;
+      return[]
     }
     return [];
-  }, [datosDocumentos, getValues]);
+  }, [datosDocumentos]);
 
   const animation = useMemo(() => {
     return require("../../assets/animations/empty.json");
@@ -73,7 +76,7 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
       setValue(`datos.${index}.imagenes`, union);
       setModalCamara(false);
     },
-    [imagenes, index, setValue]
+    [imagenes, index, setValue],
   );
 
   const handleCloseModalCamara = useCallback(() => {
@@ -92,7 +95,7 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         datosDocumentos={datosDocumentos}
       />
     ),
-    [control, datosDocumentos, handleOpenModalCamara, watch]
+    [control, datosDocumentos, handleOpenModalCamara, watch],
   );
 
   return (
@@ -102,7 +105,7 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item.doctran}
+        keyExtractor={(item) => (item.doctran ? item.doctran : "")}
         ListEmptyComponent={() => (
           <View style={styles.styleSinInfo}>
             <LottieAnimation resource={animation} />
