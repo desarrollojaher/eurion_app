@@ -1,5 +1,5 @@
 import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -8,6 +8,7 @@ import {
   Control,
   FieldArrayWithId,
   UseFormGetValues,
+  UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
@@ -16,12 +17,15 @@ import { IDatosSelect } from "../commons/select/Select";
 import LottieAnimation from "../commons/lottie/LottieAnimation";
 import { BLANCO } from "@/constants/Colors";
 import { useFormaPagoObtener } from "@/service/FormasPago/useFormaPagoObtener";
+import Camara from "../commons/camera/Camara";
+import { IImagenCompleta } from "@/models/IImagenCompleta";
 
 interface PropsReciboTabTipoPago {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
   watch: UseFormWatch<IReciboEnviarDatos>;
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
   getValues: UseFormGetValues<IReciboEnviarDatos>;
+  setValue: UseFormSetValue<IReciboEnviarDatos>;
 }
 
 const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
@@ -29,7 +33,12 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
   watch,
   control,
   getValues,
+  setValue,
 }) => {
+  const [modalCamara, setModalCamara] = useState(false);
+  const [indexImg, setIndexImg] = useState(0);
+  const [imagen, setImagen] = useState<IImagenCompleta>();
+
   const { data: dataFormasPago } = useFormaPagoObtener();
   const formasPago = useMemo(() => {
     const datos: IDatosSelect[] = [];
@@ -64,6 +73,15 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
     return require("../../assets/animations/empty.json");
   }, []);
 
+  const handleOpenModalCamara = useCallback((index: number) => {
+    setIndexImg(index);
+    setModalCamara(true);
+  }, []);
+
+  const handleEliminarImagen = useCallback(() => {
+    setImagen(undefined);
+  }, []);
+
   const renderItem = useCallback(
     ({ item, index }: { item: IReciboEnviar; index: number }) => (
       <CardReciboTabTipoPago
@@ -73,11 +91,33 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
         formasPago={formasPago}
         datosDocumentos={datosDocumentos}
         dataFormasPago={dataFormasPago}
+        handleOpenModalCamara={handleOpenModalCamara}
+        indexCard={index}
+        imagen={index === indexImg ? imagen : undefined}
+        handleEliminarImagen={handleEliminarImagen}
       />
     ),
-    [control, dataFormasPago, datosDocumentos, formasPago, watch],
+    [
+      control,
+      dataFormasPago,
+      datosDocumentos,
+      formasPago,
+      handleEliminarImagen,
+      handleOpenModalCamara,
+      imagen,
+      indexImg,
+      watch,
+    ],
   );
 
+  const handleGuardarImagenes = useCallback((data: IImagenCompleta[]) => {
+    setImagen(data[0]);
+    setModalCamara(false);
+  }, []);
+
+  const handleCloseModalCamara = useCallback(() => {
+    setModalCamara(false);
+  }, []);
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <FlatList
@@ -94,6 +134,14 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
           </View>
         )}
       />
+      {modalCamara && (
+        <Camara
+          handleCaptureImage={handleGuardarImagenes}
+          onClose={handleCloseModalCamara}
+          visible={modalCamara}
+          cantidadMaxima={1}
+        />
+      )}
     </ScrollView>
   );
 };

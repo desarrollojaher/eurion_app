@@ -33,6 +33,7 @@ import * as Location from "expo-location";
 import ModalLoading from "../commons/modal/ModalLoading";
 import ModalAlertaGurdar from "./modal/ModalAlertaGurdar";
 import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesObtener";
+import { useSession } from "@/helper/provider/Auth";
 
 const schema = z.object({
   datos: z.array(
@@ -41,21 +42,24 @@ const schema = z.object({
         .string()
         .min(1, "La identificación es requerida"),
       doctran: z.string().min(1, "El número de transacción es requerido"),
+      usId: z.number().nullish(),
+      crId: z
+        .number({
+          required_error: "El crId es requerido",
+          invalid_type_error: "El crId debe ser un number",
+        })
+        .nullish(),
       valores: z
         .array(
           z.object({
-            banco: z.string().nullish(),
+            id: z.string().nullish(),
             tipoPago: z.string().min(1, "El tipo de pago es requerido"),
-            numeroDocumento: z.string().nullish(),
-            fechaVencimiento: z.string().nullish(),
-            emisor: z.string().nullish(),
-            numeroCuenta: z.string().nullish(),
-            propieario: z.string().nullish(),
-            numeroCheque: z.string().nullish(),
             valor: z
               .number()
               .min(1, "El valor debe ser mayor a cero")
               .nullish(),
+            fechaCobro: z.string().nullish(),
+            urlImagen: z.string().nullish(),
           }),
         )
         .nullish(),
@@ -99,6 +103,7 @@ const schema = z.object({
       imagenes: z
         .array(
           z.object({
+            idPago: z.string().nullish(),
             url: z.string(),
             titulo: z.string(),
           }),
@@ -110,6 +115,7 @@ const schema = z.object({
 
 const RecibosDetalles = () => {
   const [tab, setTab] = useState(0);
+  const { usuario } = useSession();
 
   const [modalAlerta, setModalAlerta] = useState(false);
   const [loadingRecibo, setIsLoadingRecibo] = useState(false);
@@ -139,6 +145,8 @@ const RecibosDetalles = () => {
         valorCancela: null,
         observaciones: "",
         identificacionCliente: datos?.identificacion ?? "",
+        crId: item.idCredito,
+        usId: usuario?.usuId,
       }));
       const datosEnviar: IReciboEnviarDatos = {
         datos: data,
@@ -147,20 +155,12 @@ const RecibosDetalles = () => {
       return datosEnviar;
     }
     return { datos: [] };
-  }, [datos, documentos]);
+  }, [datos?.identificacion, documentos, usuario?.usuId]);
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    // formState: { errors },
-    watch,
-    setValue,
-    getValues,
-  } = useForm<IReciboEnviarDatos>({
-    resolver: zodResolver(schema),
-    //efaultValues: defaultValueRecibos,
-  });
+  const { control, handleSubmit, reset, watch, setValue, getValues } =
+    useForm<IReciboEnviarDatos>({
+      resolver: zodResolver(schema),
+    });
 
   const { fields: datosDocumentos } = useFieldArray({
     control,
@@ -196,6 +196,7 @@ const RecibosDetalles = () => {
           watch={watch}
           control={control}
           getValues={getValues}
+          setValue={setValue}
         />
       );
     }
@@ -209,9 +210,6 @@ const RecibosDetalles = () => {
     tabs,
     watch,
   ]);
-
-  // const { mutate: guardarRecibos, isPending: isLoadingReciboGuardar } =
-  //   useRecibosGuardar();
 
   const handleCompararObjetos = useCallback((valor1: any, valor2: any) => {
     if (
@@ -236,94 +234,133 @@ const RecibosDetalles = () => {
     return null;
   }, []);
 
-  const onSuccess = useCallback(async (data: IReciboEnviarDatos) => {
-    setModalAlertaGuardar(false);
-    setIsLoadingRecibo(true);
-    let noExiste = false;
-    // for (let index = 0; index < data.datos.length; index++) {
-    //   const element = data.datos[index];
-    //   const ob = defaultValueRecibos.datos[index];
-    //   const clavesComunes = intersection(
-    //     Object.keys(element),
-    //     Object.keys(ob),
-    //   );
-    //   const objetoFiltrado1 = pick(element, clavesComunes);
-    //   const objetoFiltrado2 = pick(ob, clavesComunes);
-    //   const sonIguales = isEqualWith(
-    //     objetoFiltrado1,
-    //     objetoFiltrado2,
-    //     handleCompararObjetos,
-    //   );
-    //   if (!sonIguales) {
-    //     noExiste = true;
-    //     console.log(element.imagenes);
+  const onSuccess = useCallback(
+    async (data: IReciboEnviarDatos) => {
+      console.log("entro a guardar");
 
-    //     if (element.imagenes?.length === 0) {
-    //       Toast.error(
-    //         `El recibo de la factura ${element.doctran} no tiene imagenes`,
-    //       );
-    //       break;
-    //     }
-    //     const dato = find(
-    //       documentos,
-    //       (item) => item.nroDocumento === element.doctran,
-    //     );
+      setModalAlertaGuardar(false);
+      setIsLoadingRecibo(true);
+      let noExiste = false;
 
-    //     const saldoVencido = dato ? dato.saldoVencido : 0;
-    //     const gastosCobranza = dato ? dato.gastosCobranza : 0;
-    //     const interesMora = dato ? dato.interesMora : 0;
+      for (let index = 0; index < data.datos.length; index++) {
+        const element = data.datos[index];
+        const ob = defaultValueRecibos.datos[index];
+        const clavesComunes = intersection(
+          Object.keys(element),
+          Object.keys(ob),
+        );
+        const objetoFiltrado1 = pick(element, clavesComunes);
+        const objetoFiltrado2 = pick(ob, clavesComunes);
+        const sonIguales = isEqualWith(
+          objetoFiltrado1,
+          objetoFiltrado2,
+          handleCompararObjetos,
+        );
 
-    //     if (
-    //       (element.valorCancela ?? 0) +
-    //         (element.valorCobranza ?? 0) +
-    //         (element.valorMora ?? 0) >
-    //         0 &&
-    //       (element.valorCancela ?? 0) <= saldoVencido &&
-    //       (element.valorCobranza ?? 0) <= gastosCobranza &&
-    //       (element.valorMora ?? 0) <= interesMora
-    //     ) {
-    //       if (element.valores && element.valores?.length > 0) {
-    //         const sumaTotal =
-    //           (element.valorCancela ?? 0) +
-    //           (element.valorCobranza ?? 0) +
-    //           (element.valorMora ?? 0);
-    //         const sumaTiposComprobantes = sumBy(element.valores, (item) =>
-    //           Number(item.valor),
-    //         );
-    //         if (sumaTotal === sumaTiposComprobantes) {
-    //           const location = await handleObtenerDireccionGps();
-    //           const dataAux = cloneDeep(element);
-    //           dataAux.latitud = location?.coords.latitude ?? 0;
-    //           dataAux.longitud = location?.coords.longitude ?? 0;
-    //           guardarRecibos(dataAux, {
-    //             onSuccess: () => {
-    //               setIsLoadingRecibo(false);
-    //               reset(defaultValueRecibos);
-    //               setTab(0);
-    //             },
-    //             onError: () => {
-    //               setIsLoadingRecibo(false);
-    //             },
-    //           });
-    //         } else {
-    //           Toast.error(
-    //             `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`,
-    //           );
-    //         }
-    //       } else {
-    //         Toast.error("Ingrese tipos de comprobantes");
-    //       }
-    //     } else {
-    //       Toast.error("Ingrese los valores correctos");
-    //     }
-    //   }
-    // }
+        if (!sonIguales) {
+          noExiste = true;
 
-    if (!noExiste) {
-      Toast.error("Debe ingresar valores en un comprobante");
-    }
-    setIsLoadingRecibo(false);
-  }, []);
+          // const file = find(
+          //   dataFormasPago,
+          //   (item) => item.fpSolicitaDetalle === "S",
+          // );
+          // console.log(element);
+          // console.log(file);
+
+          // const existe = find(
+          //   element.valores,
+          //   (item) =>
+          //     item.tipoPago === file?.fpId?.toString()
+          // );
+
+          // const datosSinImagen = filter(
+          //   element.valores,
+          //   (item) =>
+          //     item.id === file?.fpId?.toString() &&
+          //     (item.urlImagen === null ||
+          //       item.urlImagen === "" ||
+          //       item.urlImagen === undefined),
+          // );
+          // console.log(datosSinImagen);
+
+          // if (existe?.urlImagen === null || existe?.urlImagen === "" || existe?.urlImagen === undefined) {
+          //   Toast.error(
+          //     `El recibo de la factura ${element.doctran} no tiene imagenes del comprobante de pago`,
+          //   );
+          //   setIsLoadingRecibo(false);
+          //   return;
+          // }
+          const dato = find(
+            documentos,
+            (item) =>
+              `${item.tipoComprobante} ${item.idCredito}` === element.doctran,
+          );
+
+          const saldoVencido = dato ? (dato.crSaldoCapital ?? 0) : 0;
+          const gastosCobranza = dato ? (dato.interesGastoCobranza ?? 0) : 0;
+          const interesMora = dato ? (dato.interesGastoMora ?? 0) : 0;
+
+          if (
+            (element.valorCancela ?? 0) +
+              (element.valorCobranza ?? 0) +
+              (element.valorMora ?? 0) >
+              0 &&
+            (element.valorCancela ?? 0) <= saldoVencido &&
+            (element.valorCobranza ?? 0) <= gastosCobranza &&
+            (element.valorMora ?? 0) <= interesMora
+          ) {
+            if (element.valores && element.valores?.length > 0) {
+              const sumaTotal =
+                (element.valorCancela ?? 0) +
+                (element.valorCobranza ?? 0) +
+                (element.valorMora ?? 0);
+              const sumaTiposComprobantes = sumBy(element.valores, (item) =>
+                Number(item.valor),
+              );
+              if (sumaTotal === sumaTiposComprobantes) {
+                const location = await handleObtenerDireccionGps();
+                const dataAux = cloneDeep(element);
+                dataAux.latitud = location?.coords.latitude ?? 0;
+                dataAux.longitud = location?.coords.longitude ?? 0;
+
+                console.log(dataAux);
+
+                setIsLoadingRecibo(false);
+                // guardarRecibos(dataAux, {
+                //   onSuccess: () => {
+                //     reset(defaultValueRecibos);
+                //     setTab(0);
+                //   },
+                //   onError: () => {
+                //     setIsLoadingRecibo(false);
+                //   },
+                // });
+              } else {
+                Toast.error(
+                  `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`,
+                );
+              }
+            } else {
+              Toast.error("Ingrese tipos de comprobantes");
+            }
+          } else {
+            Toast.error("Ingrese los valores correctos");
+          }
+        }
+      }
+
+      if (!noExiste) {
+        Toast.error("Debe ingresar valores en un comprobante");
+      }
+      setIsLoadingRecibo(false);
+    },
+    [
+      defaultValueRecibos.datos,
+      documentos,
+      handleCompararObjetos,
+      handleObtenerDireccionGps,
+    ],
+  );
 
   const onError = useCallback((error: any) => {
     console.log("Erores ==> ", error);
@@ -392,12 +429,9 @@ const RecibosDetalles = () => {
       {modalAlerta && (
         <ModalAlertBack onClose={handleCloseModal} visible={modalAlerta} />
       )}
-      {/* {(loadingRecibo || isLoadingReciboGuardar) && (
-        <ModalLoading
-          onClose={() => {}}
-          visible={loadingRecibo || isLoadingReciboGuardar}
-        />
-      )} */}
+      {loadingRecibo && (
+        <ModalLoading onClose={() => {}} visible={loadingRecibo} />
+      )}
       {modalAlertaGuardar && (
         <ModalAlertaGurdar
           onClose={handleCloseModalGuardar}

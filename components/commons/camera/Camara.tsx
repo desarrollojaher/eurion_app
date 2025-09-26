@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import ModalCustom from "../modal/ModalCustom";
 import LottieAnimation from "../lottie/LottieAnimation";
@@ -29,12 +29,14 @@ interface PropsCamara {
   onClose: () => void;
   visible: boolean;
   handleCaptureImage: (images: IImagenCompleta[]) => void;
+  cantidadMaxima?: number;
 }
 
 const Camara: React.FC<PropsCamara> = ({
   onClose,
   visible,
   handleCaptureImage,
+  cantidadMaxima = 3,
 }) => {
   const [facing, setFacing] = useState<CameraType>("back");
 
@@ -45,11 +47,22 @@ const Camara: React.FC<PropsCamara> = ({
 
   const ref = useRef<CameraView>(null);
 
+  const desabilitado = useMemo(() => {
+    if (imagenes.length >= cantidadMaxima) {
+      return true;
+    }
+    return false;
+  }, [cantidadMaxima, imagenes.length]);
+
   const handleToggleCamera = useCallback(() => {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }, []);
 
   const handleTakePicture = useCallback(async () => {
+    if (desabilitado) {
+      Toast.error("Se ha alcanzado el limite de fotos");
+      return;
+    }
     const photo = await ref.current?.takePictureAsync(); //{ base64: true }
     if (!photo) {
       Toast.error("No se pudo tomar la foto");
@@ -57,7 +70,7 @@ const Camara: React.FC<PropsCamara> = ({
     } else {
       setImagenes((current) => [...current, photo.uri ?? ""]);
     }
-  }, [setImagenes]);
+  }, [desabilitado]);
 
   const handleGuardarDatos = useCallback(() => {
     const res: IImagenCompleta[] = [];
@@ -73,11 +86,11 @@ const Camara: React.FC<PropsCamara> = ({
     (indexElemento: number) => {
       const datos = remove(
         imagenes,
-        (item) => item !== imagenes[indexElemento]
+        (item) => item !== imagenes[indexElemento],
       );
       setImagenes(datos);
     },
-    [imagenes]
+    [imagenes],
   );
 
   const handleOpenImagenCompleta = useCallback(
@@ -85,7 +98,7 @@ const Camara: React.FC<PropsCamara> = ({
       setImagen({ titulo: "", url: imagen });
       setOpenImagenCompleta(true);
     },
-    [setOpenImagenCompleta]
+    [setOpenImagenCompleta],
   );
 
   const handleRenderizarImagenes = useCallback(
@@ -110,7 +123,7 @@ const Camara: React.FC<PropsCamara> = ({
         </View>
       </TouchableOpacity>
     ),
-    [handleOpenImagenCompleta, handleRemoveImage]
+    [handleOpenImagenCompleta, handleRemoveImage],
   );
 
   const handleCloseImagen = useCallback(() => {
@@ -123,7 +136,7 @@ const Camara: React.FC<PropsCamara> = ({
       setImagenes(datos);
       setOpenImagenCompleta(false);
     },
-    [imagenes]
+    [imagenes],
   );
 
   if (!permission) {
@@ -193,7 +206,11 @@ const Camara: React.FC<PropsCamara> = ({
                 size={convertirTamanoHorizontal(50)}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleTakePicture}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleTakePicture}
+              // disabled={imagenes.length >= cantidadMaxima}
+            >
               <Icon
                 name="camera"
                 color={BLANCO}

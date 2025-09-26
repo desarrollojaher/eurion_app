@@ -44,7 +44,7 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
   const index = useMemo(() => {
     const index = findIndex(
       datosDocumentos,
-      (items) => items.doctran === item.doctran
+      (items) => items.doctran === item.doctran,
     );
     return index;
   }, [datosDocumentos, item.doctran]);
@@ -84,14 +84,14 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
     (index: number) => {
       remove(index);
     },
-    [remove]
+    [remove],
   );
 
   const handleRemoveValores = useCallback(
     (index: number) => {
       removeValores(index);
     },
-    [removeValores]
+    [removeValores],
   );
 
   if (!valorMora && !valorCobranza && !valorCancela && index === 0)
@@ -129,7 +129,7 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
       <HeaderCard
         labelLeft="VALOR A PAGAR CANCELADO"
         labelRight={formatCurrency(
-          Number(valorCancela?.replace(",", ".") ?? 0)
+          Number(valorCancela?.replace(",", ".") ?? 0),
         )}
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
@@ -143,7 +143,7 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
       <HeaderCard
         labelLeft="GASTOS COBRANZA"
         labelRight={formatCurrency(
-          Number(valorCobranza?.replace(",", ".") ?? 0)
+          Number(valorCobranza?.replace(",", ".") ?? 0),
         )}
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
@@ -174,8 +174,8 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
                   labelRight={
                     find(
                       dataFormasPagos,
-                      (valor) => valor.codFormaPago === item.tipoPago
-                    )?.nombre ?? ""
+                      (valor) => valor.fpId?.toString() === item.tipoPago,
+                    )?.fpNombre ?? ""
                   }
                   styleLeft={styles.styleLeftTiposPagoCard}
                   styleRight={styles.styleRightTiposPagoCard}

@@ -17,8 +17,11 @@ export interface IDocumentos {
 }
 
 export interface IRecibosEnviarDetalles {
+  id?: string | null;
   tipoPago: string;
   valor?: number | null | any;
+  fechaCobro?: string | null;
+  urlImagen?: string | null;
 }
 
 export interface IReciboEnviar {
@@ -35,6 +38,8 @@ export interface IReciboEnviar {
   longitud?: number | null;
   identificacionCliente: string;
   banco?: string | null;
+  crId?: number | null;
+  usId?: number | null;
 }
 
 export interface IReciboEnviarDatos {

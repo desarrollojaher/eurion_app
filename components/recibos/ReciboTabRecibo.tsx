@@ -38,28 +38,23 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
   const [index, setIndex] = useState(0);
   const imagenes = watch(`datos.${index}.imagenes`);
 
-  // const { data: dataFormasPagos } = useRecibosFormaPago();
-
   const itemsCambios = useMemo(() => {
-    console.log(datosDocumentos);
-
     if (datosDocumentos.length > 0) {
-      // const d: IReciboEnviar[] = [];
-      // for (let index = 0; index < datosDocumentos.length; index++) {
-      //   const datos = getValues(`datos.${index}`);
-      //   if (
-      //     (datos.valorCancela !== null && datos.valorCancela !== "") ||
-      //     (datos.valorCobranza !== null && datos.valorCobranza !== "") ||
-      //     (datos.valorMora !== null && datos.valorMora !== "")
-      //   ) {
-      //     d.push(datos);
-      //   }
-      // }
-      // return d;
-      return[]
+      const d: IReciboEnviar[] = [];
+      for (let index = 0; index < datosDocumentos.length; index++) {
+        const datos = getValues(`datos.${index}`);
+        if (
+          (datos.valorCancela !== null && datos.valorCancela !== "") ||
+          (datos.valorCobranza !== null && datos.valorCobranza !== "") ||
+          (datos.valorMora !== null && datos.valorMora !== "")
+        ) {
+          d.push(datos);
+        }
+      }
+      return d;
     }
     return [];
-  }, [datosDocumentos]);
+  }, [datosDocumentos, getValues]);
 
   const animation = useMemo(() => {
     return require("../../assets/animations/empty.json");

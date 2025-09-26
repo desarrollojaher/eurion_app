@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import Card from "@/components/commons/card/Card";
 import HeaderCard from "@/components/commons/card/HeaderCard";
@@ -29,8 +29,15 @@ import { Toast } from "toastify-react-native";
 import { formatCurrency } from "@/helper/function/numericas";
 import { find, findIndex, sumBy } from "lodash";
 import { IFormaPago } from "@/models/IFormaPago";
+import { format } from "date-fns";
+import uuid from "react-native-uuid";
+import { View } from "react-native";
+import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import { IImagenCompleta } from "@/models/IImagenCompleta";
 
 const schemaTiposPago = z.object({
+  id: z.string().nullish(),
   tipoPago: z
     .string({
       required_error: "Obligatorio",
@@ -48,6 +55,8 @@ const schemaTiposPago = z.object({
     }
     return typeof val === "number" ? val : null;
   }, z.number().min(1, "Ingrese un numero mayor a 0").nullish()),
+  fechaCobro: z.string().nullish(),
+  urlImagen: z.string().nullish(),
 });
 
 interface PropsCardReciboTabTipoPago {
@@ -57,6 +66,10 @@ interface PropsCardReciboTabTipoPago {
   formasPago: IDatosSelect[];
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
   dataFormasPago: IFormaPago[] | undefined;
+  indexCard: number;
+  handleOpenModalCamara: (index: number) => void;
+  imagen: IImagenCompleta | undefined;
+  handleEliminarImagen: () => void;
 }
 
 const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
@@ -66,6 +79,10 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   formasPago,
   datosDocumentos,
   dataFormasPago,
+  indexCard,
+  handleOpenModalCamara,
+  imagen,
+  handleEliminarImagen,
 }) => {
   const defaultValue = useMemo<IRecibosEnviarDetalles>(
     () => ({
@@ -74,18 +91,19 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     }),
     [],
   );
-
   const {
     control: controlTiposPagos,
     handleSubmit: handleSubmitTipoPagos,
     formState: { errors: errorsTipoDatos },
-    setError: setErrorTiposPagos,
     reset: resetTiposPagos,
-    setValue: setValueTiposPagos,
   } = useForm<IRecibosEnviarDetalles>({
     resolver: zodResolver(schemaTiposPago),
     defaultValues: defaultValue,
   });
+  // const { fields: dataImagen, remove } = useFieldArray({
+  //   control,
+  //   name: `datos.${indexCard}.imagenes`,
+  // });
 
   const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
 
@@ -97,7 +115,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     if (f) {
       return f.fpSolicitaDetalle;
     } else {
-      return false;
+      return "";
     }
   }, [dataFormasPago, tipoPago?.value]);
 
@@ -134,9 +152,12 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
-      console.log(data);
-
+      if (pideFoto && imagen === undefined) {
+        Toast.error("Ingrese una imagen");
+        return;
+      }
       if (valorTotal > 0) {
+        const id = uuid.v4();
         if (data.valor === null || data.valor === "") {
           Toast.error("Ingrese un valor válido");
           return;
@@ -145,8 +166,16 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           Toast.error("El valor a pagar va a sobrepasar al valor total");
           return;
         }
+        data.fechaCobro = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+        data.id = id;
+        if (pideFoto) {
+          data.urlImagen = imagen?.url;
+        }
+        data.urlImagen = imagen?.url;
+
         append(data);
         resetTiposPagos();
+        handleEliminarImagen();
         setTipoPago({ label: "CONTADO", value: "CONTADO" });
         Toast.success("Tipo de pago agregado");
       } else {
@@ -155,7 +184,26 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
         );
       }
     },
-    [append, resetTiposPagos, valorIngresado, valorTotal],
+    [
+      append,
+      handleEliminarImagen,
+      imagen,
+      pideFoto,
+      resetTiposPagos,
+      valorIngresado,
+      valorTotal,
+    ],
+  );
+
+  const openModalCamara = useCallback(() => {
+    handleOpenModalCamara(index);
+  }, [handleOpenModalCamara, index]);
+
+  const handleRemoveImage = useCallback(
+    (index: number) => {
+      handleEliminarImagen();
+    },
+    [handleEliminarImagen],
   );
 
   const onError = useCallback((error: any) => {
@@ -217,7 +265,25 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
           />
         )}
       />
-      {pideFoto && <Text>Tomar Imagen</Text>}
+      {pideFoto === "S" && (
+        <View style={styles.containerImagen}>
+          {imagen ? (
+            <CarouselImagenes
+              data={[imagen]}
+              width={convertirTamanoHorizontal(325)}
+              //camera
+              handleOpenCamara={openModalCamara}
+              paginacion
+              remove
+              handleRemoveImage={handleRemoveImage}
+            />
+          ) : (
+            <Pressable onPress={openModalCamara} style={styles.stylePressable}>
+              <Icon name="camera" size={convertirTamanoHorizontal(80)} />
+            </Pressable>
+          )}
+        </View>
+      )}
       <Separador />
 
       <ButtonCustom
@@ -244,5 +310,13 @@ const styles = StyleSheet.create({
   },
   styleButton: {
     alignSelf: "center",
+  },
+  containerImagen: {
+    height: convertirTamanoVertical(250),
+  },
+  stylePressable: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

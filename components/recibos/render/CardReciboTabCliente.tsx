@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import Card from "@/components/commons/card/Card";
@@ -14,6 +14,9 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import { GRIS } from "@/constants/Colors";
 import { IComprobanteObtener } from "@/models/IComprobante";
+import Icon from "react-native-vector-icons/FontAwesome5";
+import TextCardIcon from "@/components/commons/card/TextCardIcon";
+import { View } from "react-native";
 
 interface PropsCardReciboTabCliente {
   item: IReciboEnviar;
@@ -32,6 +35,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
   const [errorMora, setErrorMora] = useState<boolean>(false);
   const [errorCobranza, setErrorCobranza] = useState<boolean>(false);
   const [errorCancelar, setErrorCancelar] = useState<boolean>(false);
+  const [mostrarComentario, setMostrarComentario] = useState<boolean>(false);
 
   const valor = useMemo(
     () =>
@@ -102,7 +106,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
       <HeaderCard
         labelLeft="Deuda Total"
         labelRight={formatCurrency(
-          (valor?.crSaldoCapital ?? 0) +
+          (valor?.crSaldoCredito ?? 0) +
             (valor?.interesGastoCobranza ?? 0) +
             (valor?.interesGastoMora ?? 0),
         )}
@@ -119,7 +123,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
         labelLeft="Gastos cobranza"
         labelRight={formatCurrency(valor?.interesGastoCobranza ?? 0)}
       />
-      <Controller
+      {/* <Controller
         name={`datos.${index}.valorMora`}
         control={control}
         render={({ field: { value } }) => (
@@ -150,7 +154,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
             labelError={"El valor sobrepasa al valor por cobranza"}
           />
         )}
-      />
+      /> */}
       <Controller
         name={`datos.${index}.valorCancela`}
         control={control}
@@ -167,21 +171,29 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
           />
         )}
       />
-      <Controller
-        name={`datos.${index}.observaciones`}
-        control={control}
-        render={({ field: { value, onChange } }) => (
-          <TextInput
-            text=""
-            tipo="text"
-            placeholder="Observaciones"
-            direction="column"
-            multiline
-            defaultValueText={value ?? undefined}
-            onChangeText={onChange}
-          />
-        )}
-      />
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <Text>Observaciones</Text>
+        <Pressable onPress={() => setMostrarComentario(!mostrarComentario)}>
+          <Icon name="plus" size={20} color={GRIS} />
+        </Pressable>
+      </View>
+      {mostrarComentario && (
+        <Controller
+          name={`datos.${index}.observaciones`}
+          control={control}
+          render={({ field: { value, onChange } }) => (
+            <TextInput
+              text=""
+              tipo="text"
+              placeholder="Observaciones"
+              direction="column"
+              multiline
+              defaultValueText={value ?? undefined}
+              onChangeText={onChange}
+            />
+          )}
+        />
+      )}
     </Card>
   );
 };
