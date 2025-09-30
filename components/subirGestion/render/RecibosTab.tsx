@@ -13,18 +13,22 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { GRIS, GRIS_CLARO } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO, ROJO, VERDE_CLARO } from "@/constants/Colors";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { formatCurrency } from "@/helper/function/numericas";
 import ModalAlertaSubirEliminar from "@/components/commons/modal/ModalAlertaSubirEliminar";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
 import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
-import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
+import { IRecibosObtener } from "@/models/IRecibo";
 import { useRecibosObtener } from "@/service/Recibos/useRecibosObtener";
+import { useRecibosEliminar } from "@/service/Recibos/useRecibosEliminar";
+import { useRecibosEnviar } from "@/service/Recibos/useRecibosEnviar";
 
 const RecibosTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
-  const [reciboEliminar, setReciboEliminar] = useState<IRecibos | null>(null);
+  const [reciboEliminar, setReciboEliminar] = useState<IRecibosObtener | null>(
+    null,
+  );
   const [tipoAlerta, setTipoAlerta] = useState<"subir" | "eliminar">("subir");
 
   const {
@@ -33,14 +37,22 @@ const RecibosTab = () => {
     refetch: refetchRecibos,
   } = useRecibosObtener();
 
-  const handleTabDelete = useCallback((item: IRecibos) => {
+  const { mutate: eliminarRecibo, isPending: isLoadingEliminar } =
+    useRecibosEliminar();
+
+  const { mutate: enviarRecibo, isPending: isLoadingEnviar } =
+    useRecibosEnviar();
+
+  const handleTabDelete = useCallback((item: IRecibosObtener) => {
     setTipoAlerta("eliminar");
     setReciboEliminar(item);
     setModalAlertaSubida(true);
   }, []);
 
-  const handleTabUpload = useCallback(() => {
-    console.log("handleTabUpload");
+  const handleTabUpload = useCallback((item: IRecibosObtener) => {
+    setTipoAlerta("subir");
+    setReciboEliminar(item);
+    setModalAlertaSubida(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
@@ -49,18 +61,23 @@ const RecibosTab = () => {
 
   const handleEliminar = useCallback(() => {
     if (reciboEliminar) {
-      // eliminarRecibo(
-      //   { id: reciboEliminar.id },
-      //   {
-      //     onSuccess: () => {
-      //       setModalAlertaSubida(false);
-      //     },
-      //   }
-      // );
+      eliminarRecibo(reciboEliminar, {
+        onSuccess: () => {
+          setModalAlertaSubida(false);
+        },
+      });
     }
-  }, [reciboEliminar]);
+  }, [eliminarRecibo, reciboEliminar]);
 
-  const handleSubir = useCallback(() => {}, []);
+  const handleSubir = useCallback(() => {
+    if (reciboEliminar) {
+      enviarRecibo(reciboEliminar, {
+        onSuccess: () => {
+          handleCloseModal();
+        },
+      });
+    }
+  }, [enviarRecibo, handleCloseModal, reciboEliminar]);
 
   const renderItem = useCallback(
     ({ item }: { item: IRecibosObtener }) => (
@@ -101,10 +118,21 @@ const RecibosTab = () => {
             style={styles.pressableStyle}
             onPress={() => handleTabDelete(item)}
           >
-            <Icon name="trash" size={convertirTamanoHorizontal(30)} />
+            <Icon
+              name="trash"
+              size={convertirTamanoHorizontal(30)}
+              color={ROJO}
+            />
           </Pressable>
-          <Pressable style={styles.pressableStyle} onPress={handleTabUpload}>
-            <Icon name="upload" size={convertirTamanoHorizontal(30)} />
+          <Pressable
+            style={styles.pressableStyle}
+            onPress={() => handleTabUpload(item)}
+          >
+            <Icon
+              name="upload"
+              size={convertirTamanoHorizontal(30)}
+              color={VERDE_CLARO}
+            />
           </Pressable>
         </View>
       </Card>
@@ -137,7 +165,7 @@ const RecibosTab = () => {
           tipo={tipoAlerta}
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
-          isLoading={false}
+          isLoading={isLoadingEliminar || isLoadingEnviar}
         />
       )}
     </View>

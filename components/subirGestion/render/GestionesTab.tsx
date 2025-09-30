@@ -24,6 +24,7 @@ import { useSubirGestionEliminar } from "@/service/SubirInformacion/useSubirGest
 import { format, parseISO } from "date-fns";
 import { SubirVerificacionUnica } from "@/service/SubirInformacion/subirVerificacionUnica";
 import ModalError from "@/components/sincronizar/modal/ModalError";
+import { useGestionesEnviar } from "@/service/Gestiones/useGestionesEnviar";
 
 const GestionesTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
@@ -43,10 +44,10 @@ const GestionesTab = () => {
   const { mutate: eliminarGestion, isPending: isLoadingEliminaGestion } =
     useSubirGestionEliminar();
 
-  // const {
-  //   mutate: eliminarGestionVerificacion,
-  //   isPending: isLoadingEliminaGestionVerificacion,
-  // } = useSubirGestionEliminarVerificacion();
+  const {
+    mutate: sincronizarGestionesEnviar,
+    isPending: isLoadingSincronizar,
+  } = useGestionesEnviar();
 
   const handleTabDelete = useCallback((datos: ISubirInformacion) => {
     setGestion(datos);
@@ -84,26 +85,6 @@ const GestionesTab = () => {
           },
         );
       }
-      // else if (
-      //   gestion.factura === "VERIFICACION" &&
-      //   (gestion.calificacion === "ANULAR" ||
-      //     gestion.calificacion === "REASIGNAR")
-      // ) {
-      //   eliminarGestionVerificacion(
-      //     {
-      //       calificacion: 0,
-      //       identificacionCliente: gestion.identificacionCliente,
-      //       reversar: true,
-      //       codigoTipoGestion:
-      //         gestion.tipoGestion === "VERIFICACION DOMICILIO" ? 1 : 2,
-      //     },
-      //     {
-      //       onSuccess: () => {
-      //         handleCloseModal();
-      //       },
-      //     }
-      //   );
-      // }
       if (gestion.factura !== "VERIFICACION") {
         eliminarGestion(
           {
@@ -127,8 +108,19 @@ const GestionesTab = () => {
   const handleSubir = useCallback(() => {
     if (gestion && gestion.factura === "VERIFICACION") {
       subirVerificacion(Number(gestion.id), handleCloseModal);
+    } else if (gestion) {
+      sincronizarGestionesEnviar(gestion, {
+        onSuccess: () => {
+          handleCloseModal();
+        },
+      });
     }
-  }, [gestion, handleCloseModal, subirVerificacion]);
+  }, [
+    gestion,
+    handleCloseModal,
+    sincronizarGestionesEnviar,
+    subirVerificacion,
+  ]);
 
   const renderItem = useCallback(
     ({ item, index }: { item: ISubirInformacion; index: number }) => (
@@ -225,7 +217,7 @@ const GestionesTab = () => {
           tipo={tipoAlerta}
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
-          isLoading={isLoadingEliminaGestion || loading}
+          isLoading={isLoadingEliminaGestion || loading || isLoadingSincronizar}
         />
       )}
       {error && (

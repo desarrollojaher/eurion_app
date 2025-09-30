@@ -23,6 +23,8 @@ export interface IGestionesDetalles {
   gcId: number;
   caId: number;
   crId: number;
+  idAgencia: number;
+  idHojaDetalle: number;
 }
 export interface IGestiones {
   idHojaRuta: number;
@@ -83,6 +85,25 @@ export interface IGestionesRealizas {
   crFechaGestionada?: string | null;
 }
 
+export interface IGestionesRealizasEnviar {
+  gcIdCc: number | null;
+  gdId: number | null;
+  crLatitud?: number | null;
+  crLongitud?: number | null;
+  crObservaciones: string | null;
+  usIdGestiona?: number | null;
+  caId: number | null;
+  clId: number | null;
+  agId?: number | null;
+  crIdCredito: number | null;
+  cpFechaCompromiso?: string | null;
+  hdId?: number | null;
+  cpObservaciones?: string | null;
+  gcId: number | null;
+  crFechaProxGestion?: string | null;
+  trId: number | null;
+  crFechaGestionada?: string | null;
+}
 export interface IGestionesAnterioresParams {
   crId: number;
 }

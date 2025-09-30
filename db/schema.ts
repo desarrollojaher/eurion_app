@@ -161,6 +161,8 @@ export const gestionesDetallesTable = sqliteTable("gestiones_detalles", {
   gcId: int(),
   caId: int(),
   crId: int(),
+  idAgencia: int(),
+  idHojaDetalle: int(),
 });
 
 export const referenciasTable = sqliteTable("referencias", {
@@ -287,6 +289,8 @@ export const gestionesCobranzasResultados = sqliteTable(
     crFechaProxGestion: text(),
     trId: int(),
     crFechaGestionada: text(),
+    diId: int(),
+    teId: int(),
   },
 );
 

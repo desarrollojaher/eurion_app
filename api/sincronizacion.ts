@@ -4,7 +4,12 @@ import {
 } from "@/models/ISincronizar";
 import { get, post } from "./config";
 import { ITiposVerificaciones } from "@/models/ITiposVerificaciones";
-import { IGestiones, IGestionesAnteriores } from "@/models/IGestiones";
+import {
+  IGestiones,
+  IGestionesAnteriores,
+  IGestionesRealizas,
+  IGestionesRealizasEnviar,
+} from "@/models/IGestiones";
 import { IClientesGestion } from "@/models/ICliente";
 import { IReferencia } from "@/models/IReferencia";
 import { IComprobante } from "@/models/IComprobante";
@@ -13,6 +18,7 @@ import { IDireccion } from "@/models/IDireccion";
 import { ITelefono } from "@/models/ITelefono";
 import { ITipoReferencia } from "@/models/ITipoReferencia";
 import { IFormaPago } from "@/models/IFormaPago";
+import { IRecibosEnviar } from "@/models/IRecibo";
 
 export const sincronizacionApi = {
   obtenerVerificaciones: async () => {
@@ -73,4 +79,12 @@ export const sincronizacionApi = {
     const res = await get<IFormaPago[]>("sincronizacion/formas-pago/obtener");
     return res.data;
   },
+  sinronizarGestionesEnviar: async (datos: IGestionesRealizasEnviar) => {
+    const res = await post("sincronizacion/gestiones/sincronizar", datos);
+    return res.data;
+  },
+  sincronizarRecibosEnviar: async (datos: IRecibosEnviar) => {
+    const res = await post("sincronizacion/pagos/sincronizar", datos);
+    return res.data;
+  }
 };

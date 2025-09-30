@@ -43,6 +43,7 @@ import {
   IGestionesAnterioresParams,
   IGestionesCabecera,
   IGestionesRealizas,
+  IGestionesRealizasEnviar,
 } from "@/models/IGestiones";
 import { IReferencia, IReferenciaParams } from "@/models/IReferencia";
 import {
@@ -63,7 +64,7 @@ import { IProducto } from "@/models/IProducto";
 import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
 import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
-import { union } from "lodash";
+import {  union } from "lodash";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -557,14 +558,14 @@ export const dbSqliteService = {
 
   obtenerInfoSubir: async () => {
     try {
-      const verificaciones = await dbSqliteService.obtenerDatosSubirVerificacion();
+      const verificaciones =
+        await dbSqliteService.obtenerDatosSubirVerificacion();
 
       const gestionesRealizadas = await dbSqliteService.obtenerGestiones();
-     
 
       const gestionesRealizadasUnion: ISubirInformacion[] = union(
         verificaciones,
-        gestionesRealizadas
+        gestionesRealizadas,
       );
       return gestionesRealizadasUnion;
     } catch (error: any) {
@@ -611,9 +612,32 @@ export const dbSqliteService = {
         });
         await db.run("COMMIT");
       }
-      // if (datos.modulo === "gestion") {
-      //   await dbSqliteService.eliminarGestionesCelular(datos);
-      // }
+      if (datos.modulo === "gestion") {
+        await db.run("BEGIN TRANSACTION");
+        await dbSqliteService.eliminarGestionRealizada(Number(datos.id));
+        const cliente = await db
+          .select()
+          .from(schema.clienteTable)
+          .where(
+            eq(
+              schema.clienteTable.identificacionCliente,
+              datos.identificacionCliente,
+            ),
+          )
+          .limit(1)
+          .get();
+
+        if (!cliente) {
+          throw { message: "No se encontro el cliente" };
+        }
+
+        await db
+          .update(schema.gestionesTable)
+          .set({ gestionado: 0 })
+          .where(eq(schema.gestionesTable.clId, Number(cliente.idCliente)));
+
+        await db.run("COMMIT");
+      }
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
@@ -1089,6 +1113,8 @@ export const dbSqliteService = {
           clId: schema.documentosTable.clId,
           caId: schema.gestionesDetallesTable.caId,
           gcId: schema.gestionesDetallesTable.gcId,
+          idHojaDetalle: schema.gestionesDetallesTable.idHojaDetalle,
+          idAgencia: schema.gestionesDetallesTable.idAgencia,
         })
         .from(schema.documentosTable)
         .leftJoin(
@@ -1269,11 +1295,16 @@ export const dbSqliteService = {
           clId: schema.documentosTable.clId,
           doctran: sql`${schema.documentosTable.tipoComprobante} || ' ' || ${schema.documentosTable.idCredito}`,
           tipoPago: schema.formasPagoTable.fpNombre,
+          identificacionCliente: schema.clienteTable.identificacionCliente,
         })
         .from(schema.pagosGestion)
         .leftJoin(
           schema.documentosTable,
           eq(schema.documentosTable.idCredito, schema.pagosGestion.coId),
+        )
+        .leftJoin(
+          schema.clienteTable,
+          eq(schema.clienteTable.idCliente, schema.documentosTable.clId),
         )
         .leftJoin(
           schema.formasPagoTable,
@@ -1291,10 +1322,9 @@ export const dbSqliteService = {
 
   obtenerGestiones: async () => {
     try {
-      
       const gestiones: ISubirInformacion[] = await db
         .select({
-          id: schema.gestionesCobranzasResultados.caId,
+          id: schema.gestionesCobranzasResultados.gcId,
           tipoGestion: sql`'Gestion'`,
           fecha: schema.gestionesCobranzasResultados.crFechaGestionada,
           cliente: sql`(${schema.clienteTable.apellidoCliente} || ' ' || ${schema.clienteTable.nombreCliente})`,
@@ -1329,6 +1359,108 @@ export const dbSqliteService = {
           eq(schema.gestionesCobranzasResultados.crEstadoSync, "PENDIENTE"),
         );
       return gestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerGestionesRealizadas: async (id: number) => {
+    try {
+      const gestiones: IGestionesRealizasEnviar[] = await db
+        .select({
+          gcIdCc: schema.gestionesCobranzasResultados.gcIdCc,
+          gdId: schema.gestionesCobranzasResultados.gdId,
+          crLatitud: schema.gestionesCobranzasResultados.crLatitud,
+          crLongitud: schema.gestionesCobranzasResultados.crLongitud,
+          crObservaciones: schema.gestionesCobranzasResultados.crObservaciones,
+          usIdGestiona: schema.gestionesCobranzasResultados.usIdGestiona,
+          caId: schema.gestionesCobranzasResultados.caId,
+          clId: schema.gestionesCobranzasResultados.clId,
+          agId: schema.gestionesCobranzasResultados.agId,
+          crIdCredito: schema.gestionesCobranzasResultados.crIdCredito,
+          cpFechaCompromiso:
+            schema.gestionesCobranzasResultados.cpFechaCompromiso,
+          hdId: schema.gestionesCobranzasResultados.hdId,
+          cpObservaciones: schema.gestionesCobranzasResultados.cpObservaciones,
+          gcId: schema.gestionesCobranzasResultados.gcId,
+          crFechaProxGestion:
+            schema.gestionesCobranzasResultados.crFechaProxGestion,
+          trId: schema.gestionesCobranzasResultados.trId,
+          crFechaGestionada:
+            schema.gestionesCobranzasResultados.crFechaGestionada,
+        })
+        .from(schema.gestionesCobranzasResultados)
+        .where(eq(schema.gestionesCobranzasResultados.gcId, id));
+      return gestiones;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  actualizarGestion: async (id: number) => {
+    try {
+      await db
+        .update(schema.gestionesCobranzasResultados)
+        .set({ crEstadoSync: "ENVIADO" })
+        .where(eq(schema.gestionesCobranzasResultados.gcId, id));
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarGestionRealizada: async (id: number) => {
+    try {
+      await db
+        .delete(schema.gestionesCobranzasResultados)
+        .where(eq(schema.gestionesCobranzasResultados.gcId, id));
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  eliminarRecibos: async (id: IRecibosObtener) => {
+    try {
+      await db
+        .delete(schema.pagosGestion)
+        .where(
+          and(
+            eq(schema.pagosGestion.gcId, id.gcId ?? -1),
+            eq(schema.pagosGestion.fpId, id.fpId ?? -1),
+            eq(schema.pagosGestion.coId, id.coId ?? -1),
+            eq(schema.pagosGestion.usIdCobrador, id.usIdCobrador ?? -1),
+            eq(schema.pagosGestion.pgValorCobrado, id.pgValorCobrado ?? -1),
+            eq(schema.pagosGestion.pgFechaCobro, id.pgFechaCobro ?? ""),
+          ),
+        );
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  actualizarRecibos: async (id: IRecibosObtener) => {
+    try {
+      await db
+        .update(schema.pagosGestion)
+        .set({ pgSincronizado: "ENVIADO" })
+        .where(
+          and(
+            eq(schema.pagosGestion.gcId, id.gcId ?? -1),
+            eq(schema.pagosGestion.fpId, id.fpId ?? -1),
+          ),
+        );
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =

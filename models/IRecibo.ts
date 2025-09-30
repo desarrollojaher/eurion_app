@@ -89,4 +89,22 @@ export type IRecibosObtener = IRecibos & {
   clId: number | null;
   doctran: string | null;
   tipoPago: string | null;
+  identificacionCliente: string | null;
 };
+
+export interface IRecibosEnviar {
+  coId: number;
+  pgValorCobrado: number;
+  usIdCobrador: number;
+  fpId: number;
+  pgFechaCobro: string;
+  pgObservaciones: string;
+  pgLatitud: number;
+  pgLongitud: number;
+  gcId: number;
+  pgKeyImagen: string;
+  pgBucket: string;
+  pgPath: string;
+  pgMimetype: string;
+  pgEstado: number;
+}

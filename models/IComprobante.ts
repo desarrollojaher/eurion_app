@@ -22,12 +22,14 @@ export interface IComprobante {
 export type IComprobanteObtener = Omit<IComprobante, "productos"> & {
   caId: number | null;
   gcId: number | null;
+  idHojaDetalle: number | null;
+  idAgencia: number | null;
 };
 
 export interface IComprobanteObtenerParams {
   clId: number;
 }
 
-export interface IComprobanteDetalleParams{
-  crId: number
+export interface IComprobanteDetalleParams {
+  crId: number;
 }

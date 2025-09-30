@@ -216,6 +216,8 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       if (fac && fac?.gcId && fac?.caId) {
         setValue("gcId", fac?.gcId);
         setValue("caId", fac?.caId);
+        setValue("agId", fac?.idAgencia);
+        setValue("hdId", fac?.idHojaDetalle);
       }
     },
     [dataComprobantes, setValue],

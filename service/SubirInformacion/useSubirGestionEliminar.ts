@@ -15,7 +15,7 @@ export const useSubirGestionEliminar = (
     any,
     ISubirInformacionEliminar,
     unknown
-  >
+  >,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({

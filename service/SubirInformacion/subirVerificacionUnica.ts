@@ -4,10 +4,7 @@ import { dbSqliteService } from "../db/db";
 import { ISincronizarVerificacionesEnviar } from "@/models/ISincronizar";
 import { subirInformacionKeys } from "./subirInformacionKeys";
 import { Toast } from "toastify-react-native";
-import {
-  compressImage,
-  eliminarImagen,
-} from "@/helper/function/comprimirImagen";
+import { compressImage, eliminarImagen } from "@/helper/function/comprimirImagen";
 import { awsApi } from "@/api/aws";
 import uuid from "react-native-uuid";
 import { BucketS3Jaher } from "@/constants/env";
@@ -37,7 +34,8 @@ export const SubirVerificacionUnica = () => {
       const verificacion: ISincronizarVerificacionesEnviar[] =
         await dbSqliteService.obtenerVerificacionesSubidaUnica({ vdId: vdId });
 
-      const url = await awsApi.obtenerPath({ modulo: "VERIFICACIONES" });
+      // const url = await awsApi.obtenerPath({ modulo: "VERIFICACIONES" });
+      const url = [{ path: "CEDULA/VERIFICACIONES/FOTOS" }];
       let urlS3 = "";
       if (url.length > 0) {
         urlS3 = url[0].path.replace("CEDULA", verificacion[0].clIdentificacion);
@@ -96,9 +94,7 @@ export const SubirVerificacionUnica = () => {
       if (error.message === "Network Error") {
         setErrorMessage("No se pudo conectar con el servidor");
       } else {
-        setErrorMessage(
-          `Error en subir la verificacion:  ${error.response.data.message}`,
-        );
+        setErrorMessage(`Error en subir la verificacion:  ${error.response.data.message}`);
       }
       setError(true);
       setLoading(false);
