@@ -80,6 +80,7 @@ export interface IGestionesRealizas {
   gcId: number;
   crFechaProxGestion?: string | null;
   trId: number;
+  crFechaGestionada?: string | null;
 }
 
 export interface IGestionesAnterioresParams {

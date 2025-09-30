@@ -83,8 +83,9 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
 
       if (
         valor &&
-        valor.crSaldoCapital &&
-        valor.crSaldoCapital >=
+        (valor?.crSaldoCredito ?? 0) +
+          (valor?.interesGastoCobranza ?? 0) +
+          (valor?.interesGastoMora ?? 0) >=
           Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
       ) {
         setErrorCancelar(false);

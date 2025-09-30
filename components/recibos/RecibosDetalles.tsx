@@ -13,7 +13,7 @@ import ReciboTabRecibo from "./ReciboTabRecibo";
 import ReciboTabTipoPago from "./ReciboTabTipoPago";
 import { useReciboStore } from "@/helper/store/storeRecibos";
 import { z } from "zod";
-import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
+import { IReciboEnviar, IReciboEnviarDatos, IRecibos } from "@/models/IRecibo";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toast } from "toastify-react-native";
@@ -34,6 +34,8 @@ import ModalLoading from "../commons/modal/ModalLoading";
 import ModalAlertaGurdar from "./modal/ModalAlertaGurdar";
 import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesObtener";
 import { useSession } from "@/helper/provider/Auth";
+import { useRecibosGuardar } from "@/service/Recibos/useRecibosGuardar";
+import { handleChangeDireccionImagenes } from "@/helper/function/imagenes";
 
 const schema = z.object({
   datos: z.array(
@@ -100,15 +102,16 @@ const schema = z.object({
       observaciones: z.string().nullish(),
       latitud: z.number().nullish(),
       longitud: z.number().nullish(),
-      imagenes: z
-        .array(
-          z.object({
-            idPago: z.string().nullish(),
-            url: z.string(),
-            titulo: z.string(),
-          }),
-        )
-        .nullish(),
+      gcId: z.number().nullish(),
+      // imagenes: z
+      //   .array(
+      //     z.object({
+      //       idPago: z.string().nullish(),
+      //       url: z.string(),
+      //       titulo: z.string(),
+      //     }),
+      //   )
+      //   .nullish(),
     }),
   ),
 });
@@ -128,6 +131,9 @@ const RecibosDetalles = () => {
   const { data: documentos } = useComprobantesObtener({
     clId: datos?.cliId ?? -1,
   });
+
+  const { mutate: guardarRecibo, isPending: isPendingRecibo } =
+    useRecibosGuardar();
   const defaultValueRecibos = useMemo<IReciboEnviarDatos>(() => {
     if (documentos && documentos.length > 0) {
       const data = documentos.map<IReciboEnviar>((item) => ({
@@ -147,6 +153,7 @@ const RecibosDetalles = () => {
         identificacionCliente: datos?.identificacion ?? "",
         crId: item.idCredito,
         usId: usuario?.usuId,
+        gcId: item.gcId,
       }));
       const datosEnviar: IReciboEnviarDatos = {
         datos: data,
@@ -236,14 +243,13 @@ const RecibosDetalles = () => {
 
   const onSuccess = useCallback(
     async (data: IReciboEnviarDatos) => {
-      console.log("entro a guardar");
-
       setModalAlertaGuardar(false);
       setIsLoadingRecibo(true);
       let noExiste = false;
 
       for (let index = 0; index < data.datos.length; index++) {
         const element = data.datos[index];
+
         const ob = defaultValueRecibos.datos[index];
         const clavesComunes = intersection(
           Object.keys(element),
@@ -259,55 +265,20 @@ const RecibosDetalles = () => {
 
         if (!sonIguales) {
           noExiste = true;
-
-          // const file = find(
-          //   dataFormasPago,
-          //   (item) => item.fpSolicitaDetalle === "S",
-          // );
-          // console.log(element);
-          // console.log(file);
-
-          // const existe = find(
-          //   element.valores,
-          //   (item) =>
-          //     item.tipoPago === file?.fpId?.toString()
-          // );
-
-          // const datosSinImagen = filter(
-          //   element.valores,
-          //   (item) =>
-          //     item.id === file?.fpId?.toString() &&
-          //     (item.urlImagen === null ||
-          //       item.urlImagen === "" ||
-          //       item.urlImagen === undefined),
-          // );
-          // console.log(datosSinImagen);
-
-          // if (existe?.urlImagen === null || existe?.urlImagen === "" || existe?.urlImagen === undefined) {
-          //   Toast.error(
-          //     `El recibo de la factura ${element.doctran} no tiene imagenes del comprobante de pago`,
-          //   );
-          //   setIsLoadingRecibo(false);
-          //   return;
-          // }
           const dato = find(
             documentos,
             (item) =>
               `${item.tipoComprobante} ${item.idCredito}` === element.doctran,
           );
 
-          const saldoVencido = dato ? (dato.crSaldoCapital ?? 0) : 0;
+          const saldoVencido = dato ? (dato.crSaldoCredito ?? 0) : 0;
           const gastosCobranza = dato ? (dato.interesGastoCobranza ?? 0) : 0;
           const interesMora = dato ? (dato.interesGastoMora ?? 0) : 0;
 
           if (
-            (element.valorCancela ?? 0) +
-              (element.valorCobranza ?? 0) +
-              (element.valorMora ?? 0) >
-              0 &&
-            (element.valorCancela ?? 0) <= saldoVencido &&
-            (element.valorCobranza ?? 0) <= gastosCobranza &&
-            (element.valorMora ?? 0) <= interesMora
+            (element.valorCancela ?? 0) > 0 &&
+            (element.valorCancela ?? 0) <=
+              saldoVencido + gastosCobranza + interesMora
           ) {
             if (element.valores && element.valores?.length > 0) {
               const sumaTotal =
@@ -323,18 +294,43 @@ const RecibosDetalles = () => {
                 dataAux.latitud = location?.coords.latitude ?? 0;
                 dataAux.longitud = location?.coords.longitude ?? 0;
 
-                console.log(dataAux);
+                const dataEnviar: IRecibos[] = [];
+
+                if (dataAux.valores && dataAux.valores.length > 0) {
+                  for (let index = 0; index < dataAux.valores.length; index++) {
+                    const url = await handleChangeDireccionImagenes({
+                      titulo: dataAux.valores[index].id ?? "",
+                      url: dataAux.valores[index].urlImagen ?? "",
+                    });
+                    const valores: IRecibos = {
+                      coId: dataAux.crId ?? 0,
+                      pgLatitud: dataAux.latitud,
+                      pgLongitud: dataAux.longitud,
+                      pgObservaciones: dataAux.observaciones ?? "",
+                      pgSincronizado: "N",
+                      pgValorCobrado: dataAux.valores[index].valor,
+                      usIdCobrador: dataAux.usId ?? 0,
+                      pgFechaCobro: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+                      fpId: Number(dataAux.valores[index].tipoPago),
+                      gcId: dataAux.gcId ?? -1,
+                      nombreImg: dataAux.valores[index].id ?? "",
+                      urlImg: url ?? "",
+                    };
+                    dataEnviar.push(valores);
+                  }
+                }
 
                 setIsLoadingRecibo(false);
-                // guardarRecibos(dataAux, {
-                //   onSuccess: () => {
-                //     reset(defaultValueRecibos);
-                //     setTab(0);
-                //   },
-                //   onError: () => {
-                //     setIsLoadingRecibo(false);
-                //   },
-                // });
+                guardarRecibo(dataEnviar, {
+                  onSuccess: () => {
+                    reset(defaultValueRecibos);
+                    setTab(0);
+                    setIsLoadingRecibo(false);
+                  },
+                  onError: () => {
+                    setIsLoadingRecibo(false);
+                  },
+                });
               } else {
                 Toast.error(
                   `La suma de los valores del comprobante ${data.datos[index].doctran} son diferentes`,
@@ -355,10 +351,12 @@ const RecibosDetalles = () => {
       setIsLoadingRecibo(false);
     },
     [
-      defaultValueRecibos.datos,
+      defaultValueRecibos,
       documentos,
+      guardarRecibo,
       handleCompararObjetos,
       handleObtenerDireccionGps,
+      reset,
     ],
   );
 
@@ -429,8 +427,11 @@ const RecibosDetalles = () => {
       {modalAlerta && (
         <ModalAlertBack onClose={handleCloseModal} visible={modalAlerta} />
       )}
-      {loadingRecibo && (
-        <ModalLoading onClose={() => {}} visible={loadingRecibo} />
+      {loadingRecibo && isPendingRecibo && (
+        <ModalLoading
+          onClose={() => {}}
+          visible={loadingRecibo || isPendingRecibo}
+        />
       )}
       {modalAlertaGuardar && (
         <ModalAlertaGurdar

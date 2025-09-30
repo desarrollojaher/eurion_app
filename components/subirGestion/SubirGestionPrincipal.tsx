@@ -1,12 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import Header from "../commons/header/Header";
-import Icon from "react-native-vector-icons/FontAwesome5";
-import { BLANCO } from "@/constants/Colors";
-import {
-  convertirTamanoHorizontal,
-  convertirTamanoVertical,
-} from "@/helper/function/renderizadoImagen";
+import { convertirTamanoVertical } from "@/helper/function/renderizadoImagen";
 import Footer from "../commons/footer/Footer";
 import GestionesTab from "./render/GestionesTab";
 import ActualizacionesTab from "./render/ActualizacionesTab";
@@ -17,7 +12,7 @@ const SubirGestionPrincipal = () => {
   const [index, setIndex] = useState(0);
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
 
-  const tabs = useMemo(() => ["Gestiones", "Actualizaciones", "Recibos"], []);
+  const tabs = useMemo(() => ["Gestiones", "Recibos"], []);
 
   const renderTab = useMemo(() => {
     if (tabs[index] === "Gestiones") {
@@ -46,13 +41,13 @@ const SubirGestionPrincipal = () => {
     <View style={styles.constainerGeneral}>
       <Header
         title="Subir Información"
-        iconRight={
-          <Icon
-            name="save"
-            color={BLANCO}
-            size={convertirTamanoHorizontal(30)}
-          />
-        }
+        // iconRight={
+        //   <Icon
+        //     name="save"
+        //     color={BLANCO}
+        //     size={convertirTamanoHorizontal(30)}
+        //   />
+        // }
         handleTapIconRight={handleTapSave}
       />
       <View style={styles.containerBody}>{renderTab}</View>

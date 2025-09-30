@@ -152,7 +152,9 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
-      if (pideFoto && imagen === undefined) {
+      console.log(pideFoto);
+
+      if (pideFoto === "S" && imagen === undefined) {
         Toast.error("Ingrese una imagen");
         return;
       }

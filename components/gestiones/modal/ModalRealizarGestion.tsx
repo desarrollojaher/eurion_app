@@ -24,6 +24,7 @@ import { getUbicacion } from "@/helper/function/ubicacion";
 import { useSession } from "@/helper/provider/Auth";
 import { useGuardarGestion } from "@/service/Gestiones/useGuardarGestion";
 import { router } from "expo-router";
+import { format } from "date-fns";
 
 const schema = z.object({
   gcIdCc: z.number({
@@ -68,6 +69,7 @@ const schema = z.object({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
+  crFechaGestionada: z.string().nullish(),
 });
 
 interface PropsModalRealizarGestion {
@@ -257,7 +259,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       dataAux.crLongitud = localizacion.coords.longitude;
       dataAux.usIdGestiona = usuario?.usuId ?? -1;
 
-      console.log(dataAux);
+      dataAux.crFechaGestionada = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
       setGuardandoGestion(false);
       guardarGestion(dataAux, {
@@ -392,7 +394,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
               onChangeText={onChange}
               text=""
               tipo="text"
-              defaultValueText={value}
+              defaultValueText={value ?? ""}
               direction="column"
               placeholder="Observaciones"
               multiline

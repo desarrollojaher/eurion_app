@@ -19,24 +19,21 @@ import { formatCurrency } from "@/helper/function/numericas";
 import ModalAlertaSubirEliminar from "@/components/commons/modal/ModalAlertaSubirEliminar";
 import EmptyList from "@/components/commons/FlatList/EmptyList";
 import LoadingComponent from "@/components/commons/FlatList/LoadingComponent";
-import { IRecibosCabeceraListado } from "@/models/IRecibo";
+import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
+import { useRecibosObtener } from "@/service/Recibos/useRecibosObtener";
 
 const RecibosTab = () => {
   const [modalAlertaSubida, setModalAlertaSubida] = useState(false);
-  const [reciboEliminar, setReciboEliminar] =
-    useState<IRecibosCabeceraListado | null>(null);
+  const [reciboEliminar, setReciboEliminar] = useState<IRecibos | null>(null);
   const [tipoAlerta, setTipoAlerta] = useState<"subir" | "eliminar">("subir");
 
-  // const { mutate: eliminarRecibo, isPending: isLoadingEliminar } =
-  //   useRecibosEliminar();
+  const {
+    data: dataRecibos,
+    isLoading: isLoadingRecibos,
+    refetch: refetchRecibos,
+  } = useRecibosObtener();
 
-  // const {
-  //   data: dataRecibos,
-  //   isLoading: isLoadingRecibos,
-  //   refetch: refetchRecibos,
-  // } = useRecibosObtener();
-
-  const handleTabDelete = useCallback((item: IRecibosCabeceraListado) => {
+  const handleTabDelete = useCallback((item: IRecibos) => {
     setTipoAlerta("eliminar");
     setReciboEliminar(item);
     setModalAlertaSubida(true);
@@ -63,37 +60,38 @@ const RecibosTab = () => {
     }
   }, [reciboEliminar]);
 
-  const handleSubir = useCallback(() => { }, []);
+  const handleSubir = useCallback(() => {}, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: IRecibosCabeceraListado }) => (
+    ({ item }: { item: IRecibosObtener }) => (
       <Card>
-        <HeaderCard labelLeft={`${item.apellidos}`} labelRight={item.fecha} />
+        <HeaderCard
+          labelLeft={item.doctran ?? ""}
+          labelRight={item.pgFechaCobro}
+        />
         <Separador />
         <HeaderCard
-          labelLeft="Capital"
-          labelRight={formatCurrency(item.capital ?? 0)}
+          labelLeft="Observacion"
+          labelRight={
+            item.pgObservaciones && item.pgObservaciones.trim().length > 0
+              ? item.pgObservaciones
+              : "No hay observaciones"
+          }
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
+
         <Separador color={GRIS_CLARO} />
         <HeaderCard
-          labelLeft="Interes mora"
-          labelRight={formatCurrency(item.interesMora ?? 0)}
-          styleLeft={styles.styleLabelLeft}
-          styleRight={styles.styleLabelRigth}
-        />
-        <Separador color={GRIS_CLARO} />
-        <HeaderCard
-          labelLeft="Gastos cobranza"
-          labelRight={formatCurrency(item.gastoCobranza ?? 0)}
+          labelLeft="Tipo Cobro"
+          labelRight={item.tipoPago}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
         <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Total"
-          labelRight={formatCurrency(item.cobroTotalCuotas ?? 0)}
+          labelRight={formatCurrency(item.pgValorCobrado ?? 0)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
         />
@@ -111,22 +109,22 @@ const RecibosTab = () => {
         </View>
       </Card>
     ),
-    [handleTabDelete, handleTabUpload]
+    [handleTabDelete, handleTabUpload],
   );
   return (
     <View>
       <FlatList
-        data={[]}
+        data={dataRecibos}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListStyle}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(datos) => datos.id.toString()}
-        ListEmptyComponent={<EmptyList isLoading={true} />}
-        ListFooterComponent={<LoadingComponent isLoading={true} />}
+        keyExtractor={(datos) => datos.nombreImg ?? ""}
+        ListEmptyComponent={<EmptyList isLoading={isLoadingRecibos} />}
+        ListFooterComponent={<LoadingComponent isLoading={isLoadingRecibos} />}
         refreshControl={
           <RefreshControl
-            refreshing={true}
-           // onRefresh={refetchRecibos}
+            refreshing={isLoadingRecibos}
+            onRefresh={refetchRecibos}
             colors={["#007AFF"]}
             tintColor="#007AFF"
           />

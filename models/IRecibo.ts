@@ -1,5 +1,3 @@
-import { IImagenCompleta } from "./IImagenCompleta";
-
 export interface IRecibo {
   nombre: string;
   cedula: string;
@@ -26,7 +24,7 @@ export interface IRecibosEnviarDetalles {
 
 export interface IReciboEnviar {
   [key: string]: any;
-  imagenes?: IImagenCompleta[] | null;
+  // imagenes?: IImagenCompleta[] | null;
   doctran: string;
   valores?: IRecibosEnviarDetalles[] | null;
   valorMora?: number | null | any;
@@ -40,6 +38,7 @@ export interface IReciboEnviar {
   banco?: string | null;
   crId?: number | null;
   usId?: number | null;
+  gcId?: number | null;
 }
 
 export interface IReciboEnviarDatos {
@@ -69,4 +68,25 @@ export interface IRecibosCabeceraListado {
 
 export type IRecibosEliminarParams = {
   id: number;
+};
+
+export interface IRecibos {
+  coId: number | null;
+  pgValorCobrado: number | null;
+  usIdCobrador: number | null;
+  fpId: number | null;
+  pgFechaCobro: string | null;
+  pgObservaciones: string | null;
+  pgSincronizado: string | null;
+  pgLatitud: number | null;
+  pgLongitud: number | null;
+  gcId: number | null;
+  urlImg: string | null;
+  nombreImg: string | null;
+}
+
+export type IRecibosObtener = IRecibos & {
+  clId: number | null;
+  doctran: string | null;
+  tipoPago: string | null;
 };

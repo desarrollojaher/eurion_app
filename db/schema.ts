@@ -286,6 +286,7 @@ export const gestionesCobranzasResultados = sqliteTable(
     gcId: int(),
     crFechaProxGestion: text(),
     trId: int(),
+    crFechaGestionada: text(),
   },
 );
 
@@ -293,4 +294,19 @@ export const formasPagoTable = sqliteTable("formas_pago", {
   fpId: int(),
   fpNombre: text(),
   fpSolicitaDetalle: text(),
+});
+
+export const pagosGestion = sqliteTable("pagos_gestion", {
+  coId: int(),
+  pgValorCobrado: integer({ mode: "number" }),
+  usIdCobrador: int(),
+  fpId: int(),
+  pgFechaCobro: text(),
+  pgObservaciones: text(),
+  pgSincronizado: text().default("PENDIENTE"),
+  pgLatitud: integer({ mode: "number" }),
+  pgLongitud: integer({ mode: "number" }),
+  gcId: int(),
+  urlImg: text(),
+  nombreImg: text(),
 });

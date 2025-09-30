@@ -62,6 +62,8 @@ import { ITipoReferencia } from "@/models/ITipoReferencia";
 import { IProducto } from "@/models/IProducto";
 import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
+import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
+import { union } from "lodash";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -555,17 +557,16 @@ export const dbSqliteService = {
 
   obtenerInfoSubir: async () => {
     try {
-      const verificaciones =
-        await dbSqliteService.obtenerDatosSubirVerificacion();
+      const verificaciones = await dbSqliteService.obtenerDatosSubirVerificacion();
 
-      // const gestionesRealizadas =
-      //   await dbSqliteService.obtenerGestionesRealizadas();
+      const gestionesRealizadas = await dbSqliteService.obtenerGestiones();
+     
 
-      // const gestionesRealizadasUnion: ISubirInformacion[] = union(
-      //   verificaciones,
-      //   gestionesRealizadas
-      // );
-      return verificaciones;
+      const gestionesRealizadasUnion: ISubirInformacion[] = union(
+        verificaciones,
+        gestionesRealizadas
+      );
+      return gestionesRealizadasUnion;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -940,7 +941,7 @@ export const dbSqliteService = {
     }
   },
 
-    sincronizarFormasPago: async (data: IFormaPago[]) => {
+  sincronizarFormasPago: async (data: IFormaPago[]) => {
     try {
       await db.insert(schema.formasPagoTable).values(data);
     } catch (error: any) {
@@ -1114,7 +1115,7 @@ export const dbSqliteService = {
       await db
         .update(schema.gestionesTable)
         .set({ gestionado: 1 })
-        .where(eq(schema.gestionesTable.clId, data.clId));
+        .where(eq(schema.gestionesTable.clId, data.clId ?? -1));
       await db.run("COMMIT");
     } catch (error: any) {
       await db.run("ROLLBACK");
@@ -1230,6 +1231,104 @@ export const dbSqliteService = {
         .select()
         .from(schema.formasPagoTable);
       return formasPago;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  insertarRecibos: async (data: IRecibos[]) => {
+    try {
+      await db.insert(schema.pagosGestion).values(data);
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerRecibos: async () => {
+    try {
+      const recibos: IRecibosObtener[] = await db
+        .select({
+          coId: schema.pagosGestion.coId,
+          pgValorCobrado: schema.pagosGestion.pgValorCobrado,
+          usIdCobrador: schema.pagosGestion.usIdCobrador,
+          fpId: schema.pagosGestion.fpId,
+          pgFechaCobro: schema.pagosGestion.pgFechaCobro,
+          pgObservaciones: schema.pagosGestion.pgObservaciones,
+          pgSincronizado: schema.pagosGestion.pgSincronizado,
+          pgLatitud: schema.pagosGestion.pgLatitud,
+          pgLongitud: schema.pagosGestion.pgLongitud,
+          gcId: schema.pagosGestion.gcId,
+          urlImg: schema.pagosGestion.urlImg,
+          nombreImg: schema.pagosGestion.nombreImg,
+          clId: schema.documentosTable.clId,
+          doctran: sql`${schema.documentosTable.tipoComprobante} || ' ' || ${schema.documentosTable.idCredito}`,
+          tipoPago: schema.formasPagoTable.fpNombre,
+        })
+        .from(schema.pagosGestion)
+        .leftJoin(
+          schema.documentosTable,
+          eq(schema.documentosTable.idCredito, schema.pagosGestion.coId),
+        )
+        .leftJoin(
+          schema.formasPagoTable,
+          eq(schema.formasPagoTable.fpId, schema.pagosGestion.fpId),
+        )
+        .where(eq(schema.pagosGestion.pgSincronizado, "N"));
+      return recibos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  obtenerGestiones: async () => {
+    try {
+      
+      const gestiones: ISubirInformacion[] = await db
+        .select({
+          id: schema.gestionesCobranzasResultados.caId,
+          tipoGestion: sql`'Gestion'`,
+          fecha: schema.gestionesCobranzasResultados.crFechaGestionada,
+          cliente: sql`(${schema.clienteTable.apellidoCliente} || ' ' || ${schema.clienteTable.nombreCliente})`,
+          calificacion: schema.tiposGestionesDetallesTable.gdDescripcion,
+          factura: sql`${schema.documentosTable.tipoComprobante} || ' ' || ${schema.documentosTable.idCredito}`,
+          identificacionCliente: schema.clienteTable.identificacionCliente,
+          observacion: schema.gestionesCobranzasResultados.crObservaciones,
+        })
+        .from(schema.gestionesCobranzasResultados)
+        .leftJoin(
+          schema.clienteTable,
+          eq(
+            schema.gestionesCobranzasResultados.clId,
+            schema.clienteTable.idCliente,
+          ),
+        )
+        .leftJoin(
+          schema.documentosTable,
+          eq(
+            schema.gestionesCobranzasResultados.crIdCredito,
+            schema.documentosTable.idCredito,
+          ),
+        )
+        .leftJoin(
+          schema.tiposGestionesDetallesTable,
+          eq(
+            schema.gestionesCobranzasResultados.gcId,
+            schema.tiposGestionesDetallesTable.gcId,
+          ),
+        )
+        .where(
+          eq(schema.gestionesCobranzasResultados.crEstadoSync, "PENDIENTE"),
+        );
+      return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
