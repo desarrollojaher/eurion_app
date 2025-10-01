@@ -219,7 +219,7 @@ const Principal = () => {
             <Text style={styles.textIconos}>Subir Información</Text>
           </TouchableOpacity>
         </Card>
-        <Card
+        {/* <Card
           width={convertirTamanoHorizontal(160)}
           heigth={convertirTamanoVertical(156)}
           style={styles.styleCard}
@@ -233,7 +233,7 @@ const Principal = () => {
             />
             <Text style={styles.textIconos}>Información Subida</Text>
           </TouchableOpacity>
-        </Card>
+        </Card> */}
       </View>
       <Text style={styles.textVersion}>Version: {version}</Text>
       {modalAlerta && (

@@ -1302,7 +1302,7 @@ export const dbSqliteService = {
         .from(schema.pagosGestion)
         .leftJoin(
           schema.documentosTable,
-          eq(schema.documentosTable.idCredito, schema.pagosGestion.coId),
+          eq(schema.documentosTable.idCredito, schema.pagosGestion.crId),
         )
         .leftJoin(
           schema.clienteTable,
