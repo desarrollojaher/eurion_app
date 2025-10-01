@@ -21,7 +21,7 @@ export const useRecibosEnviar = (
     mutationFn: async (data: IRecibosObtener) => {
       // const url = await awsApi.obtenerPath({ modulo: "VERIFICACIONES" });
       const datos: IRecibosEnviar = {
-        coId: data.coId ?? -1,
+        crId: data.crId ?? -1,
         pgValorCobrado: data.pgValorCobrado ?? 0,
         usIdCobrador: data.usIdCobrador ?? -1,
         fpId: data.fpId ?? -1,
@@ -37,6 +37,8 @@ export const useRecibosEnviar = (
         pgMimetype: "",
       };
 
+      console.log(data);
+
       if (
         data.urlImg !== null &&
         data.urlImg !== undefined &&
@@ -44,11 +46,10 @@ export const useRecibosEnviar = (
       ) {
         const url = "CEDULA/VERIFICACIONES/RECIBOS";
         const urlS3 = url.replace("CEDULA", data.identificacionCliente ?? "-1");
-        const key = uuid.v4();
         const compressed = await compressImage(data.urlImg ?? "");
         const fileData = await fetch(compressed.uri).then((res) => res.blob());
         const presignal = await awsApi.generarPresignal({
-          path: `${urlS3}/${key}`,
+          path: `${urlS3}`,
         });
         const response = await fetch(presignal.url, {
           method: "PUT",
@@ -60,7 +61,7 @@ export const useRecibosEnviar = (
         if (response.ok) {
           datos.pgBucket = BucketS3Jaher;
           datos.pgPath = urlS3;
-          datos.pgKeyImagen = key;
+          datos.pgKeyImagen = presignal.uuid;
           datos.pgMimetype = fileData.type;
         } else {
           throw new Error("Error al subir imagen");
@@ -70,8 +71,8 @@ export const useRecibosEnviar = (
       return sincronizacionApi.sincronizarRecibosEnviar(datos);
     },
     onSuccess: (data, variables) => {
-      //dbSqliteService.actualizarRecibos(variables);
-      //queryClient.invalidateQueries({ queryKey: recibosKeys.todos() });
+      dbSqliteService.actualizarRecibos(variables);
+      queryClient.invalidateQueries({ queryKey: recibosKeys.todos() });
       Toast.success("Recibo enviado");
     },
     onError: (error: any) => {

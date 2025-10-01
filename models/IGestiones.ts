@@ -59,6 +59,7 @@ export interface IGestionesCabecera {
   longitudCliente: number;
   cliId: number;
   idHojaRuta: number;
+  peId: number | null;
 }
 
 export interface IGestionCabeceraParams {
@@ -83,6 +84,8 @@ export interface IGestionesRealizas {
   crFechaProxGestion?: string | null;
   trId: number;
   crFechaGestionada?: string | null;
+  diId?: number | null;
+  teId?: number | null;
 }
 
 export interface IGestionesRealizasEnviar {
@@ -103,6 +106,8 @@ export interface IGestionesRealizasEnviar {
   crFechaProxGestion?: string | null;
   trId: number | null;
   crFechaGestionada?: string | null;
+  diId?: number | null;
+  teId?: number | null;
 }
 export interface IGestionesAnterioresParams {
   crId: number;

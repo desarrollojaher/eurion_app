@@ -7,7 +7,6 @@ import { ITiposVerificaciones } from "@/models/ITiposVerificaciones";
 import {
   IGestiones,
   IGestionesAnteriores,
-  IGestionesRealizas,
   IGestionesRealizasEnviar,
 } from "@/models/IGestiones";
 import { IClientesGestion } from "@/models/ICliente";
@@ -22,14 +21,20 @@ import { IRecibosEnviar } from "@/models/IRecibo";
 
 export const sincronizacionApi = {
   obtenerVerificaciones: async () => {
-    const res = await get<ISincronizarVerificaciones[]>("sincronizacion/verificaciones-vista");
+    const res = await get<ISincronizarVerificaciones[]>(
+      "sincronizacion/verificaciones-vista",
+    );
     return res.data;
   },
   obtenerTipoVerificaciones: async () => {
-    const res = await get<ITiposVerificaciones[]>("sincronizacion/tipo-verificaciones");
+    const res = await get<ITiposVerificaciones[]>(
+      "sincronizacion/tipo-verificaciones",
+    );
     return res.data;
   },
-  sincronizarVerificacionEnviar: async (datos: ISincronizarVerificacionesEnviar) => {
+  sincronizarVerificacionEnviar: async (
+    datos: ISincronizarVerificacionesEnviar,
+  ) => {
     const res = await post("sincronizacion/recibirVerificacion", datos);
     return res.data;
   },
@@ -38,7 +43,9 @@ export const sincronizacionApi = {
     return res.data;
   },
   sincronizarClientesGestiones: async () => {
-    const res = await get<IClientesGestion[]>("sincronizacion/clientes/obtener");
+    const res = await get<IClientesGestion[]>(
+      "sincronizacion/clientes/obtener",
+    );
     return res.data;
   },
   sincronizarReferencias: async () => {
@@ -46,19 +53,27 @@ export const sincronizacionApi = {
     return res.data;
   },
   sincronizarComprobantes: async () => {
-    const res = await get<IComprobante[]>("sincronizacion/comprobantes/obtener");
+    const res = await get<IComprobante[]>(
+      "sincronizacion/comprobantes/obtener",
+    );
     return res.data;
   },
   sincronizarGestionesAnteriores: async () => {
-    const res = await get<IGestionesAnteriores[]>("sincronizacion/gestiones-anteriores/obtener");
+    const res = await get<IGestionesAnteriores[]>(
+      "sincronizacion/gestiones-anteriores/obtener",
+    );
     return res.data;
   },
   sincronizarTipoGestionesCabecera: async () => {
-    const res = await get<ITipoGestion[]>("sincronizacion/tipo-gestion-cabecera/obtener");
+    const res = await get<ITipoGestion[]>(
+      "sincronizacion/tipo-gestion-cabecera/obtener",
+    );
     return res.data;
   },
   sincronizarTipoGestionesDetalle: async () => {
-    const res = await get<ITipoGestionDetalle[]>("sincronizacion/tipo-gestion-detalle/obtener");
+    const res = await get<ITipoGestionDetalle[]>(
+      "sincronizacion/tipo-gestion-detalle/obtener",
+    );
     return res.data;
   },
   sincronizarDirecciones: async () => {
@@ -71,7 +86,9 @@ export const sincronizacionApi = {
   },
 
   sincronizarTiposReferencias: async () => {
-    const res = await get<ITipoReferencia[]>("sincronizacion/tipos-referencias/obtener");
+    const res = await get<ITipoReferencia[]>(
+      "sincronizacion/tipos-referencias/obtener",
+    );
     return res.data;
   },
 
@@ -86,5 +103,5 @@ export const sincronizacionApi = {
   sincronizarRecibosEnviar: async (datos: IRecibosEnviar) => {
     const res = await post("sincronizacion/pagos/sincronizar", datos);
     return res.data;
-  }
+  },
 };

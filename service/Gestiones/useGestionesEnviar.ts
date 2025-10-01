@@ -23,6 +23,7 @@ export const useGestionesEnviar = (
     mutationFn: async (gestion) => {
       const datos: IGestionesRealizasEnviar[] =
         await dbSqliteService.obtenerGestionesRealizadas(Number(gestion.id));
+
       return await sincronizacionApi.sinronizarGestionesEnviar(datos[0]);
     },
     onSuccess: async (data, variables, context) => {

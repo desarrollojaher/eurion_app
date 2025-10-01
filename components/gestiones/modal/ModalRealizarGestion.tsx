@@ -25,6 +25,8 @@ import { useSession } from "@/helper/provider/Auth";
 import { useGuardarGestion } from "@/service/Gestiones/useGuardarGestion";
 import { router } from "expo-router";
 import { format } from "date-fns";
+import { useTelefonoObtener } from "@/service/Telefono/useTelefonoObtener";
+import { useDireccionObtener } from "@/service/Direccion/useDireccionObtener";
 
 const schema = z.object({
   gcIdCc: z.number({
@@ -70,6 +72,8 @@ const schema = z.object({
     invalid_type_error: "Obligatorio",
   }),
   crFechaGestionada: z.string().nullish(),
+  diId: z.number().nullish(),
+  teId: z.number().nullish(),
 });
 
 interface PropsModalRealizarGestion {
@@ -124,10 +128,45 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
     { enabled: datos.cliId !== undefined },
   );
 
+  const { data: dataTelefonos } = useTelefonoObtener(
+    {
+      peId: datos.peId ?? -1,
+    },
+    { enabled: datos.peId !== undefined },
+  );
+
+  const { data: dataDirecciones } = useDireccionObtener(
+    {
+      peId: datos.peId ?? -1,
+    },
+    { enabled: datos.peId !== undefined },
+  );
+
   const { mutate: guardarGestion, isPending: isLoadingGuardarGestion } =
     useGuardarGestion();
 
   const { usuario } = useSession();
+
+  const telefonos = useMemo(() => {
+    return dataTelefonos
+      ? dataTelefonos?.map((item) => {
+          return {
+            label: item.teTelefono ?? "",
+            value: item.teId?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataTelefonos]);
+  const direccion = useMemo(() => {
+    return dataDirecciones
+      ? dataDirecciones?.map((item) => {
+          return {
+            label: item.diDireccion ?? "",
+            value: item.diId?.toString() ?? "",
+          };
+        })
+      : [];
+  }, [dataDirecciones]);
 
   const tiposReferencias = useMemo(() => {
     return dataTiposReferencias
@@ -207,6 +246,20 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
     [setValue],
   );
 
+  const handleChanceDireccion = useCallback(
+    (value: IDatosSelect) => {
+      setValue("diId", Number(value.value));
+    },
+    [setValue],
+  );
+
+  const handleChanceTelefono = useCallback(
+    (value: IDatosSelect) => {
+      setValue("teId", Number(value.value));
+    },
+    [setValue],
+  );
+
   const handleChanceFactura = useCallback(
     (value: IDatosSelect) => {
       const fac = find(dataComprobantes, (item) => {
@@ -241,10 +294,20 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       }
 
       if (tipoGestion.gfCompromisoPago === "S") {
-        dataAux.cpObservaciones = data.cpObservaciones;
+        dataAux.cpObservaciones = data.crObservaciones;
         dataAux.crObservaciones = "";
         if (!dataAux.cpFechaCompromiso) {
           Toast.error("Seleccione una fecha de compromiso");
+          setGuardandoGestion(false);
+          return;
+        }
+        if (!dataAux.diId || dataAux.diId < 0) {
+          Toast.error("Seleccione una dirección de cobro");
+          setGuardandoGestion(false);
+          return;
+        }
+        if (!dataAux.teId || dataAux.teId < 0) {
+          Toast.error("Seleccione un telefono de cobro");
           setGuardandoGestion(false);
           return;
         }
@@ -264,6 +327,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       dataAux.crFechaGestionada = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
       setGuardandoGestion(false);
+      console.log(dataAux);
       guardarGestion(dataAux, {
         onSuccess: () => {
           if (seccion === "detalles") {
@@ -348,6 +412,51 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
           />
         </View>
       )}
+
+      {seleccionDetalle && seleccionDetalle.gfCompromisoPago === "S" && (
+        <View style={styles.container}>
+          <Text>Dirección de cobro</Text>
+          <Controller
+            control={control}
+            name="diId"
+            render={({ field: { value, onChange } }) => (
+              <Select
+                datos={direccion}
+                styleContainer={styles.styleSelect}
+                defaultValue={find(direccion, (item) => {
+                  return Number(item.value) === value;
+                })}
+                onSelect={handleChanceDireccion}
+                isError={!!errors.diId}
+                labelError={errors.diId?.message}
+              />
+            )}
+          />
+        </View>
+      )}
+
+      {seleccionDetalle && seleccionDetalle.gfCompromisoPago === "S" && (
+        <View style={styles.container}>
+          <Text>Telefono de cobro</Text>
+          <Controller
+            control={control}
+            name="teId"
+            render={({ field: { value, onChange } }) => (
+              <Select
+                datos={telefonos}
+                styleContainer={styles.styleSelect}
+                defaultValue={find(telefonos, (item) => {
+                  return Number(item.value) === value;
+                })}
+                onSelect={handleChanceTelefono}
+                isError={!!errors.teId}
+                labelError={errors.teId?.message}
+              />
+            )}
+          />
+        </View>
+      )}
+
       <View style={styles.container}>
         <Text>Tipo Referencia</Text>
         <Controller

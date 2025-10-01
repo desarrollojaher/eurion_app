@@ -4,9 +4,11 @@ import { dbSqliteService } from "../db/db";
 import { ISincronizarVerificacionesEnviar } from "@/models/ISincronizar";
 import { subirInformacionKeys } from "./subirInformacionKeys";
 import { Toast } from "toastify-react-native";
-import { compressImage, eliminarImagen } from "@/helper/function/comprimirImagen";
+import {
+  compressImage,
+  eliminarImagen,
+} from "@/helper/function/comprimirImagen";
 import { awsApi } from "@/api/aws";
-import uuid from "react-native-uuid";
 import { BucketS3Jaher } from "@/constants/env";
 import { IImagenS3 } from "@/models/IImagenes";
 import { sincronizacionApi } from "@/api/sincronizacion";
@@ -42,14 +44,13 @@ export const SubirVerificacionUnica = () => {
       }
       const imagenesS3: IImagenS3[] = [];
       for (let i = 0; i < verificacion.length; i++) {
-        const key = uuid.v4();
         const img = verificacion[i];
         const compressed = await compressImage(img.vcImagenBase);
 
         const fileData = await fetch(compressed.uri).then((res) => res.blob());
 
         const presignal = await awsApi.generarPresignal({
-          path: `${urlS3}/${key}`,
+          path: `${urlS3}`,
         });
 
         const response = await fetch(presignal.url, {
@@ -64,7 +65,7 @@ export const SubirVerificacionUnica = () => {
           imagenesS3.push({
             bucket: BucketS3Jaher,
             path: `${urlS3}`,
-            key: key,
+            key: presignal.uuid,
             mimetype: fileData.type,
           });
         } else {
@@ -94,7 +95,9 @@ export const SubirVerificacionUnica = () => {
       if (error.message === "Network Error") {
         setErrorMessage("No se pudo conectar con el servidor");
       } else {
-        setErrorMessage(`Error en subir la verificacion:  ${error.response.data.message}`);
+        setErrorMessage(
+          `Error en subir la verificacion:  ${error.response.data.message}`,
+        );
       }
       setError(true);
       setLoading(false);

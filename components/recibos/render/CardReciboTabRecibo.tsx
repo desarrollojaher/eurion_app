@@ -3,12 +3,10 @@ import React, { useCallback, useMemo } from "react";
 import HeaderCard from "@/components/commons/card/HeaderCard";
 import Separador from "@/components/commons/separador/Separador";
 import Card from "@/components/commons/card/Card";
-import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import Icon from "react-native-vector-icons/FontAwesome5";
 import IconFont from "react-native-vector-icons/FontAwesome";
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import {
@@ -49,11 +47,6 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
     return index;
   }, [datosDocumentos, item.doctran]);
 
-  const { fields, remove } = useFieldArray({
-    control,
-    name: `datos.${index}.imagenes`,
-  });
-
   const { remove: removeValores, fields: comprobantes } = useFieldArray({
     control,
     name: `datos.${index}.valores`,
@@ -76,17 +69,6 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
     return valor;
   }, [valorCancela, valorCobranza, valorMora]);
 
-  const openModalCamara = useCallback(() => {
-    handleOpenModalCamara(index);
-  }, [handleOpenModalCamara, index]);
-
-  const handleRemoveImage = useCallback(
-    (index: number) => {
-      remove(index);
-    },
-    [remove],
-  );
-
   const handleRemoveValores = useCallback(
     (index: number) => {
       removeValores(index);
@@ -107,24 +89,6 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
   return (
     <Card style={styles.styleCard}>
       <HeaderCard labelLeft={item.doctran} labelRight={item.fechaComprobante} />
-      <Separador />
-      <View style={styles.containerImagen}>
-        {fields && fields.length > 0 ? (
-          <CarouselImagenes
-            data={fields}
-            width={convertirTamanoHorizontal(325)}
-            camera
-            handleOpenCamara={openModalCamara}
-            paginacion
-            remove
-            handleRemoveImage={handleRemoveImage}
-          />
-        ) : (
-          <Pressable onPress={openModalCamara} style={styles.stylePressable}>
-            <Icon name="camera" size={convertirTamanoHorizontal(80)} />
-          </Pressable>
-        )}
-      </View>
       <Separador />
       <HeaderCard
         labelLeft="VALOR A PAGAR CANCELADO"
@@ -156,7 +120,11 @@ const CardReciboTabRecibo: React.FC<PropsCardReciboTabRecibo> = ({
       />
       <HeaderCard
         labelLeft="OBSERVACIONES"
-        labelRight={observaciones}
+        labelRight={
+          observaciones && observaciones?.length > 0
+            ? observaciones
+            : "Sin Observacion"
+        }
         styleLeft={styles.styleLeftCard}
         styleRight={styles.styleRightCard}
       />

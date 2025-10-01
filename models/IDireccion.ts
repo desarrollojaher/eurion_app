@@ -7,17 +7,22 @@ export interface IDireccionGcobranza {
 ///////////////////////////////////
 
 export interface IDireccion {
-  diId: number;
+  diId: number | null;
+  peId: number | null;
+  diDireccion: string | null;
+  diReferencia: string | null;
+  idTipoVivienda: number | null;
+  tipoVivienda: string | null;
+  diTrasversal: string | null;
+  diSector: string  | null;
+  diNroCasa: string | null;
+  diLatitud: number | null;
+  diLongitud: number | null;
+  diPrincipal: string | null;
+  diCobranza: string | null;
+}
+
+
+export interface IDireccionParams {
   peId: number;
-  diDireccion: string;
-  diReferencia: string;
-  idTipoVivienda: number;
-  tipoVivienda: string;
-  diTrasversal: string;
-  diSector: string;
-  diNroCasa: string;
-  diLatitud: number;
-  diLongitud: number;
-  diPrincipal: string;
-  diCobranza: string;
 }

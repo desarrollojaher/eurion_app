@@ -301,6 +301,7 @@ export const formasPagoTable = sqliteTable("formas_pago", {
 });
 
 export const pagosGestion = sqliteTable("pagos_gestion", {
+  crId: int(),
   coId: int(),
   pgValorCobrado: integer({ mode: "number" }),
   usIdCobrador: int(),

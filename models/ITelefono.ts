@@ -7,10 +7,14 @@ export interface ITelefonoAntiguo {
 //////////////////////////////////////
 
 export interface ITelefono {
-  teId: number;
+  teId: number | null;
+  peId: number | null;
+  teTelefono: string | null;
+  idTipoTelefono: number | null;
+  tipoTelefono: string | null;
+  tePrincipal: string | null;
+}
+
+export interface ITelefonoParams {
   peId: number;
-  teTelefono: string;
-  idTipoTelefono: number;
-  tipoTelefono: string;
-  tePrincipal: string;
 }

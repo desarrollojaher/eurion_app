@@ -100,10 +100,6 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     resolver: zodResolver(schemaTiposPago),
     defaultValues: defaultValue,
   });
-  // const { fields: dataImagen, remove } = useFieldArray({
-  //   control,
-  //   name: `datos.${indexCard}.imagenes`,
-  // });
 
   const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
 
@@ -273,7 +269,6 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
             <CarouselImagenes
               data={[imagen]}
               width={convertirTamanoHorizontal(325)}
-              //camera
               handleOpenCamara={openModalCamara}
               paginacion
               remove
@@ -289,7 +284,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
       <Separador />
 
       <ButtonCustom
-        label="Agregar"
+        label="Agregar Tipo de Pago"
         style={styles.styleButton}
         onPress={handleSubmitTipoPagos(onSuccess, onError)}
       />

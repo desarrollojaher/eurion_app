@@ -57,14 +57,14 @@ import {
   ITipoGestionDetalle,
   ITipoGestionDetalleParams,
 } from "@/models/ITiposGestiones";
-import { IDireccion } from "@/models/IDireccion";
-import { ITelefono } from "@/models/ITelefono";
+import { IDireccion, IDireccionParams } from "@/models/IDireccion";
+import { ITelefono, ITelefonoParams } from "@/models/ITelefono";
 import { ITipoReferencia } from "@/models/ITipoReferencia";
 import { IProducto } from "@/models/IProducto";
 import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
 import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
-import {  union } from "lodash";
+import { union } from "lodash";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -1005,6 +1005,7 @@ export const dbSqliteService = {
           longitudCliente: schema.direccionesTable.diLongitud,
           cliId: schema.clienteTable.idCliente,
           idHojaRuta: schema.gestionesTable.idHojaRuta,
+          peId: schema.clienteTable.personaId,
         })
         .from(schema.gestionesTable)
         .leftJoin(
@@ -1281,6 +1282,7 @@ export const dbSqliteService = {
       const recibos: IRecibosObtener[] = await db
         .select({
           coId: schema.pagosGestion.coId,
+          crId: schema.pagosGestion.crId,
           pgValorCobrado: schema.pagosGestion.pgValorCobrado,
           usIdCobrador: schema.pagosGestion.usIdCobrador,
           fpId: schema.pagosGestion.fpId,
@@ -1311,6 +1313,7 @@ export const dbSqliteService = {
           eq(schema.formasPagoTable.fpId, schema.pagosGestion.fpId),
         )
         .where(eq(schema.pagosGestion.pgSincronizado, "N"));
+
       return recibos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1390,6 +1393,8 @@ export const dbSqliteService = {
           trId: schema.gestionesCobranzasResultados.trId,
           crFechaGestionada:
             schema.gestionesCobranzasResultados.crFechaGestionada,
+          diId: schema.gestionesCobranzasResultados.diId,
+          teId: schema.gestionesCobranzasResultados.teId,
         })
         .from(schema.gestionesCobranzasResultados)
         .where(eq(schema.gestionesCobranzasResultados.gcId, id));
@@ -1437,6 +1442,7 @@ export const dbSqliteService = {
             eq(schema.pagosGestion.gcId, id.gcId ?? -1),
             eq(schema.pagosGestion.fpId, id.fpId ?? -1),
             eq(schema.pagosGestion.coId, id.coId ?? -1),
+            eq(schema.pagosGestion.crId, id.crId ?? -1),
             eq(schema.pagosGestion.usIdCobrador, id.usIdCobrador ?? -1),
             eq(schema.pagosGestion.pgValorCobrado, id.pgValorCobrado ?? -1),
             eq(schema.pagosGestion.pgFechaCobro, id.pgFechaCobro ?? ""),
@@ -1461,6 +1467,34 @@ export const dbSqliteService = {
             eq(schema.pagosGestion.fpId, id.fpId ?? -1),
           ),
         );
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerTelefonos: async (params: ITelefonoParams) => {
+    try {
+      const telefonos: ITelefono[] = await db
+        .select()
+        .from(schema.telefonosTable)
+        .where(eq(schema.telefonosTable.peId, params.peId));
+      return telefonos;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerDirecciones: async (params: IDireccionParams) => {
+    try {
+      const direcciones: IDireccion[] = await db
+        .select()
+        .from(schema.direccionesTable)
+        .where(eq(schema.direccionesTable.peId, params.peId));
+      return direcciones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =

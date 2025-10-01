@@ -5,6 +5,7 @@ export interface IAws {
 
 export interface IGenerarPresignalResponse {
   url: string;
+  uuid: string;
 }
 
 export interface IModuloSubir {

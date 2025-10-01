@@ -45,6 +45,7 @@ const schema = z.object({
         .min(1, "La identificación es requerida"),
       doctran: z.string().min(1, "El número de transacción es requerido"),
       usId: z.number().nullish(),
+      coId: z.number().nullish(),
       crId: z
         .number({
           required_error: "El crId es requerido",
@@ -103,15 +104,6 @@ const schema = z.object({
       latitud: z.number().nullish(),
       longitud: z.number().nullish(),
       gcId: z.number().nullish(),
-      // imagenes: z
-      //   .array(
-      //     z.object({
-      //       idPago: z.string().nullish(),
-      //       url: z.string(),
-      //       titulo: z.string(),
-      //     }),
-      //   )
-      //   .nullish(),
     }),
   ),
 });
@@ -154,6 +146,7 @@ const RecibosDetalles = () => {
         crId: item.idCredito,
         usId: usuario?.usuId,
         gcId: item.gcId,
+        coId: item.idFactura,
       }));
       const datosEnviar: IReciboEnviarDatos = {
         datos: data,
@@ -271,6 +264,16 @@ const RecibosDetalles = () => {
               `${item.tipoComprobante} ${item.idCredito}` === element.doctran,
           );
 
+          if (
+            !element.observaciones ||
+            element.observaciones.trim().length === 0
+          ) {
+            Toast.error(
+              `Ingrese una observación en el comprobante ${element.doctran}`,
+            );
+            return;
+          }
+
           const saldoVencido = dato ? (dato.crSaldoCredito ?? 0) : 0;
           const gastosCobranza = dato ? (dato.interesGastoCobranza ?? 0) : 0;
           const interesMora = dato ? (dato.interesGastoMora ?? 0) : 0;
@@ -303,7 +306,8 @@ const RecibosDetalles = () => {
                       url: dataAux.valores[index].urlImagen ?? "",
                     });
                     const valores: IRecibos = {
-                      coId: dataAux.crId ?? 0,
+                      crId: dataAux.crId ?? 0,
+                      coId: dataAux.coId ?? 0,
                       pgLatitud: dataAux.latitud,
                       pgLongitud: dataAux.longitud,
                       pgObservaciones: dataAux.observaciones ?? "",

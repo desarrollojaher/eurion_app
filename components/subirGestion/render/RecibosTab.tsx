@@ -139,6 +139,9 @@ const RecibosTab = () => {
     ),
     [handleTabDelete, handleTabUpload],
   );
+
+  console.log(dataRecibos);
+
   return (
     <View>
       <FlatList

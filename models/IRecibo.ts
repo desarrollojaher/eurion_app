@@ -39,6 +39,7 @@ export interface IReciboEnviar {
   crId?: number | null;
   usId?: number | null;
   gcId?: number | null;
+  coId?: number | null;
 }
 
 export interface IReciboEnviarDatos {
@@ -83,6 +84,7 @@ export interface IRecibos {
   gcId: number | null;
   urlImg: string | null;
   nombreImg: string | null;
+  crId: number | null;
 }
 
 export type IRecibosObtener = IRecibos & {
@@ -93,7 +95,7 @@ export type IRecibosObtener = IRecibos & {
 };
 
 export interface IRecibosEnviar {
-  coId: number;
+  crId: number;
   pgValorCobrado: number;
   usIdCobrador: number;
   fpId: number;

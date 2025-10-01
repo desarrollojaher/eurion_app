@@ -18,6 +18,7 @@ import {
 import { IReciboEnviar, IReciboEnviarDatos } from "@/models/IRecibo";
 import LottieAnimation from "../commons/lottie/LottieAnimation";
 import { BLANCO } from "@/constants/Colors";
+import { useFormaPagoObtener } from "@/service/FormasPago/useFormaPagoObtener";
 
 interface PropsReciboTabRecibo {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
@@ -37,6 +38,8 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
   const [modalCamara, setModalCamara] = useState(false);
   const [index, setIndex] = useState(0);
   const imagenes = watch(`datos.${index}.imagenes`);
+
+  const { data: dataFormasPago } = useFormaPagoObtener();
 
   const itemsCambios = useMemo(() => {
     if (datosDocumentos.length > 0) {
@@ -86,11 +89,11 @@ const ReciboTabRecibo: React.FC<PropsReciboTabRecibo> = ({
         watch={watch}
         handleOpenModalCamara={handleOpenModalCamara}
         control={control}
-        dataFormasPagos={[]}
+        dataFormasPagos={dataFormasPago}
         datosDocumentos={datosDocumentos}
       />
     ),
-    [control, datosDocumentos, handleOpenModalCamara, watch],
+    [control, dataFormasPago, datosDocumentos, handleOpenModalCamara, watch],
   );
 
   return (
