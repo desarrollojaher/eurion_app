@@ -1,11 +1,3 @@
-export interface ITelefonoAntiguo {
-  identificacionCliente: string;
-  telefono: string;
-  tipo: string;
-}
-
-//////////////////////////////////////
-
 export interface ITelefono {
   teId: number | null;
   peId: number | null;

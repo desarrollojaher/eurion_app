@@ -54,7 +54,7 @@ const GestionesPagePrincipal = () => {
   const { setDatos } = useGestionStore();
 
   const handleOpenImagenes = useCallback((data: IGestionesCabecera) => {
-    const imagenesLista: IGestionesCabecera[] = [];
+    // const imagenesLista: IGestionesCabecera[] = [];
     // if (data.imagenCliente) {
     //   imagenesLista.push({
     //     titulo: "FOTO CLIENTE",
@@ -69,7 +69,7 @@ const GestionesPagePrincipal = () => {
     // }
 
     // setImagenes(imagenesLista);
-    // setModalCarrucel(true);
+    setModalCarrucel(true);
   }, []);
   const handleAbrirGps = useCallback((data: IGestionesCabecera) => {
     Linking.openURL(

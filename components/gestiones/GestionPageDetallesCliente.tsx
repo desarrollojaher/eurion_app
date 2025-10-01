@@ -7,14 +7,8 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import HeaderCard from "../commons/card/HeaderCard";
 import { GRIS, GRIS_CLARO } from "@/constants/Colors";
-import ModalClientes from "./modal/ModalClientes";
-import ModalVivienda from "./modal/ModalVivienda";
-import { ICliente, IClienteGaranteCobranza } from "@/models/ICliente";
-import { IClienteConyugue } from "@/models/IConyugue";
-import { IDireccionGcobranza } from "@/models/IDireccion";
 import Select, { IDatosSelect } from "../commons/select/Select";
 import { find } from "lodash";
-import { IGestionesCelularPasadas } from "@/models/IGestionesCelular";
 import { format } from "date-fns";
 import Separador from "../commons/separador/Separador";
 import { useGestionesPasadas } from "@/service/Gestiones/useGestionesPasadas";
@@ -31,12 +25,12 @@ interface PropsGestionPageDetallesCliente {
 const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   clId,
 }) => {
-  const [modalClientes, setModalClientes] = useState(false);
-  const [modalVivienda, setModalVivienda] = useState(false);
+  // const [modalClientes, setModalClientes] = useState(false);
+  // const [modalVivienda, setModalVivienda] = useState(false);
 
-  const [cliente, setCliente] = useState<Partial<ICliente> | null>(null);
+  // const [cliente, setCliente] = useState<Partial<ICliente> | null>(null);
 
-  const [vivienda, setVivienda] = useState<IDireccionGcobranza | null>(null);
+  // const [vivienda, setVivienda] = useState<IDireccionGcobranza | null>(null);
 
   const [documento, setDocumento] = useState<IDatosSelect | null>(null);
   const [referencia, setReferencia] = useState<IReferencia | null>(null);
@@ -79,44 +73,44 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
       : [];
   }, [dataComprobantes]);
 
-  const handleOpenCliente = useCallback((datos: ICliente | null) => {
-    setCliente(datos);
-    setModalClientes(true);
-  }, []);
-  const handleOpenConyugue = useCallback((dato: IClienteConyugue) => {
-    // setCliente({
-    //   apellido: dato.apellido,
-    //   identificacion: dato.identificacion,
-    //   nombres: dato.nombres,
-    //   observacion: dato.ocupacionLaboral,
-    //   referencias: dato.referencias,
-    // });
-    setModalClientes(true);
-  }, []);
+  // const handleOpenCliente = useCallback((datos: ICliente | null) => {
+  //   setCliente(datos);
+  //   setModalClientes(true);
+  // }, []);
+  // const handleOpenConyugue = useCallback((dato: IClienteConyugue) => {
+  //   // setCliente({
+  //   //   apellido: dato.apellido,
+  //   //   identificacion: dato.identificacion,
+  //   //   nombres: dato.nombres,
+  //   //   observacion: dato.ocupacionLaboral,
+  //   //   referencias: dato.referencias,
+  //   // });
+  //   setModalClientes(true);
+  // }, []);
 
-  const handleOpenGarante = useCallback((dato: IClienteGaranteCobranza) => {
-    // setCliente({
-    //   identificacion: dato.identificacion,
-    //   nombres: dato.nombres,
-    //   telefono: dato.telefono,
-    //   observacion: dato.trabajaEn,
-    //   referencias: dato.detalleDireccion,
-    // });
-    setModalClientes(true);
-  }, []);
+  // const handleOpenGarante = useCallback((dato: IClienteGaranteCobranza) => {
+  //   // setCliente({
+  //   //   identificacion: dato.identificacion,
+  //   //   nombres: dato.nombres,
+  //   //   telefono: dato.telefono,
+  //   //   observacion: dato.trabajaEn,
+  //   //   referencias: dato.detalleDireccion,
+  //   // });
+  //   setModalClientes(true);
+  // }, []);
 
-  const handleOpenVivienda = useCallback((dato: IDireccionGcobranza) => {
-    setVivienda(dato);
-    setModalVivienda(true);
-  }, []);
+  // const handleOpenVivienda = useCallback((dato: IDireccionGcobranza) => {
+  //   setVivienda(dato);
+  //   setModalVivienda(true);
+  // }, []);
 
-  const handleCloseCliente = useCallback(() => {
-    setModalClientes(false);
-  }, []);
+  // const handleCloseCliente = useCallback(() => {
+  //   setModalClientes(false);
+  // }, []);
 
-  const handleCloseVivienda = useCallback(() => {
-    setModalVivienda(false);
-  }, []);
+  // const handleCloseVivienda = useCallback(() => {
+  //   setModalVivienda(false);
+  // }, []);
 
   const handleSeleccionarDocumento = useCallback((dato: IDatosSelect) => {
     setDocumento(dato);
@@ -125,7 +119,7 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   const handleSeleccionarReferencia = useCallback(
     (dato: IDatosSelect) => {
       const ref = find(obtenerReferencias, (item) => {
-        return item.peIdReferencia == Number(dato.value);
+        return item.peIdReferencia === Number(dato.value);
       });
       setReferencia(ref ?? null);
     },
@@ -244,7 +238,7 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
           <EmptyList isLoading={isLoadingGestionesAnteriores} />
         }
       />
-      {modalClientes && cliente && (
+      {/* {modalClientes && cliente && (
         <ModalClientes
           datos={cliente}
           onClose={handleCloseCliente}
@@ -258,7 +252,7 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
           onClose={handleCloseVivienda}
           visible={modalVivienda}
         />
-      )}
+      )} */}
     </View>
   );
 };

@@ -1,4 +1,4 @@
 export interface ITiposVerificaciones {
-    vtId: number | null;
-    vtDescripcion: string | null;
+  vtId: number | null;
+  vtDescripcion: string | null;
 }

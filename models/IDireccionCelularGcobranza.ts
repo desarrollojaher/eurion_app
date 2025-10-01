@@ -11,10 +11,3 @@ export interface IDireccionCelularGcobranza {
   sincronizado?: number | null;
   imagenes?: IImagenCompleta[] | null;
 }
-
-export interface imagenActualizacion {
-  identiticacionCliente: string;
-  imagen: string;
-  titulo: string;
-  sincronizado?: number | null;
-}

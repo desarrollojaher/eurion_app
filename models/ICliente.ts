@@ -1,23 +1,4 @@
 import { IVivienda } from "./IVivienda";
-
-export interface IClienteParams {
-  identificacion: string;
-}
-
-export interface IClienteGaranteCobranza {
-  identificacion: string | null;
-  nombres: string | null;
-  telefono: string | null;
-  direccion: string | null;
-  detalleDireccion: string | null;
-  trabajaEn: string | null;
-  direccionTrabajo: string | null;
-  telefonoTrabajo: string | null;
-  celular: string | null;
-}
-
-//////////////////////////////////////////////////////////////////////////////////
-
 export interface ICliente {
   idCliente: number;
   direccionCliente: string;

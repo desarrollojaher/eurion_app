@@ -14,14 +14,13 @@ export interface IDireccion {
   idTipoVivienda: number | null;
   tipoVivienda: string | null;
   diTrasversal: string | null;
-  diSector: string  | null;
+  diSector: string | null;
   diNroCasa: string | null;
   diLatitud: number | null;
   diLongitud: number | null;
   diPrincipal: string | null;
   diCobranza: string | null;
 }
-
 
 export interface IDireccionParams {
   peId: number;

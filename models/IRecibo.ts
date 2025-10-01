@@ -1,19 +1,3 @@
-export interface IRecibo {
-  nombre: string;
-  cedula: string;
-  saldoTotal: string;
-  documentos: IDocumentos[];
-}
-
-export interface IDocumentos {
-  doctran: string;
-  fecha: string;
-  deudaTotal: number;
-  saldoVencido: number;
-  interesMora: number;
-  gastosPorCobranza: number;
-}
-
 export interface IRecibosEnviarDetalles {
   id?: string | null;
   tipoPago: string;
@@ -45,31 +29,6 @@ export interface IReciboEnviar {
 export interface IReciboEnviarDatos {
   datos: IReciboEnviar[];
 }
-
-export interface IRecibosCabeceraParams {
-  nombreCliente: string;
-}
-export interface IRecibosCabecera {
-  identificacionCliente: string;
-  apellidos: string;
-  nombres: string;
-  deudaTotal: number;
-}
-
-export interface IRecibosCabeceraListado {
-  nombres: string;
-  apellidos: string;
-  fecha: string;
-  capital: number;
-  interesMora: number;
-  gastoCobranza: number;
-  cobroTotalCuotas: number;
-  id: number;
-}
-
-export type IRecibosEliminarParams = {
-  id: number;
-};
 
 export interface IRecibos {
   coId: number | null;
