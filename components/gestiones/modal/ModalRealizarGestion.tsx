@@ -46,26 +46,14 @@ const schema = z.object({
     })
     .min(1, "La observación es requerida"),
   usIdGestiona: z.number().nullish(),
-  caId: z.number({
-    required_error: "Obligatorio",
-    invalid_type_error: "Obligatorio",
-  }),
   clId: z.number({
     required_error: "Obligatorio",
     invalid_type_error: "Obligatorio",
   }),
   agId: z.number().nullish(),
-  crIdCredito: z.number({
-    required_error: "Obligatorio",
-    invalid_type_error: "Obligatorio",
-  }),
   cpFechaCompromiso: z.string().nullish(),
   hdId: z.number().nullish(),
   cpObservaciones: z.string().nullish(),
-  gcId: z.number({
-    required_error: "Obligatorio",
-    invalid_type_error: "Obligatorio",
-  }),
   crFechaProxGestion: z.string().nullish(),
   trId: z.number({
     required_error: "Obligatorio",
@@ -201,16 +189,16 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       : [];
   }, [dataTiposGestionesDetalles]);
 
-  const comprobantes = useMemo(() => {
-    return dataComprobantes
-      ? dataComprobantes?.map((item) => {
-          return {
-            label: `${item.tipoComprobante} ${item.idCredito}`,
-            value: item.idCredito?.toString() ?? "",
-          };
-        })
-      : [];
-  }, [dataComprobantes]);
+  // const comprobantes = useMemo(() => {
+  //   return dataComprobantes
+  //     ? dataComprobantes?.map((item) => {
+  //         return {
+  //           label: `${item.tipoComprobante} ${item.idCredito}`,
+  //           value: item.idCredito?.toString() ?? "",
+  //         };
+  //       })
+  //     : [];
+  // }, [dataComprobantes]);
 
   const handleChanceTipoGestion = useCallback(
     (value: IDatosSelect) => {
@@ -260,21 +248,21 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
     [setValue],
   );
 
-  const handleChanceFactura = useCallback(
-    (value: IDatosSelect) => {
-      const fac = find(dataComprobantes, (item) => {
-        return item.idCredito === Number(value.value);
-      });
-      setValue("crIdCredito", Number(value.value));
-      if (fac && fac?.gcId && fac?.caId) {
-        setValue("gcId", fac?.gcId);
-        setValue("caId", fac?.caId);
-        setValue("agId", fac?.idAgencia);
-        setValue("hdId", fac?.idHojaDetalle);
-      }
-    },
-    [dataComprobantes, setValue],
-  );
+  // const handleChanceFactura = useCallback(
+  //   (value: IDatosSelect) => {
+  //     const fac = find(dataComprobantes, (item) => {
+  //       return item.idCredito === Number(value.value);
+  //     });
+  //     setValue("crIdCredito", Number(value.value));
+  //     if (fac && fac?.gcId && fac?.caId) {
+  //       setValue("gcId", fac?.gcId);
+  //       setValue("caId", fac?.caId);
+  //       setValue("agId", fac?.idAgencia);
+  //       setValue("hdId", fac?.idHojaDetalle);
+  //     }
+  //   },
+  //   [dataComprobantes, setValue],
+  // );
 
   const onSuccess = useCallback(
     async (data: IGestionesRealizas) => {
@@ -476,7 +464,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
           )}
         />
       </View>
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <Text>Factura</Text>
         <Controller
           control={control}
@@ -494,7 +482,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
             />
           )}
         />
-      </View>
+      </View> */}
 
       <View style={styles.container}>
         <Controller

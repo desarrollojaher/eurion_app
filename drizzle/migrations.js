@@ -8,6 +8,7 @@ import m0003 from './0003_large_edwin_jarvis.sql';
 import m0004 from './0004_daffy_robbie_robertson.sql';
 import m0005 from './0005_wise_lily_hollister.sql';
 import m0006 from './0006_abnormal_galactus.sql';
+import m0007 from './0007_broad_ultimo.sql';
 
   export default {
     journal,
@@ -18,7 +19,8 @@ m0002,
 m0003,
 m0004,
 m0005,
-m0006
+m0006,
+m0007
     }
   }
   

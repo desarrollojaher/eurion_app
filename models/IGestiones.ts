@@ -52,14 +52,14 @@ export interface IGestionesRealizas {
   crLongitud?: number | null;
   crObservaciones: string;
   usIdGestiona?: number | null;
-  caId: number;
+ // caId: number;
   clId: number;
   agId?: number | null;
-  crIdCredito: number;
+  // crIdCredito: number;
   cpFechaCompromiso?: string | null;
   hdId?: number | null;
   cpObservaciones?: string | null;
-  gcId: number;
+ // gcId: number;
   crFechaProxGestion?: string | null;
   trId: number;
   crFechaGestionada?: string | null;

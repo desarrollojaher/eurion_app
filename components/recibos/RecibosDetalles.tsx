@@ -104,6 +104,7 @@ const schema = z.object({
       latitud: z.number().nullish(),
       longitud: z.number().nullish(),
       gcId: z.number().nullish(),
+      caId: z.number().nullish(),
     }),
   ),
 });
@@ -147,6 +148,7 @@ const RecibosDetalles = () => {
         usId: usuario?.usuId,
         gcId: item.gcId,
         coId: item.idFactura,
+        caId: item.caId,
       }));
       const datosEnviar: IReciboEnviarDatos = {
         datos: data,
@@ -319,6 +321,7 @@ const RecibosDetalles = () => {
                       gcId: dataAux.gcId ?? -1,
                       nombreImg: dataAux.valores[index].id ?? "",
                       urlImg: url ?? "",
+                      caId: dataAux.caId ?? -1,
                     };
                     dataEnviar.push(valores);
                   }

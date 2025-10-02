@@ -24,6 +24,7 @@ export interface IReciboEnviar {
   usId?: number | null;
   gcId?: number | null;
   coId?: number | null;
+  caId?: number | null;
 }
 
 export interface IReciboEnviarDatos {
@@ -44,6 +45,7 @@ export interface IRecibos {
   urlImg: string | null;
   nombreImg: string | null;
   crId: number | null;
+  caId: number | null;
 }
 
 export type IRecibosObtener = IRecibos & {
@@ -68,4 +70,5 @@ export interface IRecibosEnviar {
   pgPath: string;
   pgMimetype: string;
   pgEstado: number;
+  caId: number;
 }

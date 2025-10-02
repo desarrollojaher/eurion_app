@@ -65,6 +65,7 @@ import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
 import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
 import { union } from "lodash";
+import { ca } from "zod/v4/locales";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -1118,7 +1119,7 @@ export const dbSqliteService = {
           idAgencia: schema.gestionesDetallesTable.idAgencia,
         })
         .from(schema.documentosTable)
-        .leftJoin(
+        .innerJoin(
           schema.gestionesDetallesTable,
           eq(
             schema.documentosTable.idCredito,
@@ -1298,6 +1299,7 @@ export const dbSqliteService = {
           doctran: sql`${schema.documentosTable.tipoComprobante} || ' ' || ${schema.documentosTable.idCredito}`,
           tipoPago: schema.formasPagoTable.fpNombre,
           identificacionCliente: schema.clienteTable.identificacionCliente,
+          caId: schema.pagosGestion.caId,
         })
         .from(schema.pagosGestion)
         .leftJoin(

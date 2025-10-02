@@ -1,6 +1,7 @@
 import { unique } from "drizzle-orm/sqlite-core";
 import { integer } from "drizzle-orm/sqlite-core";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { ca } from "zod/v4/locales";
 
 export const bitacoraSincronizadoTable = sqliteTable("bitacora_sincronizado", {
   codigo: int().primaryKey({ autoIncrement: true }),
@@ -314,4 +315,5 @@ export const pagosGestion = sqliteTable("pagos_gestion", {
   gcId: int(),
   urlImg: text(),
   nombreImg: text(),
+  caId: int(),
 });

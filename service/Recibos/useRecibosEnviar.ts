@@ -9,7 +9,6 @@ import { dbSqliteService } from "../db/db";
 import { Toast } from "toastify-react-native";
 import { recibosKeys } from "./recibosKeys";
 import { awsApi } from "@/api/aws";
-import uuid from "react-native-uuid";
 import { compressImage } from "@/helper/function/comprimirImagen";
 import { BucketS3Jaher } from "@/constants/env";
 
@@ -35,10 +34,8 @@ export const useRecibosEnviar = (
         pgKeyImagen: "",
         pgPath: "",
         pgMimetype: "",
+        caId: data.caId ?? -1,
       };
-
-      console.log(data);
-
       if (
         data.urlImg !== null &&
         data.urlImg !== undefined &&
