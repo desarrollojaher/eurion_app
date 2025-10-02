@@ -57,7 +57,7 @@ export interface IGestionesRealizas {
   agId?: number | null;
   // crIdCredito: number;
   cpFechaCompromiso?: string | null;
-  hdId?: number | null;
+  hrId?: number | null;
   cpObservaciones?: string | null;
  // gcId: number;
   crFechaProxGestion?: string | null;
@@ -79,7 +79,7 @@ export interface IGestionesRealizasEnviar {
   agId?: number | null;
   crIdCredito: number | null;
   cpFechaCompromiso?: string | null;
-  hdId?: number | null;
+  hrId?: number | null;
   cpObservaciones?: string | null;
   gcId: number | null;
   crFechaProxGestion?: string | null;

@@ -105,6 +105,7 @@ const schema = z.object({
       longitud: z.number().nullish(),
       gcId: z.number().nullish(),
       caId: z.number().nullish(),
+      hdId: z.number().nullish(),
     }),
   ),
 });
@@ -149,6 +150,7 @@ const RecibosDetalles = () => {
         gcId: item.gcId,
         coId: item.idFactura,
         caId: item.caId,
+        hdId: item.idHojaDetalle,
       }));
       const datosEnviar: IReciboEnviarDatos = {
         datos: data,
@@ -283,7 +285,7 @@ const RecibosDetalles = () => {
           if (
             (element.valorCancela ?? 0) > 0 &&
             (element.valorCancela ?? 0) <=
-              saldoVencido + gastosCobranza + interesMora
+            saldoVencido + gastosCobranza + interesMora
           ) {
             if (element.valores && element.valores?.length > 0) {
               const sumaTotal =
@@ -322,6 +324,7 @@ const RecibosDetalles = () => {
                       nombreImg: dataAux.valores[index].id ?? "",
                       urlImg: url ?? "",
                       caId: dataAux.caId ?? -1,
+                      hdId: dataAux.hdId ?? -1,
                     };
                     dataEnviar.push(valores);
                   }
@@ -436,7 +439,7 @@ const RecibosDetalles = () => {
       )}
       {loadingRecibo && isPendingRecibo && (
         <ModalLoading
-          onClose={() => {}}
+          onClose={() => { }}
           visible={loadingRecibo || isPendingRecibo}
         />
       )}

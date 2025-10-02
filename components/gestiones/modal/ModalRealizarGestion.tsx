@@ -52,7 +52,7 @@ const schema = z.object({
   }),
   agId: z.number().nullish(),
   cpFechaCompromiso: z.string().nullish(),
-  hdId: z.number().nullish(),
+  hrId: z.number().nullish(),
   cpObservaciones: z.string().nullish(),
   crFechaProxGestion: z.string().nullish(),
   trId: z.number({
@@ -89,7 +89,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       crLatitud: null,
       crLongitud: null,
       clId: datos.cliId,
-      hdId: datos.idHojaRuta,
+      hrId: datos.idHojaRuta,
     },
   });
 
@@ -308,14 +308,16 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
         setGuardandoGestion(false);
         return;
       }
+
       dataAux.crLatitud = localizacion.coords.latitude;
       dataAux.crLongitud = localizacion.coords.longitude;
       dataAux.usIdGestiona = usuario?.usuId ?? -1;
+      dataAux.agId =
+        (dataComprobantes && dataComprobantes[0].idAgencia) ?? undefined;
 
       dataAux.crFechaGestionada = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
       setGuardandoGestion(false);
-      console.log(dataAux);
       guardarGestion(dataAux, {
         onSuccess: () => {
           if (seccion === "detalles") {
@@ -327,12 +329,13 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       });
     },
     [
+      dataComprobantes,
       dataTiposGestionesDetalles,
       guardarGestion,
       onClose,
       reset,
       seccion,
-      usuario,
+      usuario?.usuId,
     ],
   );
   const onError = useCallback((error: any) => {

@@ -1,7 +1,6 @@
 import { unique } from "drizzle-orm/sqlite-core";
 import { integer } from "drizzle-orm/sqlite-core";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { ca } from "zod/v4/locales";
 
 export const bitacoraSincronizadoTable = sqliteTable("bitacora_sincronizado", {
   codigo: int().primaryKey({ autoIncrement: true }),
@@ -272,6 +271,7 @@ export const tiposReferenciaTable = sqliteTable("tipos_referencia", {
 export const gestionesCobranzasResultados = sqliteTable(
   "gestiones_cobranzas_resultados",
   {
+    id: int("id").primaryKey({ autoIncrement: true }),
     gcIdCc: int(),
     gdId: int(),
     crLatitud: integer({ mode: "number" }),
@@ -284,7 +284,7 @@ export const gestionesCobranzasResultados = sqliteTable(
     agId: int(),
     crIdCredito: int(),
     cpFechaCompromiso: text(),
-    hdId: int(),
+    hrId: int(),
     cpObservaciones: text(),
     gcId: int(),
     crFechaProxGestion: text(),
@@ -316,4 +316,5 @@ export const pagosGestion = sqliteTable("pagos_gestion", {
   urlImg: text(),
   nombreImg: text(),
   caId: int(),
+  hdId: int(),
 });

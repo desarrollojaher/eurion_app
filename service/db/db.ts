@@ -1300,6 +1300,7 @@ export const dbSqliteService = {
           tipoPago: schema.formasPagoTable.fpNombre,
           identificacionCliente: schema.clienteTable.identificacionCliente,
           caId: schema.pagosGestion.caId,
+          hdId: schema.pagosGestion.hdId,
         })
         .from(schema.pagosGestion)
         .leftJoin(
@@ -1329,7 +1330,7 @@ export const dbSqliteService = {
     try {
       const gestiones: ISubirInformacion[] = await db
         .select({
-          id: schema.gestionesCobranzasResultados.gcId,
+          id: schema.gestionesCobranzasResultados.id,
           tipoGestion: sql`'Gestion'`,
           fecha: schema.gestionesCobranzasResultados.crFechaGestionada,
           cliente: sql`(${schema.clienteTable.apellidoCliente} || ' ' || ${schema.clienteTable.nombreCliente})`,
@@ -1387,7 +1388,7 @@ export const dbSqliteService = {
           crIdCredito: schema.gestionesCobranzasResultados.crIdCredito,
           cpFechaCompromiso:
             schema.gestionesCobranzasResultados.cpFechaCompromiso,
-          hdId: schema.gestionesCobranzasResultados.hdId,
+          hrId: schema.gestionesCobranzasResultados.hrId,
           cpObservaciones: schema.gestionesCobranzasResultados.cpObservaciones,
           gcId: schema.gestionesCobranzasResultados.gcId,
           crFechaProxGestion:
@@ -1399,7 +1400,7 @@ export const dbSqliteService = {
           teId: schema.gestionesCobranzasResultados.teId,
         })
         .from(schema.gestionesCobranzasResultados)
-        .where(eq(schema.gestionesCobranzasResultados.gcId, id));
+        .where(eq(schema.gestionesCobranzasResultados.id, id));
       return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1413,7 +1414,7 @@ export const dbSqliteService = {
       await db
         .update(schema.gestionesCobranzasResultados)
         .set({ crEstadoSync: "ENVIADO" })
-        .where(eq(schema.gestionesCobranzasResultados.gcId, id));
+        .where(eq(schema.gestionesCobranzasResultados.id, id));
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -1426,7 +1427,7 @@ export const dbSqliteService = {
     try {
       await db
         .delete(schema.gestionesCobranzasResultados)
-        .where(eq(schema.gestionesCobranzasResultados.gcId, id));
+        .where(eq(schema.gestionesCobranzasResultados.id, id));
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
