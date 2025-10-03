@@ -12,7 +12,7 @@ import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
 import InputCustom from "../commons/input/InputCustom";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { AZUL, GRIS, NEGRO } from "@/constants/Colors";
+import { AZUL, GRIS, GRIS_CLARO, NEGRO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -272,5 +272,7 @@ const styles = StyleSheet.create({
   },
   cardStyle: {
     marginTop: convertirTamanoVertical(10),
+    borderWidth: 2,
+    borderColor: GRIS_CLARO,
   },
 });

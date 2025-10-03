@@ -81,7 +81,7 @@ const RecibosTab = () => {
 
   const renderItem = useCallback(
     ({ item }: { item: IRecibosObtener }) => (
-      <Card>
+      <Card style={styles.card}>
         <HeaderCard
           labelLeft={item.doctran ?? ""}
           labelRight={item.pgFechaCobro}
@@ -199,4 +199,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  card: {
+    borderWidth: convertirTamanoHorizontal(2),
+    borderColor: GRIS_CLARO,
+  }
 });

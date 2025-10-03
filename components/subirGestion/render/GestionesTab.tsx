@@ -124,7 +124,7 @@ const GestionesTab = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: ISubirInformacion; index: number }) => (
-      <Card>
+      <Card style={styles.card}>
         <HeaderCard
           labelLeft={item.cliente ?? ""}
           labelRight={format(parseISO(item.fecha ?? ""), "dd-MM-yyyy hh:mm:ss")}
@@ -238,6 +238,10 @@ const styles = StyleSheet.create({
   flatListStyle: {
     gap: convertirTamanoVertical(10),
     marginHorizontal: convertirTamanoHorizontal(35),
+  },
+  card: {
+    borderWidth: convertirTamanoHorizontal(2),
+    borderColor: GRIS_CLARO,
   },
   containerBotones: {
     flexDirection: "row",

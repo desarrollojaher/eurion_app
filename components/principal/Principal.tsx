@@ -12,23 +12,20 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSession } from "@/helper/provider/Auth";
-import { AZUL, BLANCO } from "@/constants/Colors";
+import { AZUL, AZUL_CLARO, AZUL_ICONO, BLANCO, ROJO, TOMATE, TOMATE_CLARO, TOMATE_ICONO } from "@/constants/Colors";
 import Card from "../commons/card/Card";
 import IconFont from "react-native-vector-icons/FontAwesome5";
 import IconFont6 from "react-native-vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";
-import NetInfo from "@react-native-community/netinfo";
 import ModalSincronizar from "./modal/ModalSincronizar";
-import { useObtenerFecha } from "@/service/Sincronizacion/useObtenerFecha";
 import ModalCerrarSesion from "./modal/ModalCerrarSesion";
 import Constants from "expo-constants";
+import { LinearGradient } from "expo-linear-gradient";
 const Principal = () => {
   const [modalAlerta, setModalAlerta] = useState(false);
   const [modalCerrarSesion, setModalCerrarSesion] = useState(false);
 
   const { usuario } = useSession();
-
-  const { data: dataFecha } = useObtenerFecha();
 
   const router = useRouter();
 
@@ -121,104 +118,139 @@ const Principal = () => {
   }, [router]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.containerHeader}>
+    <View>
+      <LinearGradient
+        colors={[AZUL, AZUL_CLARO]} // AZUL a ROJO
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.containerHeader}
+      >
+        <View style={styles.containerButtonHeader}>
+          <Text style={styles.textContainHeader}>EURION</Text>
+          <Pressable
+            onPress={handleOpenModalCerrarSesion}
+            style={styles.iconStyle}
+          >
+            <Icon
+              name={"logout"}
+              size={convertirTamanoHorizontal(25)}
+              color={BLANCO}
+            />
+          </Pressable>
+        </View>
+        <Text style={styles.textHeader}>Bienvenido</Text>
         <Text style={styles.textHeader}>
-          Bienvenido {usuario?.usuNombre.split(" ")[0]}
+          {usuario?.usuNombre.split(" ")[0]}
         </Text>
-        <Pressable
-          onPress={handleOpenModalCerrarSesion}
-          style={styles.iconStyle}
-        >
-          <Icon
-            name={"logout"}
-            size={convertirTamanoHorizontal(30)}
-            color={BLANCO}
-          />
-        </Pressable>
-      </View>
+        <Text style={styles.subTextContainer}>¿Que deseas hacer hoy?</Text>
+      </LinearGradient>
 
       <View style={styles.containerBotones}>
-        <Card
-          width={convertirTamanoHorizontal(160)}
-          heigth={convertirTamanoVertical(156)}
+        <LinearGradient
+          colors={[AZUL, AZUL_CLARO]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.styleCard}
         >
-          <TouchableOpacity onPress={handleOpenSincronizador}>
-            <IconFont
-              name="sync"
-              color={AZUL}
-              size={convertirTamanoHorizontal(60)}
-              style={styles.iconModulosStyle}
-            />
+          <TouchableOpacity
+            onPress={handleOpenSincronizador}
+            style={styles.styleTouchable}
+          >
+            <View style={styles.containerIcon}>
+              <IconFont
+                name="sync"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(30)}
+              />
+            </View>
             <Text style={styles.textIconos}>Sincronizar</Text>
           </TouchableOpacity>
-        </Card>
-        <Card
-          width={convertirTamanoHorizontal(160)}
-          heigth={convertirTamanoVertical(156)}
+        </LinearGradient>
+        <LinearGradient
+          colors={[AZUL, AZUL_CLARO]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.styleCard}
         >
-          <TouchableOpacity onPress={handleOpenVerificaciones}>
-            <IconFont
-              name="user-check"
-              color={AZUL}
-              size={convertirTamanoHorizontal(60)}
-              style={styles.iconModulosStyle}
-            />
+          <TouchableOpacity
+            onPress={handleOpenVerificaciones}
+            style={styles.styleTouchable}
+          >
+            <View style={styles.containerIcon}>
+              <IconFont
+                name="user-check"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(30)}
+              />
+            </View>
             <Text style={styles.textIconos}>Verificar</Text>
           </TouchableOpacity>
-        </Card>
+        </LinearGradient>
       </View>
       <View style={styles.containerBotones}>
-        <Card
-          width={convertirTamanoHorizontal(160)}
-          heigth={convertirTamanoVertical(156)}
+        <LinearGradient
+          colors={[AZUL, AZUL_CLARO]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.styleCard}
         >
-          <TouchableOpacity onPress={handleOpenGestiones}>
-            <IconFont6
-              name="list"
-              color={AZUL}
-              size={convertirTamanoHorizontal(60)}
-              style={styles.iconModulosStyle}
-            />
+          <TouchableOpacity
+            onPress={handleOpenGestiones}
+            style={styles.styleTouchable}
+          >
+            <View style={styles.containerIcon}>
+              <IconFont6
+                name="list"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(30)}
+              />
+            </View>
             <Text style={styles.textIconos}>Gestiones</Text>
           </TouchableOpacity>
-        </Card>
-        <Card
-          width={convertirTamanoHorizontal(160)}
-          heigth={convertirTamanoVertical(156)}
+        </LinearGradient>
+        <LinearGradient
+          colors={[AZUL, AZUL_CLARO]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.styleCard}
         >
-          <TouchableOpacity onPress={handleOpenRecibos}>
-            <IconFont
-              name="receipt"
-              color={AZUL}
-              size={convertirTamanoHorizontal(60)}
-              style={styles.iconModulosStyle}
-            />
+          <TouchableOpacity
+            onPress={handleOpenRecibos}
+            style={styles.styleTouchable}
+          >
+            <View style={styles.containerIcon}>
+              <IconFont
+                name="receipt"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(30)}
+              />
+            </View>
             <Text style={styles.textIconos}>Recibos</Text>
           </TouchableOpacity>
-        </Card>
+        </LinearGradient>
       </View>
 
       <View style={styles.containerBotones}>
-        <Card
-          width={convertirTamanoHorizontal(160)}
-          heigth={convertirTamanoVertical(156)}
+        <LinearGradient
+          colors={[TOMATE_CLARO, TOMATE]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.styleCard}
         >
-          <TouchableOpacity onPress={handleOpenSubirInformacion}>
-            <IconFont
-              name="upload"
-              color={AZUL}
-              size={convertirTamanoHorizontal(60)}
-              style={styles.iconModulosStyle}
-            />
+          <TouchableOpacity
+            onPress={handleOpenSubirInformacion}
+            style={styles.styleTouchable}
+          >
+            <View style={styles.containerIconTomate}>
+              <IconFont
+                name="upload"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(30)}
+              />
+            </View>
             <Text style={styles.textIconos}>Subir Información</Text>
           </TouchableOpacity>
-        </Card>
+        </LinearGradient>
         {/* <Card
           width={convertirTamanoHorizontal(160)}
           heigth={convertirTamanoVertical(156)}
@@ -235,7 +267,9 @@ const Principal = () => {
           </TouchableOpacity>
         </Card> */}
       </View>
-      <Text style={styles.textVersion}>Version: {version}</Text>
+      <View style={styles.containerVersion}>
+        <Text style={styles.textVersion}>Version: {version}</Text>
+      </View>
       {modalAlerta && (
         <ModalSincronizar onClose={handleModalAlerta} visible={modalAlerta} />
       )}
@@ -256,47 +290,97 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: convertirTamanoHorizontal(35),
   },
-  iconStyle: {
-    width: convertirTamanoHorizontal(40),
-    height: convertirTamanoVertical(40),
+  containerButtonHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: convertirTamanoHorizontal(15),
+    paddingTop: convertirTamanoVertical(10),
+  },
+  textContainHeader: {
+    fontWeight: "bold",
+    fontSize: convertirTamanoHorizontal(15),
+    color: BLANCO,
+  },
+  subTextContainer: {
+    fontSize: convertirTamanoHorizontal(12),
+    color: BLANCO,
+    paddingHorizontal: convertirTamanoHorizontal(15),
+  },
+  containerIcon: {
+    marginBottom: convertirTamanoVertical(18),
+    width: convertirTamanoHorizontal(60),
+    height: convertirTamanoHorizontal(60),
+    borderRadius: convertirTamanoHorizontal(10),
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: AZUL_ICONO,
   },
-  containerHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  containerIconTomate: {
+    marginBottom: convertirTamanoVertical(18),
+    width: convertirTamanoHorizontal(60),
+    height: convertirTamanoHorizontal(60),
+    borderRadius: convertirTamanoHorizontal(15),
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: convertirTamanoVertical(72),
+    backgroundColor: TOMATE_ICONO,
+  },
+  iconStyle: {
+    width: convertirTamanoHorizontal(50),
+    height: convertirTamanoVertical(50),
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: AZUL_ICONO,
+    borderRadius: convertirTamanoHorizontal(10),
+  },
+  styleTouchable: { alignItems: "center" },
+  containerHeader: {
+    height: convertirTamanoVertical(180),
+    borderColor: ROJO,
+    borderBottomWidth: convertirTamanoVertical(2),
   },
   textHeader: {
     width: convertirTamanoHorizontal(290),
     fontSize: convertirTamanoHorizontal(25),
+    paddingHorizontal: convertirTamanoHorizontal(15),
     fontWeight: "bold",
     color: BLANCO,
   },
   containerBotones: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: convertirTamanoVertical(57),
+    marginTop: convertirTamanoVertical(40),
+    paddingHorizontal: convertirTamanoHorizontal(35),
   },
   textVersion: {
     fontSize: convertirTamanoHorizontal(18),
-    fontWeight: "regular",
-    color: BLANCO,
-    marginTop: convertirTamanoVertical(85),
+    fontWeight: "semibold",
+    color: AZUL,
     textAlign: "center",
   },
   styleCard: {
     justifyContent: "center",
+    width: convertirTamanoHorizontal(170),
+    height: convertirTamanoVertical(170),
+    borderRadius: convertirTamanoHorizontal(20),
   },
   textIconos: {
     fontSize: convertirTamanoHorizontal(18),
-    fontWeight: "regular",
-    color: AZUL,
+    fontWeight: "bold",
+    color: BLANCO,
     textAlign: "center",
   },
   iconModulosStyle: {
     alignSelf: "center",
     marginBottom: convertirTamanoVertical(18),
+  },
+  containerVersion: {
+    marginTop: convertirTamanoVertical(35),
+    borderWidth: convertirTamanoHorizontal(1),
+    borderColor: ROJO,
+    height: convertirTamanoVertical(60),
+    margin: convertirTamanoHorizontal(20),
+    borderRadius: convertirTamanoHorizontal(10),
+    justifyContent: "center",
   },
 });

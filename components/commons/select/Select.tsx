@@ -99,6 +99,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: convertirTamanoHorizontal(12),
+    borderWidth: 1,
+    borderColor: GRIS
   },
   dropdownButtonTxtStyle: {
     flex: 1,

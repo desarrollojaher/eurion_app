@@ -7,7 +7,7 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { AZUL, GRIS } from "@/constants/Colors";
+import { AZUL, GRIS, GRIS_CLARO } from "@/constants/Colors";
 import Card from "../commons/card/Card";
 import HeaderCard from "../commons/card/HeaderCard";
 import TextCard from "../commons/card/TextCard";
@@ -44,7 +44,7 @@ const RecibosPrincipal = () => {
 
   const renderItem = useCallback(
     ({ item, index }: { item: IDocumentosRecibos; index: number }) => (
-      <Card>
+      <Card style={styles.containerCard}>
         <TouchableOpacity onPress={() => redireccionar(item)}>
           <TextCard
             titulo={`${item.apellidoCliente} ${item.nombreCliente}`}
@@ -69,6 +69,7 @@ const RecibosPrincipal = () => {
       <Header title="RECIBOS" />
       <InputCustom
         styleContainer={styles.styleInput}
+        placeholder="BUSCAR"
         leftIcon={
           <Icon
             name="search"
@@ -136,5 +137,9 @@ const styles = StyleSheet.create({
   },
   containerHeader: {
     marginTop: convertirTamanoVertical(5),
+  },
+  containerCard: {
+    borderWidth: convertirTamanoVertical(2),
+    borderColor: GRIS_CLARO,
   },
 });

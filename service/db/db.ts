@@ -1159,7 +1159,7 @@ export const dbSqliteService = {
       const gestiones: IGestionesAnteriores[] = await db
         .select({
           gcId: schema.gestionesAnterioresTable.gcId,
-          idCliente: schema.gestionesAnterioresTable.idCredito,
+          idCliente: schema.gestionesAnterioresTable.idCliente,
           nombreCliente: schema.gestionesAnterioresTable.nombreCliente,
           codComprobanteStock:
             schema.gestionesAnterioresTable.codComprobanteStock,
@@ -1172,7 +1172,7 @@ export const dbSqliteService = {
           estadoGestion: schema.gestionesAnterioresTable.estadoGestion,
         })
         .from(schema.gestionesAnterioresTable)
-        .where(eq(schema.gestionesAnterioresTable.idCredito, params.crId));
+        .where(eq(schema.gestionesAnterioresTable.idCliente, params.clId));
       return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";

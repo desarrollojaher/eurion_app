@@ -91,5 +91,5 @@ export interface IGestionesRealizasEnviar {
   teId?: number | null;
 }
 export interface IGestionesAnterioresParams {
-  crId: number;
+  clId: number;
 }

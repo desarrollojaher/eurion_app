@@ -40,36 +40,31 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   const {
     data: datosGestionesAnteriores,
     isLoading: isLoadingGestionesAnteriores,
-  } = useGestionesPasadas(
-    {
-      crId: Number(documento?.value ?? "0"),
-    },
-    {
-      enabled: !!documento && !!documento?.value,
-    },
-  );
+  } = useGestionesPasadas({
+    clId: clId,
+  });
 
   const { data: obtenerReferencias } = useReferenciasObtener({ clId: clId });
 
   const referencias = useMemo(() => {
     return obtenerReferencias
       ? obtenerReferencias?.map((item) => {
-          return {
-            label: item.tipoReferencia ?? "",
-            value: item.peIdReferencia?.toString() ?? "",
-          };
-        })
+        return {
+          label: item.tipoReferencia ?? "",
+          value: item.peIdReferencia?.toString() ?? "",
+        };
+      })
       : [];
   }, [obtenerReferencias]);
 
   const comprobantes = useMemo(() => {
     return dataComprobantes
       ? dataComprobantes?.map((item) => {
-          return {
-            label: `${item.tipoComprobante} ${item.idCredito}`,
-            value: item.idCredito?.toString() ?? "",
-          };
-        })
+        return {
+          label: `${item.tipoComprobante} ${item.idCredito}`,
+          value: item.idCredito?.toString() ?? "",
+        };
+      })
       : [];
   }, [dataComprobantes]);
 
@@ -128,7 +123,7 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
 
   const renderItem = useCallback(
     ({ item, index }: { item: IGestionesAnteriores; index: number }) => (
-      <Card width={convertirTamanoHorizontal(370)}>
+      <Card width={convertirTamanoHorizontal(370)} style={styles.card}>
         <HeaderCard
           labelRight={format(item.fechaGestionado ?? "", "dd-MM-yyyy HH:mm:ss")}
           styleRight={styles.styleHeaderCardRigth}
@@ -299,4 +294,8 @@ const styles = StyleSheet.create({
     width: convertirTamanoHorizontal(200),
     lineHeight: convertirTamanoVertical(25),
   },
+  card: {
+    borderWidth: convertirTamanoHorizontal(2),
+    borderColor: GRIS_CLARO,
+  }
 });

@@ -5,14 +5,16 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { BLANCO } from "@/constants/Colors";
+import { AZUL, AZUL_CLARO, BLANCO, ROJO } from "@/constants/Colors";
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface PropsHeader {
   title?: string;
   iconRight?: React.ReactNode;
   handleTapIconRight?: () => void;
   handleTapIconLeft?: () => void;
+  sincronizacion?: boolean;
 }
 
 const Header: React.FC<PropsHeader> = ({
@@ -20,6 +22,7 @@ const Header: React.FC<PropsHeader> = ({
   iconRight,
   handleTapIconRight,
   handleTapIconLeft,
+  sincronizacion,
 }) => {
   const router = useRouter();
 
@@ -36,7 +39,15 @@ const Header: React.FC<PropsHeader> = ({
   }, [handleTapIconRight]);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={[AZUL, AZUL_CLARO]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[
+        styles.container,
+        !sincronizacion && styles.containerSincronizacion,
+      ]}
+    >
       <TouchableOpacity onPress={handleBack} style={styles.containerStyle}>
         <IconFont
           name="chevron-left"
@@ -55,7 +66,7 @@ const Header: React.FC<PropsHeader> = ({
           {iconRight}
         </TouchableOpacity>
       )}
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -63,7 +74,7 @@ export default Header;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: convertirTamanoVertical(50),
+    paddingTop: convertirTamanoVertical(20),
     paddingHorizontal: convertirTamanoHorizontal(30),
     flexDirection: "row",
     gap: convertirTamanoHorizontal(3),
@@ -82,5 +93,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     fontWeight: "bold",
     alignSelf: "center",
+  },
+  containerSincronizacion: {
+    height: convertirTamanoVertical(100),
+    borderBottomWidth: convertirTamanoVertical(2),
+    borderColor: ROJO,
   },
 });

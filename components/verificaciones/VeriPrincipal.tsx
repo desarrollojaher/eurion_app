@@ -20,7 +20,7 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import InputCustom from "../commons/input/InputCustom";
-import { AZUL, NEGRO } from "@/constants/Colors";
+import { AZUL, GRIS_CLARO } from "@/constants/Colors";
 import Card from "../commons/card/Card";
 import HeaderCard from "../commons/card/HeaderCard";
 import Separador from "../commons/separador/Separador";
@@ -120,7 +120,10 @@ const VeriPrincipal = () => {
   const renderItem = useCallback(
     ({ item }: { item: IVerificacionesCabecera }) => (
       <Card style={styles.cardStyle}>
-        <TouchableOpacity onPress={() => handleChangePage(item)}>
+        <TouchableOpacity
+          onPress={() => handleChangePage(item)}
+          style={{ gap: 10 }}
+        >
           <HeaderCard
             labelLeft={item.codigoTipoDeRuta}
             labelRight={format(item.fecha, "dd-MM-yyyy")}
@@ -138,16 +141,16 @@ const VeriPrincipal = () => {
           <Separador />
           <View style={styles.containerIcons}>
             <Pressable onPress={() => handleOpenImagenes(item)}>
-              <FontAwesome5 name="images" color={NEGRO} size={30} />
+              <FontAwesome5 name="images" color={AZUL} size={30} />
             </Pressable>
             <Pressable onPress={() => handleLlamarPersona(item.telefono)}>
-              <FontAwesome5 name="phone-alt" color={NEGRO} size={30} />
+              <FontAwesome5 name="phone-alt" color={"green"} size={30} />
             </Pressable>
             <Pressable onPress={() => handleOpenGoogleMaps(item)}>
-              <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
+              <FontAwesome6 name="map-location-dot" size={30} color={AZUL} />
             </Pressable>
             <Pressable onPress={() => handleOpenGuardar(item)}>
-              <FontAwesome5 name="plus" color={NEGRO} size={30} />
+              <FontAwesome5 name="plus" color={"green"} size={30} />
             </Pressable>
           </View>
         </TouchableOpacity>
@@ -261,7 +264,7 @@ export default VeriPrincipal;
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: convertirTamanoHorizontal(35),
-    marginTop: convertirTamanoVertical(49),
+    marginTop: convertirTamanoVertical(20),
     gap: convertirTamanoVertical(23),
   },
   styleInput: {
@@ -277,5 +280,7 @@ const styles = StyleSheet.create({
   },
   cardStyle: {
     marginTop: convertirTamanoVertical(23),
+    borderColor: GRIS_CLARO,
+    borderWidth: 2,
   },
 });

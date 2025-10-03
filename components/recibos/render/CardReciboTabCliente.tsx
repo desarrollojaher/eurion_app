@@ -12,7 +12,7 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import { IComprobanteObtener } from "@/models/IComprobante";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import TextCardIcon from "@/components/commons/card/TextCardIcon";
@@ -205,7 +205,10 @@ const styles = StyleSheet.create({
   styleCard: {
     gap: convertirTamanoVertical(10),
     width: convertirTamanoHorizontal(345),
+    marginBottom: convertirTamanoVertical(10),
     alignSelf: "center",
+    borderWidth: 2,
+    borderColor: GRIS_CLARO,
   },
   labelRightCard: {
     color: GRIS,

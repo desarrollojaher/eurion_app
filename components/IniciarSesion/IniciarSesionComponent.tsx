@@ -12,7 +12,7 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import ButtonCustom from "../commons/button/ButtonCustom";
-import { BLANCO } from "@/constants/Colors";
+import { BLANCO, GRIS_CLARO } from "@/constants/Colors";
 import ImagenContainer from "../commons/imagen/ImagenContainer";
 import InputCustom from "../commons/input/InputCustom";
 import { useSession } from "@/helper/provider/Auth";
@@ -95,6 +95,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     borderRadius: convertirTamanoHorizontal(25),
+    borderWidth: convertirTamanoHorizontal(2),
+    borderColor: GRIS_CLARO,
   },
   imagen: {
     marginTop: convertirTamanoVertical(36),

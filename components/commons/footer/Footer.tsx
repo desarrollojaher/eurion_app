@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
-import { AZUL, BLANCO } from "@/constants/Colors";
+import { AZUL, BLANCO, ROJO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -21,7 +21,7 @@ const Footer: React.FC<PropsFooter> = ({
     (posicion: number) => {
       setTab(posicion);
     },
-    [setTab]
+    [setTab],
   );
 
   const item = useMemo(() => {
@@ -58,6 +58,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
+    borderTopWidth: 2,
+    borderColor: ROJO,
   },
   styleSelect: {
     color: AZUL,

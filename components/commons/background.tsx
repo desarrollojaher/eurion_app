@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
-import { AZUL, BLANCO } from "@/constants/Colors";
+import { BLANCO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -15,7 +15,7 @@ const Background: React.FC<Props> = ({ children }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.fondo}>
-        <Text style={styles.text}>Eurion</Text>
+        {/* <Text style={styles.text}>Eurion</Text> */}
         {children}
       </View>
     </SafeAreaView>
@@ -27,7 +27,7 @@ export default Background;
 const styles = StyleSheet.create({
   fondo: {
     flex: 1,
-    backgroundColor: AZUL,
+    backgroundColor: BLANCO,
   },
   text: {
     color: BLANCO,

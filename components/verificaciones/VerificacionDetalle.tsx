@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { BLANCO, GRIS } from "@/constants/Colors";
+import { BLANCO, GRIS, GRIS_CLARO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -392,6 +392,8 @@ const styles = StyleSheet.create({
     width: convertirTamanoHorizontal(342),
     marginHorizontal: convertirTamanoHorizontal(35),
     marginVertical: convertirTamanoVertical(20),
+    borderColor: GRIS_CLARO,
+    borderWidth: 2,
   },
   textTituloHeader: {
     fontWeight: "bold",

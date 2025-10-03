@@ -15,7 +15,7 @@ import {
   useFieldArray,
   UseFormWatch,
 } from "react-hook-form";
-import { BLANCO, GRIS } from "@/constants/Colors";
+import { BLANCO, GRIS, GRIS_CLARO } from "@/constants/Colors";
 import { formatCurrency } from "@/helper/function/numericas";
 import { IFormaPago } from "@/models/IFormaPago";
 import { find, findIndex } from "lodash";
@@ -189,6 +189,9 @@ const styles = StyleSheet.create({
     gap: convertirTamanoVertical(10),
     width: convertirTamanoHorizontal(345),
     alignSelf: "center",
+    borderWidth: 2,
+    borderColor: GRIS_CLARO,
+    marginBottom: convertirTamanoVertical(10),
   },
   containerImagen: {
     height: convertirTamanoVertical(250),

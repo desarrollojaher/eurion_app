@@ -35,6 +35,7 @@ import { View } from "react-native";
 import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
+import { GRIS_CLARO } from "@/constants/Colors";
 
 const schemaTiposPago = z.object({
   id: z.string().nullish(),
@@ -300,6 +301,9 @@ const styles = StyleSheet.create({
     width: convertirTamanoHorizontal(345),
     alignSelf: "center",
     minHeight: convertirTamanoVertical(400),
+    borderWidth: 2,
+    borderColor: GRIS_CLARO,
+    marginBottom: convertirTamanoVertical(10),
   },
   styleInput: {
     height: convertirTamanoVertical(50),

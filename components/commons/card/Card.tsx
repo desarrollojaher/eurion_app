@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import React from "react";
-import { BLANCO } from "@/constants/Colors";
+import { AZUL, BLANCO, NEGRO, ROJO, TOMATE } from "@/constants/Colors";
 import { convertirTamanoHorizontal } from "@/helper/function/renderizadoImagen";
 
 interface PropsCard {
@@ -22,7 +22,7 @@ export default Card;
 
 const styles = StyleSheet.create({
   card: {
-    shadowColor: "black",
+    shadowColor: ROJO,
     shadowOpacity: 0.26,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,

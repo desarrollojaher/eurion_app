@@ -6,7 +6,7 @@ import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
-import { GRIS } from "@/constants/Colors";
+import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import ModalDocumentos from "./modal/ModalDocumentos";
 
 import { IGestionesCabecera } from "@/models/IGestiones";
@@ -114,6 +114,7 @@ const GestionesPageDetallesDocumenos: React.FC<
       <Card
         width={convertirTamanoHorizontal(370)}
         heigth={convertirTamanoVertical(100)}
+        style={styles.styleCard}
       >
         <HeaderCard
           labelLeft="Saldo Vencido"
@@ -168,6 +169,8 @@ const styles = StyleSheet.create({
   },
   styleCard: {
     gap: convertirTamanoVertical(10),
+    borderWidth: convertirTamanoHorizontal(2),
+    borderColor: GRIS_CLARO,
   },
   flatListStyle: {
     gap: convertirTamanoVertical(10),

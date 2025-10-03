@@ -1,25 +1,22 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
-import Card from "../commons/card/Card";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import IconFont from "react-native-vector-icons/FontAwesome5";
-import { AZUL, BLANCO } from "@/constants/Colors";
+import { AZUL, AZUL_CLARO, AZUL_ICONO, BLANCO, ROJO } from "@/constants/Colors";
 import ModalDatos from "./modal/ModalDatos";
 import ModalSincronizarImagenes from "./modal/ModalSincronizarImagenes";
 import { useSincronizacion } from "@/service/Sincronizacion/useSincronizacion";
 import ModalError from "./modal/ModalError";
 import ModalDatosSincronizados from "./modal/ModalDatosSincronizados";
 import { useObtenerFecha } from "@/service/Sincronizacion/useObtenerFecha";
+import { LinearGradient } from "expo-linear-gradient";
 
 const SincronizarDatos = () => {
   const [modalImagenes, setModalImagenes] = useState(false);
-
-  // const db = useSQLiteContext();
-  // const drizzleDb = drizzle(db, { schema });
 
   const {
     index,
@@ -50,29 +47,41 @@ const SincronizarDatos = () => {
 
   return (
     <View>
-      <Header title="Sincronizar" />
-      <View style={styles.containerFechas}>
-        <Text style={styles.textStyle}>Última Sincronización:</Text>
-        <Text style={styles.textStyle}>
-          {dataFecha?.fecha ?? "No sincronizado"}
-        </Text>
-      </View>
+      <LinearGradient
+        colors={[AZUL, AZUL_CLARO]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.containerHeaderLinear}
+      >
+        <Header title="Sincronizar" sincronizacion={true} />
+        <View style={styles.containerFechas}>
+          <Text style={styles.textStyle}>Última Sincronización:</Text>
+          <Text style={styles.textStyle}>
+            {dataFecha?.fecha ?? "No sincronizado"}
+          </Text>
+        </View>
+      </LinearGradient>
       <View style={styles.containerBotones}>
-        <Card
-          width={convertirTamanoHorizontal(160)}
-          heigth={convertirTamanoVertical(156)}
+        <LinearGradient
+          colors={[AZUL, AZUL_CLARO]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.styleCard}
         >
-          <TouchableOpacity onPress={handleSincronizarDatos}>
-            <IconFont
-              name="info"
-              color={AZUL}
-              size={convertirTamanoHorizontal(60)}
-              style={styles.iconModulosStyle}
-            />
+          <TouchableOpacity
+            onPress={handleSincronizarDatos}
+            style={styles.styleTouchable}
+          >
+            <View style={styles.containerIcon}>
+              <IconFont
+                name="info"
+                color={BLANCO}
+                size={convertirTamanoHorizontal(30)}
+              />
+            </View>
             <Text style={styles.textIconos}>Información</Text>
           </TouchableOpacity>
-        </Card>
+        </LinearGradient>
         {/* <Card
           width={convertirTamanoHorizontal(160)}
           heigth={convertirTamanoVertical(156)}
@@ -134,6 +143,9 @@ const styles = StyleSheet.create({
   },
   styleCard: {
     justifyContent: "center",
+    width: convertirTamanoHorizontal(170),
+    height: convertirTamanoVertical(170),
+    borderRadius: convertirTamanoHorizontal(20),
   },
   iconModulosStyle: {
     alignSelf: "center",
@@ -141,17 +153,32 @@ const styles = StyleSheet.create({
   },
   textIconos: {
     fontSize: convertirTamanoHorizontal(18),
-    fontWeight: "regular",
-    color: AZUL,
+    fontWeight: "bold",
+    color: BLANCO,
     textAlign: "center",
   },
   containerFechas: {
-    marginTop: convertirTamanoVertical(40),
+    marginTop: convertirTamanoVertical(20),
     flexDirection: "row",
     gap: convertirTamanoHorizontal(10),
     marginHorizontal: convertirTamanoHorizontal(35),
   },
   textStyle: {
     color: BLANCO,
+  },
+  styleTouchable: { alignItems: "center" },
+  containerIcon: {
+    marginBottom: convertirTamanoVertical(18),
+    width: convertirTamanoHorizontal(60),
+    height: convertirTamanoHorizontal(60),
+    borderRadius: convertirTamanoHorizontal(10),
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: AZUL_ICONO,
+  },
+  containerHeaderLinear: {
+    height: convertirTamanoVertical(130),
+    borderColor: ROJO,
+    borderBottomWidth: convertirTamanoVertical(2),
   },
 });

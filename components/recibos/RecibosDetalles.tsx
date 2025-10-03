@@ -36,6 +36,7 @@ import { useComprobantesObtener } from "@/service/Comprobantes/useComprobantesOb
 import { useSession } from "@/helper/provider/Auth";
 import { useRecibosGuardar } from "@/service/Recibos/useRecibosGuardar";
 import { handleChangeDireccionImagenes } from "@/helper/function/imagenes";
+import { router } from "expo-router";
 
 const schema = z.object({
   datos: z.array(
@@ -359,6 +360,7 @@ const RecibosDetalles = () => {
         Toast.error("Debe ingresar valores en un comprobante");
       }
       setIsLoadingRecibo(false);
+      router.back();
     },
     [
       defaultValueRecibos,
