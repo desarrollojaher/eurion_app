@@ -69,9 +69,10 @@ const styles = StyleSheet.create({
     gap: convertirTamanoHorizontal(3),
   },
   containerStyle: {
-    width: convertirTamanoHorizontal(30),
-    height: convertirTamanoVertical(35),
+    width: convertirTamanoHorizontal(45),
+    height: convertirTamanoVertical(50),
     alignItems: "center",
+    justifyContent: "center",
   },
   textHeader: {
     flex: 1,
@@ -80,5 +81,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     fontWeight: "bold",
+    alignSelf: "center",
   },
 });

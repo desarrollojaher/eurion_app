@@ -44,6 +44,7 @@ const Camara: React.FC<PropsCamara> = ({
   const [openImagenCompleta, setOpenImagenCompleta] = useState<boolean>(false);
   const [imagen, setImagen] = useState<IImagenCompleta | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
+  const [isLoadingFoto, setLoadingGuardado] = useState(false);
 
   const ref = useRef<CameraView>(null);
 
@@ -59,6 +60,7 @@ const Camara: React.FC<PropsCamara> = ({
   }, []);
 
   const handleTakePicture = useCallback(async () => {
+    setLoadingGuardado(true);
     if (desabilitado) {
       Toast.error("Se ha alcanzado el limite de fotos");
       return;
@@ -66,10 +68,12 @@ const Camara: React.FC<PropsCamara> = ({
     const photo = await ref.current?.takePictureAsync(); //{ base64: true }
     if (!photo) {
       Toast.error("No se pudo tomar la foto");
+      setLoadingGuardado(false);
       return;
     } else {
       setImagenes((current) => [...current, photo.uri ?? ""]);
     }
+    setLoadingGuardado(false);
   }, [desabilitado]);
 
   const handleGuardarDatos = useCallback(() => {
@@ -209,7 +213,7 @@ const Camara: React.FC<PropsCamara> = ({
             <TouchableOpacity
               style={styles.button}
               onPress={handleTakePicture}
-              // disabled={imagenes.length >= cantidadMaxima}
+              disabled={isLoadingFoto}
             >
               <Icon
                 name="camera"

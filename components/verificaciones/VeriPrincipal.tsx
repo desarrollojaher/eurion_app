@@ -93,7 +93,12 @@ const VeriPrincipal = () => {
 
   const handleOpenGoogleMaps = useCallback(
     (cliente: IVerificacionesCabecera) => {
-      if (cliente.latitud && cliente.longitud) {
+      if (
+        cliente.latitud &&
+        cliente.longitud &&
+        cliente.latitud !== null &&
+        cliente.longitud !== null
+      ) {
         Linking.openURL(
           `geo:${cliente.latitud},${cliente.longitud}?q=${cliente.latitud},${cliente.longitud}`,
         );

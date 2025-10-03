@@ -1,10 +1,4 @@
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
 import Animated, { SharedValue } from "react-native-reanimated";
 import {
@@ -45,7 +39,7 @@ const CarouselItem: React.FC<PropsCarouselItem> = ({
       <View style={[styles.container, styleContaner, { width }]}>
         <Animated.View style={[styles.imagenContainer]}>
           {/*animatedContainerStyle*/}
-          <Text style={styles.overlayText}>{item.titulo}</Text>
+          {/* <Text style={styles.overlayText}>{item.titulo}</Text> */}
           {/*imageStyle*/}
           <Animated.Image
             style={[styles.imagen]}

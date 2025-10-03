@@ -65,7 +65,6 @@ import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
 import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
 import { union } from "lodash";
-import { ca } from "zod/v4/locales";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -1007,6 +1006,8 @@ export const dbSqliteService = {
           cliId: schema.clienteTable.idCliente,
           idHojaRuta: schema.gestionesTable.idHojaRuta,
           peId: schema.clienteTable.personaId,
+          imagenCliente: schema.clienteTable.fotoCliente,
+          imagenDomicilio: schema.clienteTable.fotoDireccion,
         })
         .from(schema.gestionesTable)
         .leftJoin(

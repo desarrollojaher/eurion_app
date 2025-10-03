@@ -35,6 +35,7 @@ import { formatCurrency } from "@/helper/function/numericas";
 import { useDebounce } from "@/hooks/debounce";
 import { useGestionStore } from "@/helper/store/storeGestiones";
 import { useObtenerGestiones } from "@/service/Gestiones/useObtenerGestiones";
+import { Toast } from "toastify-react-native";
 
 const GestionesPagePrincipal = () => {
   const [modalCarrucel, setModalCarrucel] = useState(false);
@@ -54,27 +55,36 @@ const GestionesPagePrincipal = () => {
   const { setDatos } = useGestionStore();
 
   const handleOpenImagenes = useCallback((data: IGestionesCabecera) => {
-    // const imagenesLista: IGestionesCabecera[] = [];
-    // if (data.imagenCliente) {
-    //   imagenesLista.push({
-    //     titulo: "FOTO CLIENTE",
-    //     url: data.imagenCliente.split(",")[1],
-    //   });
-    // }
-    // if (data.imagenDomicilio) {
-    //   imagenesLista.push({
-    //     titulo: "FOTO DOMICILIO",
-    //     url: data.imagenDomicilio.split(",")[1],
-    //   });
-    // }
+    const imagenesLista: IImagenCompleta[] = [];
+    if (data.imagenCliente) {
+      imagenesLista.push({
+        titulo: "FOTO CLIENTE",
+        url: data.imagenCliente.split(",")[1],
+      });
+    }
+    if (data.imagenDomicilio) {
+      imagenesLista.push({
+        titulo: "FOTO DOMICILIO",
+        url: data.imagenDomicilio.split(",")[1],
+      });
+    }
 
-    // setImagenes(imagenesLista);
+    setImagenes(imagenesLista);
     setModalCarrucel(true);
   }, []);
   const handleAbrirGps = useCallback((data: IGestionesCabecera) => {
-    Linking.openURL(
-      `geo:${data.latitudCliente},${data.longitudCliente}?q=${data.latitudCliente},${data.longitudCliente}`,
-    );
+    if (
+      data.latitudCliente &&
+      data.longitudCliente &&
+      data.latitudCliente !== null &&
+      data.longitudCliente !== null
+    ) {
+      Linking.openURL(
+        `geo:${data.latitudCliente},${data.longitudCliente}?q=${data.latitudCliente},${data.longitudCliente}`,
+      );
+    } else {
+      Toast.error("El cliente no tiene coordenadas");
+    }
   }, []);
 
   const handleCloseModalCarrucel = useCallback(() => {

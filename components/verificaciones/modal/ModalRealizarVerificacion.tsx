@@ -296,6 +296,7 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
           onClose={onCloseCamara}
           visible={visibleCamara}
           handleCaptureImage={handleCaptureImage}
+          cantidadMaxima={3 - imagenes.length}
         />
       )}
     </ModalCustom>

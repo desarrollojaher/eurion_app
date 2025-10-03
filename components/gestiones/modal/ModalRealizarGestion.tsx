@@ -206,7 +206,7 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
         return item.gcId === Number(value.value);
       });
       setValue("gcIdCc", Number(value.value));
-      setValue("gdId", -1);
+      // setValue("gdId", -1);
       if (gestion) {
         setSeleccionCabecera(gestion);
       }
