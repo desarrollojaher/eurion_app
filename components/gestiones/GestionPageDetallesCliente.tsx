@@ -49,22 +49,22 @@ const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   const referencias = useMemo(() => {
     return obtenerReferencias
       ? obtenerReferencias?.map((item) => {
-        return {
-          label: item.tipoReferencia ?? "",
-          value: item.peIdReferencia?.toString() ?? "",
-        };
-      })
+          return {
+            label: item.tipoReferencia ?? "",
+            value: item.peIdReferencia?.toString() ?? "",
+          };
+        })
       : [];
   }, [obtenerReferencias]);
 
   const comprobantes = useMemo(() => {
     return dataComprobantes
       ? dataComprobantes?.map((item) => {
-        return {
-          label: `${item.tipoComprobante} ${item.idCredito}`,
-          value: item.idCredito?.toString() ?? "",
-        };
-      })
+          return {
+            label: `${item.tipoComprobante} ${item.idCredito}`,
+            value: item.idCredito?.toString() ?? "",
+          };
+        })
       : [];
   }, [dataComprobantes]);
 
@@ -297,5 +297,5 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: convertirTamanoHorizontal(2),
     borderColor: GRIS_CLARO,
-  }
+  },
 });

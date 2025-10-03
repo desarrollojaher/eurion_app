@@ -12,7 +12,7 @@ import React, { useCallback, useState } from "react";
 import Header from "../commons/header/Header";
 import InputCustom from "../commons/input/InputCustom";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { AZUL, GRIS, GRIS_CLARO, NEGRO } from "@/constants/Colors";
+import { AZUL, GRIS, GRIS_CLARO } from "@/constants/Colors";
 import {
   convertirTamanoHorizontal,
   convertirTamanoVertical,
@@ -154,13 +154,13 @@ const GestionesPagePrincipal = () => {
           <Separador />
           <View style={styles.containerIcons}>
             <Pressable onPress={() => handleOpenImagenes(item)}>
-              <FontAwesome5 name="images" color={NEGRO} size={30} />
+              <FontAwesome5 name="images" color={"green"} size={30} />
             </Pressable>
             <Pressable onPress={() => handleAbrirGps(item)}>
-              <FontAwesome6 name="map-location-dot" size={30} color={NEGRO} />
+              <FontAwesome6 name="map-location-dot" size={30} color={AZUL} />
             </Pressable>
             <Pressable onPress={() => handleSelecionar(item)}>
-              <FontAwesome5 name="plus" color={NEGRO} size={30} />
+              <FontAwesome5 name="plus" color={"green"} size={30} />
             </Pressable>
           </View>
         </TouchableOpacity>
