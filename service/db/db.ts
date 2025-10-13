@@ -416,7 +416,9 @@ export const dbSqliteService = {
   },
   insertarTipoVerificaciones: async (datos: ITiposVerificaciones[]) => {
     try {
-      await db.insert(schema.tiposVerificacionTable).values(datos);
+      if (datos.length > 0) {
+        await db.insert(schema.tiposVerificacionTable).values(datos);
+      }
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -723,16 +725,18 @@ export const dbSqliteService = {
 
   sincronizarGestiones: async (data: IGestiones[]) => {
     try {
-      await db
-        .insert(schema.gestionesTable)
-        .values(data)
-        .onConflictDoNothing({
-          target: [schema.gestionesTable.clId],
-        });
-      for (let i = 0; i < data.length; i++) {
+      if (data.length > 0) {
         await db
-          .insert(schema.gestionesDetallesTable)
-          .values(data[i].gestiones);
+          .insert(schema.gestionesTable)
+          .values(data)
+          .onConflictDoNothing({
+            target: [schema.gestionesTable.clId],
+          });
+        for (let i = 0; i < data.length; i++) {
+          await db
+            .insert(schema.gestionesDetallesTable)
+            .values(data[i].gestiones);
+        }
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -776,7 +780,9 @@ export const dbSqliteService = {
 
   sincronizarReferecias: async (data: IReferencia[]) => {
     try {
-      await db.insert(schema.referenciasTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.referenciasTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -798,7 +804,9 @@ export const dbSqliteService = {
 
   sincronizarComprobantes: async (data: IComprobante[]) => {
     try {
-      await db.insert(schema.documentosTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.documentosTable).values(data);
+      }
       for (let i = 0; i < data.length; i++) {
         await db.insert(schema.documentosDetTable).values(data[i].productos);
       }
@@ -824,7 +832,9 @@ export const dbSqliteService = {
 
   sincronizarGestionesAnteriores: async (data: IGestionesAnteriores[]) => {
     try {
-      await db.insert(schema.gestionesAnterioresTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.gestionesAnterioresTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -846,7 +856,9 @@ export const dbSqliteService = {
 
   sincronizarTiposGestionesCabecera: async (data: ITipoGestion[]) => {
     try {
-      await db.insert(schema.tiposGestionesCabeceraTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.tiposGestionesCabeceraTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -868,7 +880,9 @@ export const dbSqliteService = {
 
   sincronizarTiposGestionesDetalle: async (data: ITipoGestionDetalle[]) => {
     try {
-      await db.insert(schema.tiposGestionesDetallesTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.tiposGestionesDetallesTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -890,7 +904,9 @@ export const dbSqliteService = {
 
   sincronizarDirecciones: async (data: IDireccion[]) => {
     try {
-      await db.insert(schema.direccionesTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.direccionesTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -912,7 +928,9 @@ export const dbSqliteService = {
 
   sincronizarTelefonos: async (data: ITelefono[]) => {
     try {
-      await db.insert(schema.telefonosTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.telefonosTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -934,7 +952,9 @@ export const dbSqliteService = {
 
   sincronizarTiposReferencia: async (data: ITipoReferencia[]) => {
     try {
-      await db.insert(schema.tiposReferenciaTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.tiposReferenciaTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
@@ -967,7 +987,9 @@ export const dbSqliteService = {
 
   sincronizarFormasPago: async (data: IFormaPago[]) => {
     try {
-      await db.insert(schema.formasPagoTable).values(data);
+      if (data.length > 0) {
+        await db.insert(schema.formasPagoTable).values(data);
+      }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
       const mensajeExtraido =
