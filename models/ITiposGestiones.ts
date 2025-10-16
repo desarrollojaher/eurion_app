@@ -1,6 +1,7 @@
 export interface ITipoGestion {
   gcId: number | null;
   gcDescripcion: string | null;
+  teId: number | null;
 }
 
 export interface ITipoGestionDetalle {
@@ -11,3 +12,7 @@ export interface ITipoGestionDetalle {
 }
 
 export type ITipoGestionDetalleParams = { gcId: number };
+
+export type ITipoDatoCabeceraParams = {
+  tcId: number;
+};

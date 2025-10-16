@@ -10,6 +10,7 @@ export interface IGestiones {
   usuId: number;
   clId: number;
   nombreCliente: string;
+  tcId: number;
   gestiones: IGestionesDetalles[];
 }
 
@@ -41,6 +42,7 @@ export interface IGestionesCabecera {
   peId: number | null;
   imagenCliente: string | null;
   imagenDomicilio: string | null;
+  tcId: number | null;
 }
 
 export interface IGestionCabeceraParams {

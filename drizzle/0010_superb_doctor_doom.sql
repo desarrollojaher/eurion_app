@@ -1,0 +1,1 @@
+ALTER TABLE `tipos_gestiones_cabecera` ADD `teId` integer;

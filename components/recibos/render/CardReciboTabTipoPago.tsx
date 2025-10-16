@@ -36,6 +36,7 @@ import CarouselImagenes from "@/components/commons/carousel/CarouselImagenes";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
 import { GRIS_CLARO } from "@/constants/Colors";
+import { IComprobanteObtener } from "@/models/IComprobante";
 
 const schemaTiposPago = z.object({
   id: z.string().nullish(),
@@ -71,6 +72,7 @@ interface PropsCardReciboTabTipoPago {
   handleOpenModalCamara: (index: number) => void;
   imagen: IImagenCompleta | undefined;
   handleEliminarImagen: () => void;
+  datos: IComprobanteObtener[];
 }
 
 const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
@@ -84,6 +86,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   handleOpenModalCamara,
   imagen,
   handleEliminarImagen,
+  datos,
 }) => {
   const defaultValue = useMemo<IRecibosEnviarDetalles>(
     () => ({
@@ -92,6 +95,17 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     }),
     [],
   );
+
+  const valor = useMemo(
+    () =>
+      find(
+        datos,
+        (valor) =>
+          item?.doctran === `${valor.tipoComprobante} ${valor.idCredito}`,
+      ),
+    [datos, item?.doctran],
+  );
+
   const {
     control: controlTiposPagos,
     handleSubmit: handleSubmitTipoPagos,
@@ -103,6 +117,7 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
   });
 
   const [tipoPago, setTipoPago] = useState<IDatosSelect | undefined>();
+  const [mostrarMas, setMostrarMas] = useState(false);
 
   const pideFoto = useMemo(() => {
     const f = find(
@@ -149,8 +164,6 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
 
   const onSuccess = useCallback(
     (data: IRecibosEnviarDetalles) => {
-      console.log(pideFoto);
-
       if (pideFoto === "S" && imagen === undefined) {
         Toast.error("Ingrese una imagen");
         return;
@@ -209,15 +222,37 @@ const CardReciboTabTipoPago: React.FC<PropsCardReciboTabTipoPago> = ({
     console.log("Errores ===> ", error);
   }, []);
 
+  const handleMostrarMas = useCallback(() => {
+    setMostrarMas(!mostrarMas);
+  }, [mostrarMas]);
+
   return (
     <Card style={styles.styleCard}>
       <HeaderCard labelLeft={item.doctran} labelRight={item.fechaComprobante} />
       <Separador />
 
       <HeaderCard
-        labelLeft="Valor Total"
+        labelLeft="Valor Total a Cancelar"
         labelRight={formatCurrency(valorTotal)}
+        abrir
+        onPress={handleMostrarMas}
       />
+      {mostrarMas && (
+        <Card>
+          <HeaderCard
+            labelLeft="Saldo Credito"
+            labelRight={formatCurrency(valor?.crSaldoCapital ?? 0)}
+          />
+          <HeaderCard
+            labelLeft="Interes por mora"
+            labelRight={formatCurrency(valor?.interesGastoMora ?? 0)}
+          />
+          <HeaderCard
+            labelLeft="Gastos cobranza"
+            labelRight={formatCurrency(valor?.interesGastoCobranza ?? 0)}
+          />
+        </Card>
+      )}
       <HeaderCard
         labelLeft="Valor Abondo"
         labelRight={formatCurrency(valorIngresado)}

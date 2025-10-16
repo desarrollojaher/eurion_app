@@ -1,6 +1,10 @@
 import { sincronizacionApi } from "@/api/sincronizacion";
 import { IRecibosEnviar, IRecibosObtener } from "@/models/IRecibo";
-import { useMutation, UseMutationOptions, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  UseMutationOptions,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { dbSqliteService } from "../db/db";
 import { Toast } from "toastify-react-native";
 import { recibosKeys } from "./recibosKeys";
@@ -9,7 +13,7 @@ import { compressImage } from "@/helper/function/comprimirImagen";
 import { BucketS3Jaher } from "@/constants/env";
 
 export const useRecibosEnviar = (
-  mutationOptions?: UseMutationOptions<unknown, any, IRecibosObtener, unknown>
+  mutationOptions?: UseMutationOptions<unknown, any, IRecibosObtener, unknown>,
 ) => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -33,7 +37,11 @@ export const useRecibosEnviar = (
         caId: data.caId ?? -1,
         hdId: data.hdId ?? -1,
       };
-      if (data.urlImg !== null && data.urlImg !== undefined && data.urlImg !== "") {
+      if (
+        data.urlImg !== null &&
+        data.urlImg !== undefined &&
+        data.urlImg !== ""
+      ) {
         const url = "CEDULA/VERIFICACIONES/RECIBOS";
         const urlS3 = url.replace("CEDULA", data.identificacionCliente ?? "-1");
         const compressed = await compressImage(data.urlImg ?? "");

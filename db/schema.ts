@@ -149,10 +149,11 @@ export const gestionesTable = sqliteTable(
     clId: int(),
     nombreCliente: text(),
     gestionado: int().default(0),
+    tcId: int(), // igual al teId del tipo de gestiones, ya que aca solo se llama asi
   },
   (table) => {
     return {
-      uniqueConstraint: unique().on(table.clId),
+      uniqueConstraint: unique().on(table.idHojaRuta, table.clId),
     };
   },
 );
@@ -225,6 +226,7 @@ export const tiposGestionesCabeceraTable = sqliteTable(
   {
     gcId: int(),
     gcDescripcion: text(),
+    teId: int(),
   },
 );
 

@@ -202,6 +202,7 @@ const RecibosDetalles = () => {
           control={control}
           getValues={getValues}
           setValue={setValue}
+          datos={documentos ?? []}
         />
       );
     }

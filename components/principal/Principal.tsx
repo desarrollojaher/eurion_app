@@ -350,6 +350,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: convertirTamanoVertical(40),
+    gap: convertirTamanoHorizontal(7),
     paddingHorizontal: convertirTamanoHorizontal(35),
   },
   textVersion: {

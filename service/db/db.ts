@@ -53,6 +53,7 @@ import {
   IComprobanteObtenerParams,
 } from "@/models/IComprobante";
 import {
+  ITipoDatoCabeceraParams,
   ITipoGestion,
   ITipoGestionDetalle,
   ITipoGestionDetalleParams,
@@ -730,7 +731,10 @@ export const dbSqliteService = {
           .insert(schema.gestionesTable)
           .values(data)
           .onConflictDoNothing({
-            target: [schema.gestionesTable.clId],
+            target: [
+              schema.gestionesTable.idHojaRuta,
+              schema.gestionesTable.clId,
+            ],
           });
         for (let i = 0; i < data.length; i++) {
           await db
@@ -768,7 +772,13 @@ export const dbSqliteService = {
             target: [schema.clienteTable.idCliente],
             set: { ...data[i].cliente },
           });
-        await db.insert(schema.viviendaTable).values(data[i].vivienda);
+        await db
+          .insert(schema.viviendaTable)
+          .values(data[i].vivienda)
+          .onConflictDoUpdate({
+            target: [schema.viviendaTable.idCliente],
+            set: { ...data[i].vivienda },
+          });
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
@@ -1030,6 +1040,7 @@ export const dbSqliteService = {
           peId: schema.clienteTable.personaId,
           imagenCliente: schema.clienteTable.fotoCliente,
           imagenDomicilio: schema.clienteTable.fotoDireccion,
+          tcId: schema.gestionesTable.tcId,
         })
         .from(schema.gestionesTable)
         .leftJoin(
@@ -1065,14 +1076,16 @@ export const dbSqliteService = {
     }
   },
 
-  obtenerTiposGestionesCabecera: async () => {
+  obtenerTiposGestionesCabecera: async (params: ITipoDatoCabeceraParams) => {
     try {
       const tiposGestiones: ITipoGestion[] = await db
         .select({
           gcId: schema.tiposGestionesCabeceraTable.gcId,
           gcDescripcion: schema.tiposGestionesCabeceraTable.gcDescripcion,
+          teId: schema.tiposGestionesCabeceraTable.teId,
         })
-        .from(schema.tiposGestionesCabeceraTable);
+        .from(schema.tiposGestionesCabeceraTable)
+        .where(eq(schema.tiposGestionesCabeceraTable.teId, params.tcId));
       return tiposGestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";

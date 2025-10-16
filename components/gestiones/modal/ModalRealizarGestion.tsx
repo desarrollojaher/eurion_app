@@ -99,8 +99,9 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
 
   const [guardandoGestion, setGuardandoGestion] = useState(false);
 
-  const { data: dataTiposGestionesCabecera } =
-    useTipoGestionesCabeceraObtener();
+  const { data: dataTiposGestionesCabecera } = useTipoGestionesCabeceraObtener({
+    tcId: datos.tcId ?? 1,
+  });
 
   const { data: dataTiposGestionesDetalles } = useTipoGestionesDetalleObtener(
     {

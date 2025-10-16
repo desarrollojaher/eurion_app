@@ -19,6 +19,7 @@ import { BLANCO } from "@/constants/Colors";
 import { useFormaPagoObtener } from "@/service/FormasPago/useFormaPagoObtener";
 import Camara from "../commons/camera/Camara";
 import { IImagenCompleta } from "@/models/IImagenCompleta";
+import { IComprobanteObtener } from "@/models/IComprobante";
 
 interface PropsReciboTabTipoPago {
   datosDocumentos: FieldArrayWithId<IReciboEnviarDatos, "datos", "id">[];
@@ -26,6 +27,7 @@ interface PropsReciboTabTipoPago {
   control: Control<IReciboEnviarDatos, any, IReciboEnviarDatos>;
   getValues: UseFormGetValues<IReciboEnviarDatos>;
   setValue: UseFormSetValue<IReciboEnviarDatos>;
+  datos: IComprobanteObtener[];
 }
 
 const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
@@ -34,6 +36,7 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
   control,
   getValues,
   setValue,
+  datos,
 }) => {
   const [modalCamara, setModalCamara] = useState(false);
   const [indexImg, setIndexImg] = useState(0);
@@ -95,11 +98,13 @@ const ReciboTabTipoPago: React.FC<PropsReciboTabTipoPago> = ({
         indexCard={index}
         imagen={index === indexImg ? imagen : undefined}
         handleEliminarImagen={handleEliminarImagen}
+        datos={datos}
       />
     ),
     [
       control,
       dataFormasPago,
+      datos,
       datosDocumentos,
       formasPago,
       handleEliminarImagen,

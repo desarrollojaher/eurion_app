@@ -59,13 +59,13 @@ const GestionesPagePrincipal = () => {
     if (data.imagenCliente) {
       imagenesLista.push({
         titulo: "FOTO CLIENTE",
-        url: data.imagenCliente.split(",")[1],
+        url: data.imagenCliente,
       });
     }
     if (data.imagenDomicilio) {
       imagenesLista.push({
         titulo: "FOTO DOMICILIO",
-        url: data.imagenDomicilio.split(",")[1],
+        url: data.imagenDomicilio,
       });
     }
 

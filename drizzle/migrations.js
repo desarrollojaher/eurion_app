@@ -11,6 +11,9 @@ import m0006 from './0006_abnormal_galactus.sql';
 import m0007 from './0007_broad_ultimo.sql';
 import m0008 from './0008_amused_bloodaxe.sql';
 import m0009 from './0009_deep_kabuki.sql';
+import m0010 from './0010_superb_doctor_doom.sql';
+import m0011 from './0011_sad_vertigo.sql';
+import m0012 from './0012_brave_true_believers.sql';
 
   export default {
     journal,
@@ -24,7 +27,10 @@ m0005,
 m0006,
 m0007,
 m0008,
-m0009
+m0009,
+m0010,
+m0011,
+m0012
     }
   }
   
