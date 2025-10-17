@@ -87,13 +87,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.eurionapp"
+    namespace 'com.jaher.eurionapp'
     defaultConfig {
-        applicationId "com.eurionapp"
+        applicationId 'com.jaher.eurionapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 4
+        versionName "2.0.2"
     }
     signingConfigs {
         debug {
