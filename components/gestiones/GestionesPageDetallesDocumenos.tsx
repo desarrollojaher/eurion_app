@@ -39,7 +39,6 @@ const GestionesPageDetallesDocumenos: React.FC<
       datosDocumentos,
       (item) =>
         (item.crSaldoCredito ?? 0) +
-        (item.crSaldoInteres ?? 0) +
         (item.interesGastoCobranza ?? 0) +
         (item.interesGastoMora ?? 0),
     );

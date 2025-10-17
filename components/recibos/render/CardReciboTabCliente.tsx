@@ -114,7 +114,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
       />
       <HeaderCard
         labelLeft="Saldo vencido"
-        labelRight={formatCurrency(valor?.crSaldoCapital ?? 0)}
+        labelRight={formatCurrency(valor?.crSaldoCredito ?? 0)}
       />
       <HeaderCard
         labelLeft="Interes por mora"

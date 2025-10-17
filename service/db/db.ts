@@ -3,6 +3,7 @@ import { ISincronizado } from "@/models/ISincronizado";
 import {
   and,
   asc,
+  count,
   desc,
   eq,
   like,
@@ -66,6 +67,7 @@ import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
 import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
 import { union } from "lodash";
+import { sqliteView } from "drizzle-orm/sqlite-core";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -1020,6 +1022,36 @@ export const dbSqliteService = {
   },
   obtenerGestionesCabecera: async (params: IGestionCabeceraParams) => {
     try {
+      //   const userView = sqliteView("user_view").as((db) =>
+      //     db
+      //       .select({
+      //         clId: schema.documentosTable.clId,
+      //         deudaTotal: sum(schema.documentosTable.valorTotalCredito),
+      //         deudaPendiente: sql`
+      //   SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +
+      //   SUM(COALESCE(${schema.documentosTable.interesGastoCobranza}, 0)) +
+      //   SUM(COALESCE(${schema.documentosTable.interesGastoMora}, 0))
+      // `,
+      //       })
+      //       .from(schema.documentosTable)
+      //       .innerJoin(
+      //         schema.gestionesTable,
+      //         and(
+      //           eq(schema.documentosTable.clId, schema.gestionesTable.clId),
+      //           eq(schema.gestionesTable.gestionado, 0)
+      //         )
+      //       )
+      //       .innerJoin(
+      //         schema.gestionesDetallesTable,
+      //         eq(schema.documentosTable.idCredito, schema.gestionesDetallesTable.crId)
+      //       )
+      //       .groupBy(schema.documentosTable.clId)
+      //   );
+
+      //   const d = await db.select().from(userView);
+
+      //   console.log(d);
+
       const gestiones: IGestionesCabecera[] = await db
         .select({
           nombreCliente: schema.clienteTable.nombreCliente,
@@ -1028,11 +1060,10 @@ export const dbSqliteService = {
           direccionCliente: schema.direccionesTable.diDireccion,
           deudaTotal: sum(schema.documentosTable.valorTotalCredito),
           deudaPendiente: sql`
-          SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +
-          SUM(COALESCE(${schema.documentosTable.crSaldoInteres}, 0)) +
-          SUM(COALESCE(${schema.documentosTable.interesGastoCobranza}, 0)) +
-          SUM(COALESCE(${schema.documentosTable.interesGastoMora}, 0))
-          `,
+      SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +
+      SUM(COALESCE(${schema.documentosTable.interesGastoCobranza}, 0)) +
+      SUM(COALESCE(${schema.documentosTable.interesGastoMora}, 0))
+    `,
           latitudCliente: schema.direccionesTable.diLatitud,
           longitudCliente: schema.direccionesTable.diLongitud,
           cliId: schema.clienteTable.idCliente,
@@ -1041,6 +1072,7 @@ export const dbSqliteService = {
           imagenCliente: schema.clienteTable.fotoCliente,
           imagenDomicilio: schema.clienteTable.fotoDireccion,
           tcId: schema.gestionesTable.tcId,
+          total: count(schema.clienteTable.personaId),
         })
         .from(schema.gestionesTable)
         .leftJoin(
@@ -1049,15 +1081,24 @@ export const dbSqliteService = {
         )
         .leftJoin(
           schema.direccionesTable,
-          eq(schema.direccionesTable.peId, schema.clienteTable.personaId),
+          and(
+            eq(schema.direccionesTable.peId, schema.clienteTable.personaId),
+            eq(schema.direccionesTable.diCobranza, "S"),
+          ),
         )
         .leftJoin(
           schema.documentosTable,
-          eq(schema.documentosTable.clId, schema.clienteTable.idCliente),
+          eq(schema.documentosTable.clId, schema.gestionesTable.clId),
+        )
+        .innerJoin(
+          schema.gestionesDetallesTable,
+          eq(
+            schema.documentosTable.idCredito,
+            schema.gestionesDetallesTable.crId,
+          ),
         )
         .where(
           and(
-            eq(schema.direccionesTable.diCobranza, "S"),
             eq(schema.gestionesTable.gestionado, 0),
             or(
               like(schema.clienteTable.apellidoCliente, `%${params.buscador}%`),
@@ -1255,8 +1296,7 @@ export const dbSqliteService = {
           identificacion: schema.clienteTable.identificacionCliente,
           deudaTotal: sql`SUM(COALESCE(${schema.documentosTable.valorTotalCredito}, 0))`,
           deudaPendiente: sql`
-          SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +
-          SUM(COALESCE(${schema.documentosTable.crSaldoInteres}, 0)) +
+          SUM(COALESCE(${schema.documentosTable.crSaldoCredito}, 0)) +         
           SUM(COALESCE(${schema.documentosTable.interesGastoCobranza}, 0)) +
           SUM(COALESCE(${schema.documentosTable.interesGastoMora}, 0))
           `,
@@ -1270,6 +1310,13 @@ export const dbSqliteService = {
         .leftJoin(
           schema.documentosTable,
           eq(schema.documentosTable.clId, schema.clienteTable.idCliente),
+        )
+        .innerJoin(
+          schema.gestionesDetallesTable,
+          eq(
+            schema.documentosTable.idCredito,
+            schema.gestionesDetallesTable.crId,
+          ),
         )
         .where(
           and(

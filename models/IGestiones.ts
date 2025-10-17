@@ -43,6 +43,7 @@ export interface IGestionesCabecera {
   imagenCliente: string | null;
   imagenDomicilio: string | null;
   tcId: number | null;
+  total: number | null;
 }
 
 export interface IGestionCabeceraParams {

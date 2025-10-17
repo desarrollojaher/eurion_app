@@ -287,7 +287,7 @@ const RecibosDetalles = () => {
           if (
             (element.valorCancela ?? 0) > 0 &&
             (element.valorCancela ?? 0) <=
-            saldoVencido + gastosCobranza + interesMora
+              saldoVencido + gastosCobranza + interesMora
           ) {
             if (element.valores && element.valores?.length > 0) {
               const sumaTotal =
@@ -442,7 +442,7 @@ const RecibosDetalles = () => {
       )}
       {loadingRecibo && isPendingRecibo && (
         <ModalLoading
-          onClose={() => { }}
+          onClose={() => {}}
           visible={loadingRecibo || isPendingRecibo}
         />
       )}
