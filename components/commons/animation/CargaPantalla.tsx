@@ -30,7 +30,7 @@ const CargaPantalla = () => {
           resizeMode="contain"
         />
       </View>
-      <Text style={{ color: "white" }}>ERION APP</Text>
+      <Text style={{ color: "white" }}>EURION APP</Text>
     </View>
   );
 };
