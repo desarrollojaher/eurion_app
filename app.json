@@ -66,9 +66,7 @@
       }
     },
     "owner": "jaher",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+   "runtimeVersion": "2.0.3",
     "updates": {
       "url": "https://u.expo.dev/1fcd3c47-7ecd-497b-a92a-34f69508447e"
     }
