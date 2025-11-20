@@ -3,7 +3,8 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const axiosInstance = axios.create({
   // baseURL: "http://172.17.28.7:5133/api/eurionapp",
-  baseURL: "https://app.jmsg.ec/bedapi/eurionapp",
+  // baseURL: "https://app.jmsg.ec/bedapi/eurionapp",
+  baseURL: "https://appcert.jmsg.ec/api/eurionapp",
   timeout: 30000,
 });
 
