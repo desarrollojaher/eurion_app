@@ -167,6 +167,7 @@ const RecibosTab = () => {
           handleEliminar={handleEliminar}
           handleSubir={handleSubir}
           isLoading={isLoadingEliminar || isLoadingEnviar}
+          modulo="recibo"
         />
       )}
     </View>

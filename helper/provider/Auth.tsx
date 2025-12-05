@@ -69,7 +69,7 @@ export function SessionProvider({ children, token }: any) {
       setUsuario(null);
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("rol");
-      await dbSqliteService.eliminarBitacoraSincronizacion();
+      await dbSqliteService.eliminarTodosLosDatos();
       router.replace("/auth/iniciarSesion");
     } catch (error) {
       console.log(error);

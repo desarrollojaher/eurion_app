@@ -138,12 +138,14 @@ const GestionesTab = () => {
           styleRight={styles.styleLabelRigth}
         />
         <Separador color={GRIS_CLARO} />
-        <HeaderCard
-          labelLeft="Factura"
-          labelRight={item.factura}
-          styleLeft={styles.styleLabelLeft}
-          styleRight={styles.styleLabelRigth}
-        />
+        {item.tipoGestion !== "Gestion" && (
+          <HeaderCard
+            labelLeft="Factura"
+            labelRight={item.factura}
+            styleLeft={styles.styleLabelLeft}
+            styleRight={styles.styleLabelRigth}
+          />
+        )}
         <Separador color={GRIS_CLARO} />
         <HeaderCard
           labelLeft="Observación"

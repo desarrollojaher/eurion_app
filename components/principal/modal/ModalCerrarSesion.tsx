@@ -32,6 +32,7 @@ const ModalCerrarSesion: React.FC<PropsModalCerrarSesion> = ({
     <ModalCustom onClose={onClose} visible={visible} titulo="Cerrar Sesion">
       <LottieAnimation resource={animation} />
       <Text style={styles.tituloStyle}>¿Estas seguro de cerrar sesión?</Text>
+      <Text>Esta acción eliminará todos tus datos</Text>
       <View style={styles.constainerButton}>
         <ButtonCustom
           label="Cancelar"

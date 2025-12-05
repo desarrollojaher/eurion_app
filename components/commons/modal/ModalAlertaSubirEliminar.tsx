@@ -17,6 +17,7 @@ interface PropsModalAlertaSubirEliminar {
   handleEliminar?: () => void;
   subidaGeneral?: boolean;
   isLoading: boolean;
+  modulo?: string;
 }
 
 const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
@@ -27,6 +28,7 @@ const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
   handleSubir,
   subidaGeneral,
   isLoading,
+  modulo,
 }) => {
   const animation = useMemo(() => {
     if (tipo === "subir") {
@@ -53,6 +55,10 @@ const ModalAlertaSubirEliminar: React.FC<PropsModalAlertaSubirEliminar> = ({
         <Text style={styles.tituloStyle}>
           El archivo se {tipo === "subir" ? "subirá" : "eliminará"}
           {tipo === "subir" ? " al sistema" : " de forma permanente"}
+          {modulo === "recibo" && tipo === "subir"
+            ? ` recuerde realizar una gestion al cliente y subirla primero para que el recibo pueda ser registrado correctamente`
+            : ""}
+          .
         </Text>
       ) : (
         <Text style={styles.tituloStyle}>
