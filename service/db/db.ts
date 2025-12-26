@@ -1,6 +1,17 @@
 import * as schema from "@/db/schema";
 import { ISincronizado } from "@/models/ISincronizado";
-import { and, asc, count, desc, eq, like, notInArray, or, sql, sum } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  like,
+  notInArray,
+  or,
+  sql,
+  sum,
+} from "drizzle-orm";
 import {
   IActualizarVerificacion,
   IVerificacion,
@@ -12,13 +23,19 @@ import {
   IVerificacionesGuardar,
   IVerificacionesVdId,
 } from "@/models/IVerificaciones";
-import { ICliente, IClientesGestion } from "@/models/ICliente";
+import { ICliente, IClientesCloud, IClientesGestion } from "@/models/ICliente";
 import { IConyugue } from "@/models/IConyugue";
 import { IVivienda } from "@/models/IVivienda";
-import { ISincronizacion, ISincronizarVerificacionesEnviar } from "@/models/ISincronizar";
+import {
+  ISincronizacion,
+  ISincronizarVerificacionesEnviar,
+} from "@/models/ISincronizar";
 import { ITiposVerificaciones } from "@/models/ITiposVerificaciones";
 import { SQLiteRunResult } from "expo-sqlite";
-import { ISubirInformacion, ISubirInformacionEliminar } from "@/models/ISubirInformacion";
+import {
+  ISubirInformacion,
+  ISubirInformacionEliminar,
+} from "@/models/ISubirInformacion";
 import { db } from "@/helper/db/db";
 import {
   IGestionCabeceraParams,
@@ -50,7 +67,6 @@ import { IDocumentosRecibos } from "@/models/IDocumentos";
 import { IFormaPago } from "@/models/IFormaPago";
 import { IRecibos, IRecibosObtener } from "@/models/IRecibo";
 import { union } from "lodash";
-import { sqliteView } from "drizzle-orm/sqlite-core";
 
 export const dbSqliteService = {
   eliminarBitacoraSincronizacion: async () => {
@@ -58,7 +74,8 @@ export const dbSqliteService = {
       await db.delete(schema.bitacoraSincronizadoTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -88,7 +105,8 @@ export const dbSqliteService = {
       await db.delete(schema.viviendaTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -98,7 +116,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -113,7 +132,8 @@ export const dbSqliteService = {
       return verificaciones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -128,14 +148,15 @@ export const dbSqliteService = {
             db
               .select({ vdId: schema.verificacionResultTable.vdId })
               .from(schema.verificacionResultTable)
-              .where(eq(schema.verificacionResultTable.vrProcesado, 0))
-          )
+              .where(eq(schema.verificacionResultTable.vrProcesado, 0)),
+          ),
         );
 
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -155,7 +176,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -168,7 +190,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -185,7 +208,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -198,24 +222,28 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
   insertarConyugue: async (datos: IConyugue) => {
     try {
+      console.log("Dato conyugue => ", datos);
+
       await db
         .insert(schema.conyugueTable)
         .values(datos)
         .onConflictDoUpdate({
-          target: [schema.clienteTable.idCliente],
+          target: [schema.conyugueTable.idCliente],
           set: { ...datos },
         });
 
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -228,7 +256,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -238,14 +267,15 @@ export const dbSqliteService = {
         .insert(schema.viviendaTable)
         .values(datos)
         .onConflictDoUpdate({
-          target: [schema.clienteTable.idCliente],
+          target: [schema.viviendaTable.idCliente],
           set: { ...datos },
         });
 
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -260,11 +290,14 @@ export const dbSqliteService = {
       return sincronizacion[0];
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
-  obtenerVerificacionesCabecera: async (params: IVerificacionesCabeceraParams) => {
+  obtenerVerificacionesCabecera: async (
+    params: IVerificacionesCabeceraParams,
+  ) => {
     try {
       const filtros = [
         eq(schema.verificacionTable.procesado, 0),
@@ -273,8 +306,14 @@ export const dbSqliteService = {
           : undefined,
         params.nombreCliente
           ? or(
-              like(schema.clienteTable.apellidoCliente, `%${params.nombreCliente}%`),
-              like(schema.clienteTable.nombreCliente, `%${params.nombreCliente}%`)
+              like(
+                schema.clienteTable.apellidoCliente,
+                `%${params.nombreCliente}%`,
+              ),
+              like(
+                schema.clienteTable.nombreCliente,
+                `%${params.nombreCliente}%`,
+              ),
             )
           : undefined,
       ].filter(Boolean);
@@ -290,8 +329,8 @@ export const dbSqliteService = {
           apellidos: schema.clienteTable.apellidoCliente,
           direccion: schema.clienteTable.direccionCliente,
           direccionTrabajo: schema.clienteTable.direccionTrabajoCliente,
-          fotoCliente: schema.clienteTable.fotoCliente,
-          fotoDomicilio: schema.clienteTable.fotoDireccion,
+          fotoCliente: schema.clienteTable.urlImgClienteLocal,
+          fotoDomicilio: schema.clienteTable.urlImgDireccionLocal,
           telefono: schema.clienteTable.telefonoEmpresaCliente,
           periodo: schema.verificacionTable.periodo,
           latitud: schema.verificacionTable.latitudCliente,
@@ -300,7 +339,7 @@ export const dbSqliteService = {
         .from(schema.verificacionTable)
         .innerJoin(
           schema.clienteTable,
-          eq(schema.clienteTable.idCliente, schema.verificacionTable.idCliente)
+          eq(schema.clienteTable.idCliente, schema.verificacionTable.idCliente),
         )
         .where(and(...filtros))
         .orderBy(asc(schema.verificacionTable.fechaVerificacion));
@@ -308,13 +347,19 @@ export const dbSqliteService = {
       return datos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       console.log(error);
       throw JSON.stringify(mensajeExtraido);
     }
   },
-  obtenerVerificacionesDetalles: async (params: IVerificacionDetallesParams) => {
+  obtenerVerificacionesDetalles: async (
+    params: IVerificacionDetallesParams,
+  ) => {
     try {
+      const v = await db.select().from(schema.viviendaTable);
+      console.log("vivienda ==> ", v);
+
       const detallesVerificaciones: IVerificacionDetalles[] = await db
         .select({
           datosGenerales: {
@@ -329,7 +374,7 @@ export const dbSqliteService = {
             detalleAdicional: schema.clienteTable.direccionCliente,
           },
           buro: {
-            categoria: schema.clienteTable.cargoCliente,
+            categoria: schema.clienteTable.categoriaCliente,
             score: schema.clienteTable.scoreCliente,
             producto: schema.verificacionTable.producto,
           },
@@ -373,22 +418,25 @@ export const dbSqliteService = {
         .from(schema.clienteTable)
         .innerJoin(
           schema.verificacionTable,
-          eq(schema.clienteTable.idCliente, schema.verificacionTable.idCliente)
+          eq(schema.clienteTable.idCliente, schema.verificacionTable.idCliente),
         )
         .leftJoin(
           schema.conyugueTable,
-          eq(schema.conyugueTable.idCliente, schema.clienteTable.idCliente)
+          eq(schema.conyugueTable.idCliente, schema.clienteTable.idCliente),
         )
         .leftJoin(
           schema.viviendaTable,
-          eq(schema.viviendaTable.idCliente, schema.clienteTable.idCliente)
+          eq(schema.viviendaTable.idCliente, schema.clienteTable.idCliente),
         )
-        .where(eq(schema.clienteTable.identificacionCliente, params.identificacion));
+        .where(
+          eq(schema.clienteTable.identificacionCliente, params.identificacion),
+        );
 
       return detallesVerificaciones[0];
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       console.log(error);
       throw JSON.stringify(mensajeExtraido);
     }
@@ -399,7 +447,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -411,7 +460,8 @@ export const dbSqliteService = {
       return true;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -424,7 +474,8 @@ export const dbSqliteService = {
       return tipoVerificaicones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw JSON.stringify(mensajeExtraido);
     }
   },
@@ -444,7 +495,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -497,7 +549,8 @@ export const dbSqliteService = {
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -518,15 +571,24 @@ export const dbSqliteService = {
         .from(schema.verificacionResultTable)
         .leftJoin(
           schema.clienteTable,
-          eq(schema.verificacionResultTable.clId, schema.clienteTable.idCliente)
+          eq(
+            schema.verificacionResultTable.clId,
+            schema.clienteTable.idCliente,
+          ),
         )
         .leftJoin(
           schema.verificacionTable,
-          eq(schema.verificacionResultTable.vdId, schema.verificacionTable.idVerificacion)
+          eq(
+            schema.verificacionResultTable.vdId,
+            schema.verificacionTable.idVerificacion,
+          ),
         )
         .leftJoin(
           schema.tiposVerificacionTable,
-          eq(schema.verificacionResultTable.vtId, schema.tiposVerificacionTable.vtId)
+          eq(
+            schema.verificacionResultTable.vtId,
+            schema.tiposVerificacionTable.vtId,
+          ),
         )
         .where(eq(schema.verificacionResultTable.vrProcesado, 0));
 
@@ -535,25 +597,28 @@ export const dbSqliteService = {
       return verificacionesSubir;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
 
   obtenerInfoSubir: async () => {
     try {
-      const verificaciones = await dbSqliteService.obtenerDatosSubirVerificacion();
+      const verificaciones =
+        await dbSqliteService.obtenerDatosSubirVerificacion();
 
       const gestionesRealizadas = await dbSqliteService.obtenerGestiones();
 
       const gestionesRealizadasUnion: ISubirInformacion[] = union(
         verificaciones,
-        gestionesRealizadas
+        gestionesRealizadas,
       );
       return gestionesRealizadasUnion;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -574,7 +639,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -599,7 +665,12 @@ export const dbSqliteService = {
         const cliente = await db
           .select()
           .from(schema.clienteTable)
-          .where(eq(schema.clienteTable.identificacionCliente, datos.identificacionCliente))
+          .where(
+            eq(
+              schema.clienteTable.identificacionCliente,
+              datos.identificacionCliente,
+            ),
+          )
           .limit(1)
           .get();
 
@@ -617,7 +688,8 @@ export const dbSqliteService = {
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -631,7 +703,8 @@ export const dbSqliteService = {
           vtId: schema.verificacionResultTable.vtId,
           clId: schema.verificacionResultTable.clId,
           usIdCobrador: schema.verificacionResultTable.usIdCobrador,
-          vrFechaVerificacion: schema.verificacionResultTable.vrFechaVerificacion,
+          vrFechaVerificacion:
+            schema.verificacionResultTable.vrFechaVerificacion,
           vrLatitud: schema.verificacionResultTable.vrLatitud,
           vrLongitud: schema.verificacionResultTable.vrLongitud,
           fecha: schema.verificacionResultDetTable.fecha,
@@ -643,17 +716,24 @@ export const dbSqliteService = {
         .from(schema.verificacionResultTable)
         .leftJoin(
           schema.verificacionResultDetTable,
-          eq(schema.verificacionResultTable.vrId, schema.verificacionResultDetTable.vrId)
+          eq(
+            schema.verificacionResultTable.vrId,
+            schema.verificacionResultDetTable.vrId,
+          ),
         )
         .leftJoin(
           schema.clienteTable,
-          eq(schema.clienteTable.idCliente, schema.verificacionResultTable.clId)
+          eq(
+            schema.clienteTable.idCliente,
+            schema.verificacionResultTable.clId,
+          ),
         )
         .where(eq(schema.verificacionResultTable.vdId, params.vdId));
       return datos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -682,7 +762,8 @@ export const dbSqliteService = {
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -694,25 +775,34 @@ export const dbSqliteService = {
           .insert(schema.gestionesTable)
           .values(data)
           .onConflictDoNothing({
-            target: [schema.gestionesTable.idHojaRuta, schema.gestionesTable.clId],
+            target: [
+              schema.gestionesTable.idHojaRuta,
+              schema.gestionesTable.clId,
+            ],
           });
         for (let i = 0; i < data.length; i++) {
-          await db.insert(schema.gestionesDetallesTable).values(data[i].gestiones);
+          await db
+            .insert(schema.gestionesDetallesTable)
+            .values(data[i].gestiones);
         }
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
   eliminarGestiones: async () => {
     try {
-      await db.delete(schema.gestionesTable).where(eq(schema.gestionesTable.gestionado, 0));
+      await db
+        .delete(schema.gestionesTable)
+        .where(eq(schema.gestionesTable.gestionado, 0));
       await db.delete(schema.gestionesDetallesTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -736,7 +826,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -748,7 +839,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -758,7 +850,8 @@ export const dbSqliteService = {
       await db.delete(schema.referenciasTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -773,7 +866,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -784,7 +878,8 @@ export const dbSqliteService = {
       await db.delete(schema.documentosDetTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -796,7 +891,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -806,7 +902,8 @@ export const dbSqliteService = {
       await db.delete(schema.gestionesAnterioresTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -818,7 +915,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -828,7 +926,8 @@ export const dbSqliteService = {
       await db.delete(schema.tiposGestionesCabeceraTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -840,7 +939,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -850,7 +950,8 @@ export const dbSqliteService = {
       await db.delete(schema.tiposGestionesDetallesTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -862,7 +963,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -872,7 +974,8 @@ export const dbSqliteService = {
       await db.delete(schema.direccionesTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -884,7 +987,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -894,7 +998,8 @@ export const dbSqliteService = {
       await db.delete(schema.telefonosTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -906,7 +1011,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -916,7 +1022,8 @@ export const dbSqliteService = {
       await db.delete(schema.tiposReferenciaTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -926,7 +1033,8 @@ export const dbSqliteService = {
       await db.delete(schema.gestionesAnterioresTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -938,7 +1046,8 @@ export const dbSqliteService = {
       }
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -948,7 +1057,8 @@ export const dbSqliteService = {
       await db.delete(schema.formasPagoTable);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1001,46 +1111,50 @@ export const dbSqliteService = {
           cliId: schema.clienteTable.idCliente,
           idHojaRuta: schema.gestionesTable.idHojaRuta,
           peId: schema.clienteTable.personaId,
-          imagenCliente: schema.clienteTable.fotoCliente,
-          imagenDomicilio: schema.clienteTable.fotoDireccion,
+          imagenCliente: schema.clienteTable.urlImgClienteLocal,
+          imagenDomicilio: schema.clienteTable.urlImgDireccionLocal,
           tcId: schema.gestionesTable.tcId,
           total: count(schema.clienteTable.personaId),
         })
         .from(schema.gestionesTable)
         .leftJoin(
           schema.clienteTable,
-          eq(schema.clienteTable.idCliente, schema.gestionesTable.clId)
+          eq(schema.clienteTable.idCliente, schema.gestionesTable.clId),
         )
         .leftJoin(
           schema.direccionesTable,
           and(
             eq(schema.direccionesTable.peId, schema.clienteTable.personaId),
-            eq(schema.direccionesTable.diCobranza, "S")
-          )
+            eq(schema.direccionesTable.diCobranza, "S"),
+          ),
         )
         .leftJoin(
           schema.documentosTable,
-          eq(schema.documentosTable.clId, schema.gestionesTable.clId)
+          eq(schema.documentosTable.clId, schema.gestionesTable.clId),
         )
         .innerJoin(
           schema.gestionesDetallesTable,
-          eq(schema.documentosTable.idCredito, schema.gestionesDetallesTable.crId)
+          eq(
+            schema.documentosTable.idCredito,
+            schema.gestionesDetallesTable.crId,
+          ),
         )
         .where(
           and(
             eq(schema.gestionesTable.gestionado, 0),
             or(
               like(schema.clienteTable.apellidoCliente, `%${params.buscador}%`),
-              like(schema.clienteTable.nombreCliente, `%${params.buscador}%`)
-            )
-          )
+              like(schema.clienteTable.nombreCliente, `%${params.buscador}%`),
+            ),
+          ),
         )
         .groupBy(schema.clienteTable.idCliente);
 
       return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1058,7 +1172,8 @@ export const dbSqliteService = {
       return tiposGestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1077,7 +1192,8 @@ export const dbSqliteService = {
       return tiposGestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1092,7 +1208,8 @@ export const dbSqliteService = {
       return tiposReferencia;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1123,13 +1240,17 @@ export const dbSqliteService = {
         .from(schema.documentosTable)
         .innerJoin(
           schema.gestionesDetallesTable,
-          eq(schema.documentosTable.idCredito, schema.gestionesDetallesTable.crId)
+          eq(
+            schema.documentosTable.idCredito,
+            schema.gestionesDetallesTable.crId,
+          ),
         )
         .where(eq(schema.documentosTable.clId, params.clId));
       return facturas;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1146,7 +1267,8 @@ export const dbSqliteService = {
     } catch (error: any) {
       await db.run("ROLLBACK");
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1157,7 +1279,8 @@ export const dbSqliteService = {
           gcId: schema.gestionesAnterioresTable.gcId,
           idCliente: schema.gestionesAnterioresTable.idCliente,
           nombreCliente: schema.gestionesAnterioresTable.nombreCliente,
-          codComprobanteStock: schema.gestionesAnterioresTable.codComprobanteStock,
+          codComprobanteStock:
+            schema.gestionesAnterioresTable.codComprobanteStock,
           idCredito: schema.gestionesAnterioresTable.idCredito,
           idFactura: schema.gestionesAnterioresTable.idFactura,
           nombreGestiona: schema.gestionesAnterioresTable.nombreGestiona,
@@ -1171,7 +1294,8 @@ export const dbSqliteService = {
       return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1185,7 +1309,8 @@ export const dbSqliteService = {
       return referencias;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1199,7 +1324,8 @@ export const dbSqliteService = {
       return productos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1221,40 +1347,47 @@ export const dbSqliteService = {
         .from(schema.gestionesTable)
         .leftJoin(
           schema.clienteTable,
-          eq(schema.clienteTable.idCliente, schema.gestionesTable.clId)
+          eq(schema.clienteTable.idCliente, schema.gestionesTable.clId),
         )
         .leftJoin(
           schema.documentosTable,
-          eq(schema.documentosTable.clId, schema.clienteTable.idCliente)
+          eq(schema.documentosTable.clId, schema.clienteTable.idCliente),
         )
         .innerJoin(
           schema.gestionesDetallesTable,
-          eq(schema.documentosTable.idCredito, schema.gestionesDetallesTable.crId)
+          eq(
+            schema.documentosTable.idCredito,
+            schema.gestionesDetallesTable.crId,
+          ),
         )
         .where(
           and(
             or(
               like(schema.clienteTable.apellidoCliente, `%${params.buscador}%`),
-              like(schema.clienteTable.nombreCliente, `%${params.buscador}%`)
-            )
-          )
+              like(schema.clienteTable.nombreCliente, `%${params.buscador}%`),
+            ),
+          ),
         )
         .groupBy(schema.clienteTable.idCliente);
 
       return recibos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
   obtenerFormasPago: async () => {
     try {
-      const formasPago: IFormaPago[] = await db.select().from(schema.formasPagoTable);
+      const formasPago: IFormaPago[] = await db
+        .select()
+        .from(schema.formasPagoTable);
       return formasPago;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1264,7 +1397,8 @@ export const dbSqliteService = {
       await db.insert(schema.pagosGestion).values(data);
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1296,19 +1430,23 @@ export const dbSqliteService = {
         .from(schema.pagosGestion)
         .leftJoin(
           schema.documentosTable,
-          eq(schema.documentosTable.idCredito, schema.pagosGestion.crId)
+          eq(schema.documentosTable.idCredito, schema.pagosGestion.crId),
         )
         .leftJoin(
           schema.clienteTable,
-          eq(schema.clienteTable.idCliente, schema.documentosTable.clId)
+          eq(schema.clienteTable.idCliente, schema.documentosTable.clId),
         )
-        .leftJoin(schema.formasPagoTable, eq(schema.formasPagoTable.fpId, schema.pagosGestion.fpId))
+        .leftJoin(
+          schema.formasPagoTable,
+          eq(schema.formasPagoTable.fpId, schema.pagosGestion.fpId),
+        )
         .where(eq(schema.pagosGestion.pgSincronizado, "N"));
 
       return recibos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1329,21 +1467,33 @@ export const dbSqliteService = {
         .from(schema.gestionesCobranzasResultados)
         .leftJoin(
           schema.clienteTable,
-          eq(schema.gestionesCobranzasResultados.clId, schema.clienteTable.idCliente)
+          eq(
+            schema.gestionesCobranzasResultados.clId,
+            schema.clienteTable.idCliente,
+          ),
         )
         .leftJoin(
           schema.documentosTable,
-          eq(schema.gestionesCobranzasResultados.crIdCredito, schema.documentosTable.idCredito)
+          eq(
+            schema.gestionesCobranzasResultados.crIdCredito,
+            schema.documentosTable.idCredito,
+          ),
         )
         .leftJoin(
           schema.tiposGestionesDetallesTable,
-          eq(schema.gestionesCobranzasResultados.gcId, schema.tiposGestionesDetallesTable.gcId)
+          eq(
+            schema.gestionesCobranzasResultados.gcId,
+            schema.tiposGestionesDetallesTable.gcId,
+          ),
         )
-        .where(eq(schema.gestionesCobranzasResultados.crEstadoSync, "PENDIENTE"));
+        .where(
+          eq(schema.gestionesCobranzasResultados.crEstadoSync, "PENDIENTE"),
+        );
       return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1361,13 +1511,16 @@ export const dbSqliteService = {
           clId: schema.gestionesCobranzasResultados.clId,
           agId: schema.gestionesCobranzasResultados.agId,
           crIdCredito: schema.gestionesCobranzasResultados.crIdCredito,
-          cpFechaCompromiso: schema.gestionesCobranzasResultados.cpFechaCompromiso,
+          cpFechaCompromiso:
+            schema.gestionesCobranzasResultados.cpFechaCompromiso,
           hrId: schema.gestionesCobranzasResultados.hrId,
           cpObservaciones: schema.gestionesCobranzasResultados.cpObservaciones,
           gcId: schema.gestionesCobranzasResultados.gcId,
-          crFechaProxGestion: schema.gestionesCobranzasResultados.crFechaProxGestion,
+          crFechaProxGestion:
+            schema.gestionesCobranzasResultados.crFechaProxGestion,
           trId: schema.gestionesCobranzasResultados.trId,
-          crFechaGestionada: schema.gestionesCobranzasResultados.crFechaGestionada,
+          crFechaGestionada:
+            schema.gestionesCobranzasResultados.crFechaGestionada,
           diId: schema.gestionesCobranzasResultados.diId,
           teId: schema.gestionesCobranzasResultados.teId,
         })
@@ -1376,7 +1529,8 @@ export const dbSqliteService = {
       return gestiones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1388,7 +1542,8 @@ export const dbSqliteService = {
         .where(eq(schema.gestionesCobranzasResultados.id, id));
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1400,7 +1555,8 @@ export const dbSqliteService = {
         .where(eq(schema.gestionesCobranzasResultados.id, id));
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1417,12 +1573,13 @@ export const dbSqliteService = {
             eq(schema.pagosGestion.crId, id.crId ?? -1),
             eq(schema.pagosGestion.usIdCobrador, id.usIdCobrador ?? -1),
             eq(schema.pagosGestion.pgValorCobrado, id.pgValorCobrado ?? -1),
-            eq(schema.pagosGestion.pgFechaCobro, id.pgFechaCobro ?? "")
-          )
+            eq(schema.pagosGestion.pgFechaCobro, id.pgFechaCobro ?? ""),
+          ),
         );
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1435,12 +1592,13 @@ export const dbSqliteService = {
         .where(
           and(
             eq(schema.pagosGestion.gcId, id.gcId ?? -1),
-            eq(schema.pagosGestion.fpId, id.fpId ?? -1)
-          )
+            eq(schema.pagosGestion.fpId, id.fpId ?? -1),
+          ),
         );
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1453,7 +1611,8 @@ export const dbSqliteService = {
       return telefonos;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },
@@ -1466,7 +1625,50 @@ export const dbSqliteService = {
       return direcciones;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
-      const mensajeExtraido = mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+  obtenerInfoClientes: async () => {
+    try {
+      const clientes: IClientesCloud[] = await db
+        .select({
+          idCliente: schema.clienteTable.idCliente,
+          fotoCliente: schema.clienteTable.fotoCliente,
+          fotoDireccion: schema.clienteTable.fotoDireccion,
+          bucketFotoCliente: schema.clienteTable.bucketFotoCliente,
+          bucketFotoDireccion: schema.clienteTable.bucketFotoDireccion,
+        })
+        .from(schema.clienteTable);
+
+      return clientes;
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
+      throw { message: mensajeExtraido };
+    }
+  },
+
+  actualizarClientes: async (url: string, tipo: number, idCliente: number) => {
+    try {
+      if (tipo === 1) {
+        await db
+          .update(schema.clienteTable)
+          .set({ urlImgClienteLocal: url })
+          .where(eq(schema.clienteTable.idCliente, idCliente));
+      }
+      if (tipo === 2) {
+        await db
+          .update(schema.clienteTable)
+          .set({ urlImgDireccionLocal: url })
+          .where(eq(schema.clienteTable.idCliente, idCliente));
+      }
+    } catch (error: any) {
+      const mensajeError = error?.message || "Error desconocido";
+      const mensajeExtraido =
+        mensajeError.split("Caused by:")[1]?.trim() || mensajeError;
       throw { message: mensajeExtraido };
     }
   },

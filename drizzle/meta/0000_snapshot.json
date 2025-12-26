@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7c48922c-eee7-4d4a-93d8-c8368451a3c7",
+  "id": "fdd64eb1-2840-4dee-8c89-915c616b23cd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bitacora_sincronizado": {
@@ -125,7 +125,7 @@
         },
         "scoreCliente": {
           "name": "scoreCliente",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -209,6 +209,20 @@
         },
         "telefonoCliente": {
           "name": "telefonoCliente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "urlImgClienteLocal": {
+          "name": "urlImgClienteLocal",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "urlImgDireccionLocal": {
+          "name": "urlImgDireccionLocal",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -448,6 +462,13 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "crId": {
+          "name": "crId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -571,6 +592,37 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "formas_pago": {
+      "name": "formas_pago",
+      "columns": {
+        "fpId": {
+          "name": "fpId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fpNombre": {
+          "name": "fpNombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fpSolicitaDetalle": {
+          "name": "fpSolicitaDetalle",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "gestiones_anteriores": {
       "name": "gestiones_anteriores",
       "columns": {
@@ -661,6 +713,13 @@
     "gestiones_cobranzas_resultados": {
       "name": "gestiones_cobranzas_resultados",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
         "gcIdCc": {
           "name": "gcIdCc",
           "type": "integer",
@@ -746,8 +805,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "hdId": {
-          "name": "hdId",
+        "hrId": {
+          "name": "hrId",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -780,6 +839,27 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "crFechaGestionada": {
+          "name": "crFechaGestionada",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "diId": {
+          "name": "diId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teId": {
+          "name": "teId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
@@ -807,6 +887,20 @@
         },
         "crId": {
           "name": "crId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "idAgencia": {
+          "name": "idAgencia",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "idHojaDetalle": {
+          "name": "idHojaDetalle",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
@@ -857,17 +951,141 @@
           "notNull": false,
           "autoincrement": false,
           "default": 0
+        },
+        "tcId": {
+          "name": "tcId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
-        "gestiones_clId_unique": {
-          "name": "gestiones_clId_unique",
+        "gestiones_idHojaRuta_clId_unique": {
+          "name": "gestiones_idHojaRuta_clId_unique",
           "columns": [
+            "idHojaRuta",
             "clId"
           ],
           "isUnique": true
         }
       },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "pagos_gestion": {
+      "name": "pagos_gestion",
+      "columns": {
+        "crId": {
+          "name": "crId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "coId": {
+          "name": "coId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pgValorCobrado": {
+          "name": "pgValorCobrado",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "usIdCobrador": {
+          "name": "usIdCobrador",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fpId": {
+          "name": "fpId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pgFechaCobro": {
+          "name": "pgFechaCobro",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pgObservaciones": {
+          "name": "pgObservaciones",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pgSincronizado": {
+          "name": "pgSincronizado",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'PENDIENTE'"
+        },
+        "pgLatitud": {
+          "name": "pgLatitud",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pgLongitud": {
+          "name": "pgLongitud",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "gcId": {
+          "name": "gcId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "urlImg": {
+          "name": "urlImg",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nombreImg": {
+          "name": "nombreImg",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "caId": {
+          "name": "caId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hdId": {
+          "name": "hdId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -1046,6 +1264,13 @@
         "gcDescripcion": {
           "name": "gcDescripcion",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teId": {
+          "name": "teId",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

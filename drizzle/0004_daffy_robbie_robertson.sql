@@ -1,1 +1,0 @@
-ALTER TABLE `gestiones_cobranzas_resultados` ADD `crFechaGestionada` text;

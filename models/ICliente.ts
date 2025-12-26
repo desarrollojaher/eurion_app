@@ -10,7 +10,7 @@ export interface ICliente {
   referencias: string | null;
   observaciones: string;
   categoriaCliente: string;
-  scoreCliente: string;
+  scoreCliente: number;
   ocupacionLaboralCliente: string;
   empresaLaboraCliente: string;
   antiguedadCliente: number;
@@ -29,4 +29,12 @@ export interface ICliente {
 export interface IClientesGestion {
   cliente: ICliente;
   vivienda: IVivienda;
+}
+
+export interface IClientesCloud {
+  idCliente: number | null;
+  fotoCliente: string | null;
+  fotoDireccion: string | null;
+  bucketFotoCliente: string | null;
+  bucketFotoDireccion: string | null;
 }

@@ -10,14 +10,14 @@ export const useIniciarSesion = (
     AxiosError,
     IAuth,
     unknown
-  >
+  >,
 ) => {
   return useMutation({
     mutationFn: authApi.login,
     onError: (error: any) => {
       if (error.message === "Network Error") {
         Toast.error(
-          "Error de conexión. Por favor, verifica tu conexión a internet."
+          "Error de conexión. Por favor, verifica tu conexión a internet.",
         );
         return;
       }

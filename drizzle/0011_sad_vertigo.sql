@@ -1,1 +1,0 @@
-ALTER TABLE `gestiones` ADD `tcId` integer;

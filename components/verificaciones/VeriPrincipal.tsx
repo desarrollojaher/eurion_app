@@ -44,6 +44,8 @@ const VeriPrincipal = () => {
   const [openGuardar, setOpenGuardar] = useState(false);
   const [openError, setOpenError] = useState(false);
 
+  const [mensajeError, setMensajeError] = useState("");
+
   const [cliente, setCliente] = useState<IVerificacionesCabecera>();
   const [filtro, setFiltro] = useState("");
   const [filtroRuta, setFiltroRuta] = useState<string | null>(null);
@@ -64,7 +66,12 @@ const VeriPrincipal = () => {
   });
 
   const handleLlamarPersona = useCallback(async (telefono: string) => {
-    await Linking.openURL(`tel:${telefono}`);
+    if (!telefono) {
+      setMensajeError("El cliente no tiene numero telefónico");
+      setOpenError(true);
+    } else {
+      await Linking.openURL(`tel:${telefono}`);
+    }
   }, []);
 
   const handleOpenImagenes = useCallback((item: IVerificacionesCabecera) => {
@@ -103,6 +110,7 @@ const VeriPrincipal = () => {
           `geo:${cliente.latitud},${cliente.longitud}?q=${cliente.latitud},${cliente.longitud}`,
         );
       } else {
+        setMensajeError("No existe coordenadas para esta verificación");
         setOpenError(true);
       }
     },
@@ -249,7 +257,7 @@ const VeriPrincipal = () => {
       )}
       {openError && (
         <ModalError
-          errorMessage="No existe coordenadas para esta verificación"
+          errorMessage={mensajeError}
           onClose={handleCloseError}
           visible={openError}
           tabla=""

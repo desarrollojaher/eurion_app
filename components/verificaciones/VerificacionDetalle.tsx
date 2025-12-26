@@ -174,13 +174,13 @@ const VerificacionDetalle = () => {
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
             />
-            <HeaderCard
+            {/* <HeaderCard
               labelLeft="Construcción"
               labelRight={data?.datosVivienda.construccon}
               styleContainer={styles.rowCardStyle}
               styleLeft={styles.labelCardLeft}
               styleRight={styles.labelCardRight}
-            />
+            /> */}
           </Card>
         )}
         {data?.datosConyugue && (

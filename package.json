@@ -75,7 +75,8 @@
     "expo-file-system": "~18.1.11",
     "expo-image-manipulator": "~13.1.7",
     "expo-updates": "~0.28.17",
-    "expo-linear-gradient": "~14.1.5"
+    "expo-linear-gradient": "~14.1.5",
+    "expo-media-library": "~17.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

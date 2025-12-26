@@ -1,1 +1,0 @@
-ALTER TABLE `pagos_gestion` ADD `caId` integer;

@@ -6,6 +6,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { sincronizacionKeys } from "./sincronizacionKey";
 import { forEach } from "lodash";
 import { useSession } from "@/helper/provider/Auth";
+import { cloudAPI } from "@/api/cloud";
+import { descargarArchivos } from "@/helper/function/descargarImagen";
+import { ca } from "zod/v4/locales";
 
 export const useSincronizacion = () => {
   const [index, setIndex] = useState(1);
@@ -50,16 +53,20 @@ export const useSincronizacion = () => {
 
         forEach(datos, async (item) => {
           if (item.verificacion) {
+            //  console.log("Dato verificacion => ", item.verificacion);
             await dbSqliteService.insertarVerificaciones(item.verificacion);
           }
           if (item.cliente) {
+            //console.log("Dato cliente => ", item.cliente);
             await dbSqliteService.insertarClientes(item.cliente);
           }
+
           if (item.conyugue) {
             await dbSqliteService.insertarConyugue(item.conyugue);
           }
           if (item.vivienda) {
             await dbSqliteService.insertarVivienda(item.vivienda);
+            // console.log("Dato vivienda => ", item.vivienda);
           }
         });
       }
@@ -157,6 +164,50 @@ export const useSincronizacion = () => {
       setCantidadDatos(formasPago.length);
       await dbSqliteService.eliminarFormasPago();
       await dbSqliteService.sincronizarFormasPago(formasPago);
+
+      setIndex(13);
+      setTabla("Sincronizar Imagenes");
+      const clientes = await dbSqliteService.obtenerInfoClientes();
+      setCantidadDatos(clientes.length * 2);
+
+      let cantidad = 0;
+
+      for (let i = 0; i < clientes.length; i++) {
+        if (clientes[i].fotoCliente !== null) {
+          const response = await cloudAPI.obtenerPresignal(
+            clientes[i].fotoCliente ?? "",
+            clientes[i].bucketFotoCliente ?? "",
+          );
+          const res = await descargarArchivos(
+            response.url,
+            clientes[i].fotoCliente?.split("/").pop() ?? "",
+          );
+          await dbSqliteService.actualizarClientes(
+            res ?? "",
+            1,
+            clientes[i].idCliente ?? -1,
+          );
+        }
+        cantidad++;
+        setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
+        if (clientes[i].fotoDireccion !== null) {
+          const response = await cloudAPI.obtenerPresignal(
+            clientes[i].fotoDireccion ?? "",
+            clientes[i].bucketFotoDireccion ?? "",
+          );
+          const res = await descargarArchivos(
+            response.url,
+            clientes[i].fotoDireccion?.split("/").pop() ?? "",
+          );
+          await dbSqliteService.actualizarClientes(
+            res ?? "",
+            2,
+            clientes[i].idCliente ?? -1,
+          );
+        }
+        cantidad++;
+        setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
+      }
 
       await dbSqliteService.insertarBitacoraSincronizacion({
         fecha: format(new Date(), "yyyy-MM-dd HH:mm:ss"),

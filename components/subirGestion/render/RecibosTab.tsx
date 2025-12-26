@@ -203,5 +203,5 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: convertirTamanoHorizontal(2),
     borderColor: GRIS_CLARO,
-  }
+  },
 });

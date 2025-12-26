@@ -17,7 +17,7 @@ CREATE TABLE `cliente` (
 	`referencias` text,
 	`observaciones` text,
 	`categoriaCliente` text,
-	`scoreCliente` text,
+	`scoreCliente` integer,
 	`ocupacionLaboralCliente` text,
 	`empresaLaboraCliente` text,
 	`antiguedadCliente` integer,
@@ -29,7 +29,9 @@ CREATE TABLE `cliente` (
 	`direccionTrabajoCliente` text,
 	`fotoCliente` text,
 	`fotoDireccion` text,
-	`telefonoCliente` text
+	`telefonoCliente` text,
+	`urlImgClienteLocal` text,
+	`urlImgDireccionLocal` text
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `cliente_idCliente_unique` ON `cliente` (`idCliente`);--> statement-breakpoint
@@ -67,7 +69,8 @@ CREATE TABLE `direcciones` (
 --> statement-breakpoint
 CREATE TABLE `documentos_det` (
 	`idArticulo` integer,
-	`nombreArticulo` text
+	`nombreArticulo` text,
+	`crId` integer
 );
 --> statement-breakpoint
 CREATE TABLE `documentos` (
@@ -88,6 +91,12 @@ CREATE TABLE `documentos` (
 	`clId` integer
 );
 --> statement-breakpoint
+CREATE TABLE `formas_pago` (
+	`fpId` integer,
+	`fpNombre` text,
+	`fpSolicitaDetalle` text
+);
+--> statement-breakpoint
 CREATE TABLE `gestiones_anteriores` (
 	`gcId` integer,
 	`idCliente` integer,
@@ -103,6 +112,7 @@ CREATE TABLE `gestiones_anteriores` (
 );
 --> statement-breakpoint
 CREATE TABLE `gestiones_cobranzas_resultados` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`gcIdCc` integer,
 	`gdId` integer,
 	`crLatitud` integer,
@@ -115,17 +125,22 @@ CREATE TABLE `gestiones_cobranzas_resultados` (
 	`agId` integer,
 	`crIdCredito` integer,
 	`cpFechaCompromiso` text,
-	`hdId` integer,
+	`hrId` integer,
 	`cpObservaciones` text,
 	`gcId` integer,
 	`crFechaProxGestion` text,
-	`trId` integer
+	`trId` integer,
+	`crFechaGestionada` text,
+	`diId` integer,
+	`teId` integer
 );
 --> statement-breakpoint
 CREATE TABLE `gestiones_detalles` (
 	`gcId` integer,
 	`caId` integer,
-	`crId` integer
+	`crId` integer,
+	`idAgencia` integer,
+	`idHojaDetalle` integer
 );
 --> statement-breakpoint
 CREATE TABLE `gestiones` (
@@ -133,10 +148,29 @@ CREATE TABLE `gestiones` (
 	`usuId` integer,
 	`clId` integer,
 	`nombreCliente` text,
-	`gestionado` integer DEFAULT 0
+	`gestionado` integer DEFAULT 0,
+	`tcId` integer
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `gestiones_clId_unique` ON `gestiones` (`clId`);--> statement-breakpoint
+CREATE UNIQUE INDEX `gestiones_idHojaRuta_clId_unique` ON `gestiones` (`idHojaRuta`,`clId`);--> statement-breakpoint
+CREATE TABLE `pagos_gestion` (
+	`crId` integer,
+	`coId` integer,
+	`pgValorCobrado` integer,
+	`usIdCobrador` integer,
+	`fpId` integer,
+	`pgFechaCobro` text,
+	`pgObservaciones` text,
+	`pgSincronizado` text DEFAULT 'PENDIENTE',
+	`pgLatitud` integer,
+	`pgLongitud` integer,
+	`gcId` integer,
+	`urlImg` text,
+	`nombreImg` text,
+	`caId` integer,
+	`hdId` integer
+);
+--> statement-breakpoint
 CREATE TABLE `referencias` (
 	`clId` integer,
 	`peIdReferencia` integer,
@@ -165,7 +199,8 @@ CREATE TABLE `telefonos` (
 --> statement-breakpoint
 CREATE TABLE `tipos_gestiones_cabecera` (
 	`gcId` integer,
-	`gcDescripcion` text
+	`gcDescripcion` text,
+	`teId` integer
 );
 --> statement-breakpoint
 CREATE TABLE `tipos_gestiones_detalles` (

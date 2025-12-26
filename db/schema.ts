@@ -49,7 +49,7 @@ export const clienteTable = sqliteTable(
     referencias: text(),
     observaciones: text(),
     categoriaCliente: text(),
-    scoreCliente: text(),
+    scoreCliente: int(),
     ocupacionLaboralCliente: text(),
     empresaLaboraCliente: text(),
     antiguedadCliente: int(),
@@ -60,8 +60,12 @@ export const clienteTable = sqliteTable(
     celJefeCliente: text(),
     direccionTrabajoCliente: text(),
     fotoCliente: text(),
+    bucketFotoCliente: text(),
     fotoDireccion: text(),
+    bucketFotoDireccion: text(),
     telefonoCliente: text(),
+    urlImgClienteLocal: text(),
+    urlImgDireccionLocal: text(),
   },
   (table) => {
     return {

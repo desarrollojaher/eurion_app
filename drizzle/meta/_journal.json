@@ -5,92 +5,15 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1758723843087,
-      "tag": "0000_dark_garia",
+      "when": 1766757905550,
+      "tag": "0000_aberrant_storm",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1758754889074,
-      "tag": "0001_woozy_anthem",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1758833228865,
-      "tag": "0002_gigantic_changeling",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1759180910417,
-      "tag": "0003_large_edwin_jarvis",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1759188500777,
-      "tag": "0004_daffy_robbie_robertson",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1759251248922,
-      "tag": "0005_wise_lily_hollister",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1759274101812,
-      "tag": "0006_abnormal_galactus",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1759416132390,
-      "tag": "0007_broad_ultimo",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1759426378190,
-      "tag": "0008_amused_bloodaxe",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1759436443184,
-      "tag": "0009_deep_kabuki",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "6",
-      "when": 1760481984255,
-      "tag": "0010_superb_doctor_doom",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "6",
-      "when": 1760482888843,
-      "tag": "0011_sad_vertigo",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "6",
-      "when": 1760560865049,
-      "tag": "0012_brave_true_believers",
+      "when": 1766758506276,
+      "tag": "0001_elite_maelstrom",
       "breakpoints": true
     }
   ]

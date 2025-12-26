@@ -2,16 +2,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const axiosInstance = axios.create({
-  //baseURL: "http://172.17.28.3:5133/api/eurionapp",
+  baseURL: "http://172.17.28.6:5133/api/eurionapp",
+  // baseURL: "http://localhost:5133/api-eurionapp",
   // baseURL: "https://app.jmsg.ec/bedapi/eurionapp",
-  baseURL: "https://appcert.jmsg.ec/api/eurionapp",
-  timeout: 30000,
+  // baseURL: "https://appcert.jmsg.ec/api/eurionapp",
+  timeout: 180000,
 });
 
 type ApiMethods = {
-  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
+  get<T = any>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>>;
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>>;
+  patch<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>>;
 };
 
 const api: ApiMethods = {

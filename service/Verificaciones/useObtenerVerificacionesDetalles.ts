@@ -16,7 +16,7 @@ export const useObtenerVerificacionesDetalles = (
       ReturnType<(typeof verificacionesKeys)["detalle"]>
     >,
     "queryKey"
-  >
+  >,
 ) => {
   const obtenerDetalles = async () => {
     return await dbSqliteService.obtenerVerificacionesDetalles(params);
