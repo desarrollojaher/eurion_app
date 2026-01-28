@@ -5,7 +5,8 @@ const axiosInstance = axios.create({
   //baseURL: "http://172.17.28.6:5133/api/eurionapp",
   // baseURL: "http://localhost:5133/api-eurionapp",
   // baseURL: "https://app.jmsg.ec/bedapi/eurionapp",
-  baseURL: "https://appcert.jmsg.ec/api/eurionapp",
+  // baseURL: "https://appcert.jmsg.ec/api/eurionapp",
+  baseURL: "https://apiscoreprod.jmsg.ec/api-eurionapp",
   timeout: 180000,
 });
 
