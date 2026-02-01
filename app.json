@@ -13,6 +13,7 @@
     },
     "android": {
       "versionCode": 6,
+      "usesCleartextTraffic": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

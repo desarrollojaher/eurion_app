@@ -5,20 +5,15 @@ import { Toast } from "toastify-react-native";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 export const useIniciarSesion = (
-  mutationOptions?: UseMutationOptions<
-    IAuthResponse,
-    AxiosError,
-    IAuth,
-    unknown
-  >,
+  mutationOptions?: UseMutationOptions<IAuthResponse, AxiosError, IAuth, unknown>
 ) => {
   return useMutation({
     mutationFn: authApi.login,
     onError: (error: any) => {
+      console.log(JSON.stringify(error));
+
       if (error.message === "Network Error") {
-        Toast.error(
-          "Error de conexión. Por favor, verifica tu conexión a internet.",
-        );
+        Toast.error("Error de conexión. Por favor, verifica tu conexión a internet.");
         return;
       }
 
