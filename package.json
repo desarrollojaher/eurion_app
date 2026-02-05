@@ -12,7 +12,8 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "generate": "drizzle-kit generate",
-    "eas:android": "eas build -p android --profile preview"
+    "eas:android": "eas build -p android --profile preview",
+    "update:android": "eas update --channel preview"
   },
   "jest": {
     "preset": "jest-expo"
