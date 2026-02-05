@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://appincertpriv.jaher.com.ec/api/cloud",
+  baseURL: "https://appinprodpriv.jaher.com.ec/api-cloud",
   timeout: 180000,
 });
 
@@ -29,7 +29,7 @@ const api: ApiMethods = {
 };
 
 axiosInstance.interceptors.request.use(async (config) => {
-  config.headers["x-access-key"] = `CLOUD-34ca4d14-644a-4a43-bfee-50b0ed012bda`;
+  config.headers["x-access-key"] = `CLOUD-4d3e5b1a-8c9f-4b2d-a1e6-7f8a9c0b1d2e`;
 
   return config;
 });
