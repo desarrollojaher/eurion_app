@@ -12,7 +12,7 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import ButtonCustom from "../commons/button/ButtonCustom";
-import { BLANCO, GRIS_CLARO } from "@/constants/Colors";
+import { AZUL, BLANCO, GRIS_CLARO, ROJO } from "@/constants/Colors";
 import ImagenContainer from "../commons/imagen/ImagenContainer";
 import InputCustom from "../commons/input/InputCustom";
 import { useSession } from "@/helper/provider/Auth";
@@ -75,6 +75,10 @@ const IniciarSesionComponent = () => {
             disabled={isLoading}
           />
         </View>
+
+        <View style={styles.containerVersion}>
+          <Text style={styles.textVersion}>Version: {version}</Text>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -132,5 +136,20 @@ const styles = StyleSheet.create({
   },
   textRecover: {
     fontSize: convertirTamanoHorizontal(12),
+  },
+  containerVersion: {
+    marginTop: convertirTamanoVertical(35),
+    borderWidth: convertirTamanoHorizontal(1),
+    borderColor: ROJO,
+    height: convertirTamanoVertical(60),
+    margin: convertirTamanoHorizontal(20),
+    borderRadius: convertirTamanoHorizontal(10),
+    justifyContent: "center",
+  },
+  textVersion: {
+    fontSize: convertirTamanoHorizontal(18),
+    fontWeight: "semibold",
+    color: AZUL,
+    textAlign: "center",
   },
 });
