@@ -12,12 +12,13 @@ import {
   convertirTamanoVertical,
 } from "@/helper/function/renderizadoImagen";
 import ButtonCustom from "../commons/button/ButtonCustom";
-import { AZUL, BLANCO, GRIS_CLARO, ROJO } from "@/constants/Colors";
+import { AZUL, BLANCO, GRIS_CLARO } from "@/constants/Colors";
 import ImagenContainer from "../commons/imagen/ImagenContainer";
 import InputCustom from "../commons/input/InputCustom";
 import { useSession } from "@/helper/provider/Auth";
 import { useIniciarSesion } from "@/service/Auth/useIniciarSesion";
 import { Toast } from "toastify-react-native";
+import Constants from "expo-constants";
 const logo = require("@/assets/images/logos.png");
 const IniciarSesionComponent = () => {
   const [usuario, setUsuario] = useState("");
@@ -25,6 +26,8 @@ const IniciarSesionComponent = () => {
 
   const { signIn } = useSession();
   const { mutate: iniciarSesion, isPending: isLoading } = useIniciarSesion();
+
+  const version = Constants.expoConfig?.version || "Versión no disponible";
 
   const handleIniciarSesion = useCallback(() => {
     if (usuario.trim() === "" || contra.trim() === "") {
@@ -139,8 +142,6 @@ const styles = StyleSheet.create({
   },
   containerVersion: {
     marginTop: convertirTamanoVertical(35),
-    borderWidth: convertirTamanoHorizontal(1),
-    borderColor: ROJO,
     height: convertirTamanoVertical(60),
     margin: convertirTamanoHorizontal(20),
     borderRadius: convertirTamanoHorizontal(10),

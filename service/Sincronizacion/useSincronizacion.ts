@@ -9,6 +9,7 @@ import { useSession } from "@/helper/provider/Auth";
 import { cloudAPI } from "@/api/cloud";
 import { descargarArchivos } from "@/helper/function/descargarImagen";
 import { ca } from "zod/v4/locales";
+import { awsApi } from "@/api/aws";
 
 export const useSincronizacion = () => {
   const [index, setIndex] = useState(1);
@@ -174,10 +175,10 @@ export const useSincronizacion = () => {
 
       for (let i = 0; i < clientes.length; i++) {
         if (clientes[i].fotoCliente !== null) {
-          const response = await cloudAPI.obtenerPresignal(
-            clientes[i].fotoCliente ?? "",
-            clientes[i].bucketFotoCliente ?? "",
-          );
+          const response = await awsApi.generarUrl({
+            path: clientes[i].fotoCliente ?? "",
+            bucket: clientes[i].bucketFotoCliente ?? "",
+          });
           const res = await descargarArchivos(
             response.url,
             clientes[i].fotoCliente?.split("/").pop() ?? "",
@@ -189,7 +190,7 @@ export const useSincronizacion = () => {
           );
         }
         cantidad++;
-        setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
+        //setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
         if (clientes[i].fotoDireccion !== null) {
           const response = await cloudAPI.obtenerPresignal(
             clientes[i].fotoDireccion ?? "",

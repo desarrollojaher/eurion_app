@@ -12,8 +12,16 @@ import {
 } from "@/helper/function/renderizadoImagen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSession } from "@/helper/provider/Auth";
-import { AZUL, AZUL_CLARO, AZUL_ICONO, BLANCO, ROJO, TOMATE, TOMATE_CLARO, TOMATE_ICONO } from "@/constants/Colors";
-import Card from "../commons/card/Card";
+import {
+  AZUL,
+  AZUL_CLARO,
+  AZUL_ICONO,
+  BLANCO,
+  ROJO,
+  TOMATE,
+  TOMATE_CLARO,
+  TOMATE_ICONO,
+} from "@/constants/Colors";
 import IconFont from "react-native-vector-icons/FontAwesome5";
 import IconFont6 from "react-native-vector-icons/FontAwesome5";
 import { useRouter } from "expo-router";

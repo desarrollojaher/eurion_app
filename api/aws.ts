@@ -19,4 +19,9 @@ export const awsApi = {
     const res = await get<IModulosResponse[]>("modulos/path", { params: data });
     return res.data;
   },
+
+  generarUrl: async (data: IAws) => {
+    const res = await get("aws-service/obtener-presignal", { params: data });
+    return res.data;
+  },
 };
