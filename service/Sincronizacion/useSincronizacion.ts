@@ -192,10 +192,10 @@ export const useSincronizacion = () => {
         cantidad++;
         //setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
         if (clientes[i].fotoDireccion !== null) {
-          const response = await cloudAPI.obtenerPresignal(
-            clientes[i].fotoDireccion ?? "",
-            clientes[i].bucketFotoDireccion ?? "",
-          );
+          const response = await awsApi.generarUrl({
+            path: clientes[i].fotoDireccion ?? "",
+            bucket: clientes[i].bucketFotoDireccion ?? "",
+          });
           const res = await descargarArchivos(
             response.url,
             clientes[i].fotoDireccion?.split("/").pop() ?? "",
