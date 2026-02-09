@@ -2,7 +2,7 @@
   "expo": {
     "name": "Eurion App",
     "slug": "eurionapp",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
     "scheme": "eurionapp",
@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "versionCode": 6,
+      "versionCode": 7,
       "usesCleartextTraffic": false,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
@@ -67,7 +67,7 @@
       }
     },
     "owner": "jaher",
-   "runtimeVersion": "2.0.4",
+   "runtimeVersion": "2.0.5",
     "updates": {
       "url": "https://u.expo.dev/1fcd3c47-7ecd-497b-a92a-34f69508447e"
     }
