@@ -4,10 +4,7 @@ import { dbSqliteService } from "../db/db";
 import { ISincronizarVerificacionesEnviar } from "@/models/ISincronizar";
 import { subirInformacionKeys } from "./subirInformacionKeys";
 import { Toast } from "toastify-react-native";
-import {
-  compressImage,
-  eliminarImagen,
-} from "@/helper/function/comprimirImagen";
+import { compressImage, eliminarImagen } from "@/helper/function/comprimirImagen";
 import { awsApi } from "@/api/aws";
 import { BucketS3Jaher } from "@/constants/env";
 import { IImagenS3 } from "@/models/IImagenes";
@@ -43,6 +40,8 @@ export const SubirVerificacionUnica = () => {
         urlS3 = url[0].path.replace("CEDULA", verificacion[0].clIdentificacion);
       }
       const imagenesS3: IImagenS3[] = [];
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
       for (let i = 0; i < verificacion.length; i++) {
         const img = verificacion[i];
         const compressed = await compressImage(img.vcImagenBase);
@@ -57,9 +56,13 @@ export const SubirVerificacionUnica = () => {
           method: "PUT",
           headers: {
             "Content-Type": fileData.type,
+            Connection: "close",
           },
           body: fileData,
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           imagenesS3.push({
@@ -95,9 +98,7 @@ export const SubirVerificacionUnica = () => {
       if (error.message === "Network Error") {
         setErrorMessage("No se pudo conectar con el servidor");
       } else {
-        setErrorMessage(
-          `Error en subir la verificacion:  ${error.response.data.message}`,
-        );
+        setErrorMessage(`Error en subir la verificacion:  ${error.response.data.message}`);
       }
       setError(true);
       setLoading(false);
