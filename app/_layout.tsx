@@ -73,6 +73,7 @@ export default function RootLayout() {
             if (e.message === "Network Error") {
               setToken(token);
             }
+            setToken(null);
           }
         } else {
           // si no tiene internet no hace la validacion del token y le deja ingresar con el token que esa
