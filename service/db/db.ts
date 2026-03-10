@@ -339,7 +339,13 @@ export const dbSqliteService = {
         .from(schema.verificacionTable)
         .innerJoin(
           schema.clienteTable,
-          eq(schema.clienteTable.idCliente, schema.verificacionTable.idCliente),
+          and(
+            eq(
+              schema.clienteTable.idCliente,
+              schema.verificacionTable.idCliente,
+            ),
+            eq(schema.clienteTable.tdId, schema.verificacionTable.tdId),
+          ),
         )
         .where(and(...filtros))
         .orderBy(asc(schema.verificacionTable.fechaVerificacion));

@@ -15,6 +15,13 @@
       "when": 1766758506276,
       "tag": "0001_elite_maelstrom",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1773176109683,
+      "tag": "0002_serious_vulcan",
+      "breakpoints": true
     }
   ]
 }

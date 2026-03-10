@@ -20,6 +20,7 @@ export const verificacionTable = sqliteTable(
     tipoVerificacion: text(),
     identificacionCobrador: int(),
     periodo: text(),
+    tdId: int(),
     producto: text(),
     procesado: int().default(0), //  0 no procesado - 1 procesado
   },
@@ -29,10 +30,10 @@ export const verificacionTable = sqliteTable(
         table.idVerificacion,
         table.idCliente,
         table.periodo,
-        table.tipoVerificacion,
+        table.tipoVerificacion
       ),
     };
-  },
+  }
 );
 
 export const clienteTable = sqliteTable(
@@ -66,12 +67,13 @@ export const clienteTable = sqliteTable(
     telefonoCliente: text(),
     urlImgClienteLocal: text(),
     urlImgDireccionLocal: text(),
+    tdId: int(),
   },
   (table) => {
     return {
-      uniqueConstraint: unique().on(table.idCliente),
+      uniqueConstraint: unique().on(table.idCliente, table.tdId),
     };
-  },
+  }
 );
 
 export const conyugueTable = sqliteTable(
@@ -94,7 +96,7 @@ export const conyugueTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  },
+  }
 );
 
 export const viviendaTable = sqliteTable(
@@ -110,7 +112,7 @@ export const viviendaTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idCliente),
     };
-  },
+  }
 );
 
 export const verificacionResultTable = sqliteTable("verificacion_result", {
@@ -127,18 +129,15 @@ export const verificacionResultTable = sqliteTable("verificacion_result", {
   pideActualizacion: int().default(0),
 });
 
-export const verificacionResultDetTable = sqliteTable(
-  "verificacion_result_det",
-  {
-    vcId: int().primaryKey({ autoIncrement: true }),
-    vrId: int(),
-    fecha: text(),
-    vcImagenBase: text(),
-    vcPeriodo: text(),
-    nombre: text(),
-    vrdProcesado: int().default(0),
-  },
-);
+export const verificacionResultDetTable = sqliteTable("verificacion_result_det", {
+  vcId: int().primaryKey({ autoIncrement: true }),
+  vrId: int(),
+  fecha: text(),
+  vcImagenBase: text(),
+  vcPeriodo: text(),
+  nombre: text(),
+  vrdProcesado: int().default(0),
+});
 
 export const tiposVerificacionTable = sqliteTable("tipos_verificacion", {
   vtId: int(),
@@ -159,7 +158,7 @@ export const gestionesTable = sqliteTable(
     return {
       uniqueConstraint: unique().on(table.idHojaRuta, table.clId),
     };
-  },
+  }
 );
 
 export const gestionesDetallesTable = sqliteTable("gestiones_detalles", {
@@ -225,24 +224,18 @@ export const gestionesAnterioresTable = sqliteTable("gestiones_anteriores", {
   estadoGestion: int(),
 });
 
-export const tiposGestionesCabeceraTable = sqliteTable(
-  "tipos_gestiones_cabecera",
-  {
-    gcId: int(),
-    gcDescripcion: text(),
-    teId: int(),
-  },
-);
+export const tiposGestionesCabeceraTable = sqliteTable("tipos_gestiones_cabecera", {
+  gcId: int(),
+  gcDescripcion: text(),
+  teId: int(),
+});
 
-export const tiposGestionesDetallesTable = sqliteTable(
-  "tipos_gestiones_detalles",
-  {
-    gdId: int(),
-    gdDescripcion: text(),
-    gcId: int(),
-    gfCompromisoPago: text(),
-  },
-);
+export const tiposGestionesDetallesTable = sqliteTable("tipos_gestiones_detalles", {
+  gdId: int(),
+  gdDescripcion: text(),
+  gcId: int(),
+  gfCompromisoPago: text(),
+});
 
 export const direccionesTable = sqliteTable("direcciones", {
   diId: int(),
@@ -274,32 +267,29 @@ export const tiposReferenciaTable = sqliteTable("tipos_referencia", {
   trReferencia: text(),
 });
 
-export const gestionesCobranzasResultados = sqliteTable(
-  "gestiones_cobranzas_resultados",
-  {
-    id: int("id").primaryKey({ autoIncrement: true }),
-    gcIdCc: int(),
-    gdId: int(),
-    crLatitud: integer({ mode: "number" }),
-    crLongitud: integer({ mode: "number" }),
-    crObservaciones: text(),
-    usIdGestiona: int(),
-    crEstadoSync: text().default("PENDIENTE"),
-    caId: int(),
-    clId: int(),
-    agId: int(),
-    crIdCredito: int(),
-    cpFechaCompromiso: text(),
-    hrId: int(),
-    cpObservaciones: text(),
-    gcId: int(),
-    crFechaProxGestion: text(),
-    trId: int(),
-    crFechaGestionada: text(),
-    diId: int(),
-    teId: int(),
-  },
-);
+export const gestionesCobranzasResultados = sqliteTable("gestiones_cobranzas_resultados", {
+  id: int("id").primaryKey({ autoIncrement: true }),
+  gcIdCc: int(),
+  gdId: int(),
+  crLatitud: integer({ mode: "number" }),
+  crLongitud: integer({ mode: "number" }),
+  crObservaciones: text(),
+  usIdGestiona: int(),
+  crEstadoSync: text().default("PENDIENTE"),
+  caId: int(),
+  clId: int(),
+  agId: int(),
+  crIdCredito: int(),
+  cpFechaCompromiso: text(),
+  hrId: int(),
+  cpObservaciones: text(),
+  gcId: int(),
+  crFechaProxGestion: text(),
+  trId: int(),
+  crFechaGestionada: text(),
+  diId: int(),
+  teId: int(),
+});
 
 export const formasPagoTable = sqliteTable("formas_pago", {
   fpId: int(),
