@@ -24,6 +24,7 @@ export interface ICliente {
   fotoDireccion: string;
   telefonoCliente: string;
   personaId: number;
+  tdId: number;
 }
 
 export interface IClientesGestion {

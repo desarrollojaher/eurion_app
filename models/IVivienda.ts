@@ -13,4 +13,5 @@ export interface IViviendaDetalles {
   nombreDueno: string;
   telDueno: string;
   construccon: string;
+  tdId: number;
 }

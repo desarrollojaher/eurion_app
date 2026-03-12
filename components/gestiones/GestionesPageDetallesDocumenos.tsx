@@ -40,7 +40,8 @@ const GestionesPageDetallesDocumenos: React.FC<
       (item) =>
         (item.crSaldoCredito ?? 0) +
         (item.interesGastoCobranza ?? 0) +
-        (item.interesGastoMora ?? 0),
+        (item.interesGastoMora ?? 0) +
+        (item.crSaldoInteres ?? 0),
     );
   }, [datosDocumentos]);
 
@@ -69,6 +70,12 @@ const GestionesPageDetallesDocumenos: React.FC<
           <HeaderCard
             labelLeft="Valor Cuota"
             labelRight={formatCurrency(item.valorCuota ?? 0)}
+            styleLeft={styles.styleLabelLeft}
+            styleRight={styles.styleLabelRigth}
+          />
+          <HeaderCard
+            labelLeft="Saldo Interes"
+            labelRight={formatCurrency(item.crSaldoInteres ?? 0)}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
           />

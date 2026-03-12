@@ -23,6 +23,7 @@ const VerificacionDetalle = () => {
   const { data } = useObtenerVerificacionesDetalles(
     {
       identificacion: datos?.identificacion ?? "",
+      tdId: datos?.tdId ?? 0,
     },
     { enabled: !!datos },
   );
@@ -135,7 +136,7 @@ const VerificacionDetalle = () => {
             styleRight={styles.labelCardRight}
           />
         </Card>
-        {data?.datosVivienda && (
+        {data?.datosVivienda && data?.datosVivienda.tdId === 1 && (
           <Card style={styles.cardStyle}>
             <Text style={styles.textTituloHeader}>Datos Vivienda</Text>
             <Separador />
@@ -183,6 +184,35 @@ const VerificacionDetalle = () => {
             /> */}
           </Card>
         )}
+
+        {data?.datosVivienda && data?.datosVivienda.tdId === 3 && (
+          <Card style={styles.cardStyle}>
+            <Text style={styles.textTituloHeader}>Datos Trabajo</Text>
+            <Separador />
+            <HeaderCard
+              labelLeft="Dirección"
+              labelRight={data?.datosVivienda.direccion}
+              styleContainer={styles.rowCardStyle}
+              styleLeft={styles.labelCardLeft}
+              styleRight={styles.labelCardRight}
+            />
+            <HeaderCard
+              labelLeft="Zona"
+              labelRight={data?.datosVivienda.zona}
+              styleContainer={styles.rowCardStyle}
+              styleLeft={styles.labelCardLeft}
+              styleRight={styles.labelCardRight}
+            />
+            {/* <HeaderCard
+              labelLeft="Construcción"
+              labelRight={data?.datosVivienda.construccon}
+              styleContainer={styles.rowCardStyle}
+              styleLeft={styles.labelCardLeft}
+              styleRight={styles.labelCardRight}
+            /> */}
+          </Card>
+        )}
+
         {data?.datosConyugue && (
           <Card style={styles.cardStyle}>
             <Text style={styles.textTituloHeader}>Datos conyugue</Text>

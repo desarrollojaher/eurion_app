@@ -15,6 +15,7 @@ export interface IVerificacion {
   identificacionCobrador: number;
   periodo: string;
   producto: string;
+  tdId: number;
 }
 
 export interface IVerificacionesCabeceraParams {
@@ -38,6 +39,7 @@ export interface IVerificacionesCabecera {
   periodo: string;
   latitud: number;
   longitud: number;
+  tdId: number;
 }
 
 export interface IVerificacionDetalles {
@@ -51,6 +53,7 @@ export interface IVerificacionDetalles {
 
 export interface IVerificacionDetallesParams {
   identificacion: string;
+  tdId: number;
 }
 
 export interface IVerificacionesGuardar {

@@ -15,7 +15,6 @@ import {
 import { GRIS, GRIS_CLARO } from "@/constants/Colors";
 import { IComprobanteObtener } from "@/models/IComprobante";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import TextCardIcon from "@/components/commons/card/TextCardIcon";
 import { View } from "react-native";
 
 interface PropsCardReciboTabCliente {
@@ -109,8 +108,13 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
         labelRight={formatCurrency(
           (valor?.crSaldoCredito ?? 0) +
             (valor?.interesGastoCobranza ?? 0) +
-            (valor?.interesGastoMora ?? 0),
+            (valor?.interesGastoMora ?? 0) +
+            (valor?.crSaldoInteres ?? 0),
         )}
+      />
+      <HeaderCard
+        labelLeft="Saldo interes"
+        labelRight={formatCurrency(valor?.crSaldoInteres ?? 0)}
       />
       <HeaderCard
         labelLeft="Saldo vencido"

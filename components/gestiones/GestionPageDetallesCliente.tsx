@@ -25,13 +25,6 @@ interface PropsGestionPageDetallesCliente {
 const GestionPageDetallesCliente: React.FC<PropsGestionPageDetallesCliente> = ({
   clId,
 }) => {
-  // const [modalClientes, setModalClientes] = useState(false);
-  // const [modalVivienda, setModalVivienda] = useState(false);
-
-  // const [cliente, setCliente] = useState<Partial<ICliente> | null>(null);
-
-  // const [vivienda, setVivienda] = useState<IDireccionGcobranza | null>(null);
-
   const [documento, setDocumento] = useState<IDatosSelect | null>(null);
   const [referencia, setReferencia] = useState<IReferencia | null>(null);
 

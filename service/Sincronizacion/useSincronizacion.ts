@@ -44,14 +44,12 @@ export const useSincronizacion = () => {
       if (datos.length > 0) {
         await dbSqliteService.deleteVerificaciones();
         const ver = await dbSqliteService.obtenerVerificaciones();
-        const ids = ver
-          .map((item) => item.idCliente)
-          .filter((id): id is number => id !== null);
+        const ids = ver.map((item) => item.idCliente).filter((id): id is number => id !== null);
 
         await dbSqliteService.deleteClientes(ids);
         await dbSqliteService.deleteConyugue(ids);
         await dbSqliteService.deleteVivienda(ids);
-
+      
         forEach(datos, async (item) => {
           if (item.verificacion) {
             //  console.log("Dato verificacion => ", item.verificacion);
@@ -74,8 +72,7 @@ export const useSincronizacion = () => {
 
       setIndex(2);
       setTabla("Tipos verificaciones");
-      const tipoVerificacion =
-        await sincronizacionApi.obtenerTipoVerificaciones();
+      const tipoVerificacion = await sincronizacionApi.obtenerTipoVerificaciones();
       await dbSqliteService.deleteTipoVerificaciones();
 
       await dbSqliteService.insertarTipoVerificaciones(tipoVerificacion);
@@ -90,8 +87,7 @@ export const useSincronizacion = () => {
 
       setIndex(4);
       setTabla("Clientes Gestiones");
-      const clientesGestiones =
-        await sincronizacionApi.sincronizarClientesGestiones();
+      const clientesGestiones = await sincronizacionApi.sincronizarClientesGestiones();
       setCantidadDatos(clientesGestiones.length);
       await dbSqliteService.sincronizarClientesGestiones(clientesGestiones);
 
@@ -111,23 +107,17 @@ export const useSincronizacion = () => {
 
       setIndex(7);
       setTabla("Sincronizar Tipos Gestiones cabecera");
-      const tiposGestionesCabecera =
-        await sincronizacionApi.sincronizarTipoGestionesCabecera();
+      const tiposGestionesCabecera = await sincronizacionApi.sincronizarTipoGestionesCabecera();
       setCantidadDatos(tiposGestionesCabecera.length);
       await dbSqliteService.eliminarTiposGestionesCabecera();
-      await dbSqliteService.sincronizarTiposGestionesCabecera(
-        tiposGestionesCabecera,
-      );
+      await dbSqliteService.sincronizarTiposGestionesCabecera(tiposGestionesCabecera);
 
       setIndex(8);
       setTabla("Sincronizar Tipos Gestiones detalle");
-      const tiposGestionesDetalle =
-        await sincronizacionApi.sincronizarTipoGestionesDetalle();
+      const tiposGestionesDetalle = await sincronizacionApi.sincronizarTipoGestionesDetalle();
       setCantidadDatos(tiposGestionesDetalle.length);
       await dbSqliteService.eliminarTiposGestionesDetalle();
-      await dbSqliteService.sincronizarTiposGestionesDetalle(
-        tiposGestionesDetalle,
-      );
+      await dbSqliteService.sincronizarTiposGestionesDetalle(tiposGestionesDetalle);
 
       setIndex(9);
       setTabla("Sincronizar Direcciones");
@@ -145,16 +135,14 @@ export const useSincronizacion = () => {
 
       setIndex(10);
       setTabla("Sincronizar Tipos Referencias");
-      const tiposReferencias =
-        await sincronizacionApi.sincronizarTiposReferencias();
+      const tiposReferencias = await sincronizacionApi.sincronizarTiposReferencias();
       setCantidadDatos(telefonos.length);
       await dbSqliteService.eliminarTiposReferencia();
       await dbSqliteService.sincronizarTiposReferencia(tiposReferencias);
 
       setIndex(11);
       setTabla("Sincronizar Gestiones Pasadas");
-      const gestionesPasadas =
-        await sincronizacionApi.sincronizarGestionesAnteriores();
+      const gestionesPasadas = await sincronizacionApi.sincronizarGestionesAnteriores();
       setCantidadDatos(gestionesPasadas.length);
       await dbSqliteService.eliminarGestionesPasadas();
       await dbSqliteService.sincronizarGestionesAnteriores(gestionesPasadas);
@@ -181,13 +169,9 @@ export const useSincronizacion = () => {
           });
           const res = await descargarArchivos(
             response.url,
-            clientes[i].fotoCliente?.split("/").pop() ?? "",
+            clientes[i].fotoCliente?.split("/").pop() ?? ""
           );
-          await dbSqliteService.actualizarClientes(
-            res ?? "",
-            1,
-            clientes[i].idCliente ?? -1,
-          );
+          await dbSqliteService.actualizarClientes(res ?? "", 1, clientes[i].idCliente ?? -1);
         }
         cantidad++;
         //setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
@@ -198,13 +182,9 @@ export const useSincronizacion = () => {
           });
           const res = await descargarArchivos(
             response.url,
-            clientes[i].fotoDireccion?.split("/").pop() ?? "",
+            clientes[i].fotoDireccion?.split("/").pop() ?? ""
           );
-          await dbSqliteService.actualizarClientes(
-            res ?? "",
-            2,
-            clientes[i].idCliente ?? -1,
-          );
+          await dbSqliteService.actualizarClientes(res ?? "", 2, clientes[i].idCliente ?? -1);
         }
         cantidad++;
         setTabla(`Sincronizar Imagenes ${cantidad}/${clientes.length * 2}`);
@@ -226,7 +206,7 @@ export const useSincronizacion = () => {
         setErrorMessage("No se pudo conectar con el servidor");
       } else {
         setErrorMessage(
-          `Hubo un error al descargar los datos en la tabla ${tabla} con el mensaje: ${JSON.stringify(error)} `,
+          `Hubo un error al descargar los datos en la tabla ${tabla} con el mensaje: ${JSON.stringify(error)} `
         );
       }
       setError(true);

@@ -39,7 +39,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
     <ModalCustom onClose={onClose} visible={visible} titulo={""}>
       <HeaderCard
         labelLeft="Saldo Vencido"
-        labelRight={formatCurrency(data.crSaldoCapital ?? 0)}
+        labelRight={formatCurrency(data.crSaldoCredito ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
@@ -54,6 +54,13 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Cuotas Pendientes"
         labelRight={data.cuotasPorPagar?.toString() ?? "0"}
+        styleLeft={styles.styleLabelLeft}
+        styleRight={styles.styleLabelRigth}
+      />
+      <Separador color={GRIS_CLARO} />
+      <HeaderCard
+        labelLeft="Saldo Interes"
+        labelRight={formatCurrency(data.crSaldoInteres ?? 0)}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
@@ -110,9 +117,10 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
       <HeaderCard
         labelLeft="Deuda Total"
         labelRight={formatCurrency(
-          (data.crSaldoCapital ?? 0) +
+          (data.crSaldoCredito ?? 0) +
             (data.interesGastoCobranza ?? 0) +
-            (data.interesGastoMora ?? 0),
+            (data.interesGastoMora ?? 0) +
+            (data.crSaldoInteres ?? 0),
         )}
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
