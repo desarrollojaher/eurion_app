@@ -92,8 +92,8 @@ android {
         applicationId 'com.jaher.eurionapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "2.0.6"
+        versionCode 9
+        versionName "2.0.7"
     }
     signingConfigs {
         debug {
