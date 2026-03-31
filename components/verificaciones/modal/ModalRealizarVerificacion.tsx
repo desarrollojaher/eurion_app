@@ -20,7 +20,6 @@ import {
 } from "@/models/IVerificaciones";
 import { IDatosSelect } from "@/components/commons/select/Select";
 import { format } from "date-fns";
-import * as Location from "expo-location";
 import { useSession } from "@/helper/provider/Auth";
 import { IImagenesVerificaciones } from "@/models/IImagenes";
 import { useGuardarVerificaciones } from "@/service/Verificaciones/useGuardarVerificaciones";
@@ -61,11 +60,12 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
 
   const datosTipo = useMemo<IDatosSelect[]>(
     () =>
-      datosTipoVerificaciones &&
-      datosTipoVerificaciones.map((item) => ({
-        label: item.vtDescripcion ?? "",
-        value: item.vtId ? item.vtId.toString() : "",
-      })),
+      (datosTipoVerificaciones &&
+        datosTipoVerificaciones.map((item) => ({
+          label: item.vtDescripcion ?? "",
+          value: item.vtId ? item.vtId.toString() : "",
+        }))) ??
+      [],
     [datosTipoVerificaciones],
   );
 
@@ -192,8 +192,8 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       if (localizacion.mensaje === "El GPS esta apagado") {
         Toast.error(
           localizacion.mensaje +
-          " " +
-          ", active el GPS para guardar la ubicación",
+            " " +
+            ", active el GPS para guardar la ubicación",
         );
         setLoadingGuardado(false);
         return;
@@ -263,7 +263,6 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
     datosTipo,
     guardarVerificacion,
     handleChangeDireccionImagenes,
-    handleObtenerDireccionGps,
     imagenes,
     observaciones,
     onClose,

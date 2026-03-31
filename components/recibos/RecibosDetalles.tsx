@@ -394,7 +394,6 @@ const RecibosDetalles = () => {
       documentos,
       guardarRecibo,
       handleCompararObjetos,
-      handleObtenerDireccionGps,
       reset,
     ],
   );
