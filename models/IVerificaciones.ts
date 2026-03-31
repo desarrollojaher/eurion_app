@@ -16,6 +16,7 @@ export interface IVerificacion {
   periodo: string;
   producto: string;
   tdId: number;
+  agencia: string;
 }
 
 export interface IVerificacionesCabeceraParams {
@@ -40,6 +41,7 @@ export interface IVerificacionesCabecera {
   latitud: number;
   longitud: number;
   tdId: number;
+  agencia: string;
 }
 
 export interface IVerificacionDetalles {

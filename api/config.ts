@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 // const axiosInstance = axios.create({
-//   //baseURL: "http://172.17.28.6:5133/api/eurionapp",
+//   //baseURL: "http://172.17.28.14:5133/api-eurionapp",
 //   // baseURL: "http://localhost:5133/api-eurionapp",
 //   // baseURL: "https://app.jmsg.ec/bedapi/eurionapp",
 //   // baseURL: "https://appcert.jmsg.ec/api/eurionapp",
@@ -17,7 +17,7 @@ const createAxiosInstance = async () => {
   const token = await AsyncStorage.getItem("token");
 
   const instance = axios.create({
-    baseURL: "https://apiscoreprod.jmsg.ec/api-eurionapp",
+    baseURL: "http://172.17.28.14:5133/api-eurionapp",
     timeout: 90000, // mucho mejor que 180000
     headers: {
       Connection: "close", // fuerza nueva conexión

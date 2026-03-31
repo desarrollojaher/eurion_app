@@ -22,6 +22,7 @@ export const verificacionTable = sqliteTable(
     periodo: text(),
     tdId: int(),
     producto: text(),
+    agencia: text(),
     procesado: int().default(0), //  0 no procesado - 1 procesado
   },
   (table) => {

@@ -76,16 +76,18 @@ const VeriPrincipal = () => {
 
   const handleOpenImagenes = useCallback((item: IVerificacionesCabecera) => {
     const imagenesLista: IImagenCompleta[] = [];
+    console.log(item);
+
     if (item.fotoCliente) {
       imagenesLista.push({
         titulo: "FOTO CLIENTE",
-        url: item.fotoCliente, //.split(",")[1],
+        url: item.fotoCliente,
       });
     }
     if (item.fotoDomicilio) {
       imagenesLista.push({
         titulo: "FOTO DOMICILIO",
-        url: item.fotoDomicilio, //.split(",")[1],
+        url: item.fotoDomicilio,
       });
     }
 
@@ -140,6 +142,12 @@ const VeriPrincipal = () => {
           <TextCard
             titulo={`${item.apellidos} ${item.nombres}`}
             subtitulo={item.identificacion}
+          />
+          <HeaderCard
+            labelLeft={"Agencia:"}
+            labelRight={item.agencia}
+            styleContainer={styles.containerAgencia}
+            styleRight={styles.labelRigt}
           />
           <Text style={styles.textDescripcion}>
             {item.codigoTipoDeRuta === "Domiciliaria"
@@ -291,4 +299,13 @@ const styles = StyleSheet.create({
     borderColor: GRIS_CLARO,
     borderWidth: 2,
   },
+  containerAgencia: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    gap: convertirTamanoHorizontal(5),
+  },
+  labelRigt: {
+    lineHeight: convertirTamanoVertical(23),
+  }
 });

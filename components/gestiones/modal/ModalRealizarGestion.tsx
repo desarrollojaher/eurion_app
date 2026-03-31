@@ -270,8 +270,6 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
       setGuardandoGestion(true);
       let dataAux = cloneDeep(data);
 
-      const localizacion = await getUbicacion();
-
       const tipoGestion = find(dataTiposGestionesDetalles, (item) => {
         return item.gdId === dataAux.gdId;
       });
@@ -304,14 +302,30 @@ const ModalRealizarGestion: React.FC<PropsModalRealizarGestion> = ({
         dataAux.cpFechaCompromiso = null;
       }
 
-      if (!localizacion) {
-        Toast.error("El GPS no tiene permiso");
-        setGuardandoGestion(false);
-        return;
+      const localizacion: any = await getUbicacion();
+
+      if (localizacion.mensaje !== "") {
+        if (localizacion.mensaje === "El GPS esta apagado") {
+          Toast.error(
+            localizacion.mensaje +
+              " " +
+              ", active el GPS para guardar la ubicación",
+          );
+          setGuardandoGestion(false);
+          return;
+        }
+        Toast.error(
+          localizacion.mensaje + " " + "se guaradara sin la ubicación",
+        );
+        await new Promise((resolve) => setTimeout(resolve, 4000));
       }
 
-      dataAux.crLatitud = localizacion.coords.latitude;
-      dataAux.crLongitud = localizacion.coords.longitude;
+      dataAux.crLatitud = localizacion.location
+        ? localizacion.location.coords.latitude
+        : 0;
+      dataAux.crLongitud = localizacion.location
+        ? localizacion.location.coords.longitude
+        : 0;
       dataAux.usIdGestiona = usuario?.usuId ?? -1;
       dataAux.agId =
         (dataComprobantes && dataComprobantes[0].idAgencia) ?? undefined;

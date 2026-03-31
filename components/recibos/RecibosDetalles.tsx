@@ -37,6 +37,7 @@ import { useSession } from "@/helper/provider/Auth";
 import { useRecibosGuardar } from "@/service/Recibos/useRecibosGuardar";
 import { handleChangeDireccionImagenes } from "@/helper/function/imagenes";
 import { router } from "expo-router";
+import { getUbicacion } from "@/helper/function/ubicacion";
 
 const schema = z.object({
   datos: z.array(
@@ -227,18 +228,18 @@ const RecibosDetalles = () => {
     return undefined;
   }, []);
 
-  const handleObtenerDireccionGps = useCallback(async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Toast.error("El GPS no tiene permiso");
-      return;
-    }
-    let location = await Location.getCurrentPositionAsync({});
-    if (location) {
-      return location;
-    }
-    return null;
-  }, []);
+  // const handleObtenerDireccionGps = useCallback(async () => {
+  //   const { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     Toast.error("El GPS no tiene permiso");
+  //     return;
+  //   }
+  //   let location = await Location.getCurrentPositionAsync({});
+  //   if (location) {
+  //     return location;
+  //   }
+  //   return null;
+  // }, []);
 
   const onSuccess = useCallback(
     async (data: IReciboEnviarDatos) => {
@@ -298,10 +299,35 @@ const RecibosDetalles = () => {
                 Number(item.valor),
               );
               if (sumaTotal === sumaTiposComprobantes) {
-                const location = await handleObtenerDireccionGps();
+                const localizacion: any = await getUbicacion();
+
+                if (localizacion.mensaje !== "") {
+                  if (localizacion.mensaje === "El GPS esta apagado") {
+                    Toast.error(
+                      localizacion.mensaje +
+                        " " +
+                        ", active el GPS para guardar la ubicación",
+                    );
+                    setIsLoadingRecibo(false);
+                    return;
+                  }
+                  Toast.error(
+                    localizacion.mensaje +
+                      " " +
+                      "se guaradara sin la ubicación",
+                  );
+                  await new Promise((resolve) => setTimeout(resolve, 4000));
+                  // setLoadingGuardado(false);
+                  // return;
+                }
                 const dataAux = cloneDeep(element);
-                dataAux.latitud = location?.coords.latitude ?? 0;
-                dataAux.longitud = location?.coords.longitude ?? 0;
+
+                dataAux.latitud = localizacion.location
+                  ? localizacion.location.coords.latitude
+                  : 0;
+                dataAux.longitud = localizacion.location
+                  ? localizacion.location.coords.longitude
+                  : 0;
 
                 const dataEnviar: IRecibos[] = [];
 
@@ -314,8 +340,8 @@ const RecibosDetalles = () => {
                     const valores: IRecibos = {
                       crId: dataAux.crId ?? 0,
                       coId: dataAux.coId ?? 0,
-                      pgLatitud: dataAux.latitud,
-                      pgLongitud: dataAux.longitud,
+                      pgLatitud: dataAux.latitud ?? 0,
+                      pgLongitud: dataAux.longitud ?? 0,
                       pgObservaciones: dataAux.observaciones ?? "",
                       pgSincronizado: "N",
                       pgValorCobrado: dataAux.valores[index].valor,

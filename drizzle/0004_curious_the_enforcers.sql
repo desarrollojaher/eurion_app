@@ -1,0 +1,1 @@
+ALTER TABLE `verificacion` ADD `agencia` text;

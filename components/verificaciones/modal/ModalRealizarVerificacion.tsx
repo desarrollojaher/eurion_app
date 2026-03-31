@@ -29,6 +29,7 @@ import { useObtenerTiposVerificaciones } from "@/service/TiposVerificaciones/use
 import * as FileSystem from "expo-file-system";
 import { Text } from "react-native";
 import { AZUL, BLANCO } from "@/constants/Colors";
+import { getUbicacion } from "@/helper/function/ubicacion";
 
 interface PropsModalRealizarVerificacion {
   visible: boolean;
@@ -71,7 +72,6 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
   const toggleSwitch = useCallback(() => {
     setActualizarDireccion(!actualizarDireccion);
     console.log(actualizarDireccion);
-
   }, [actualizarDireccion]);
 
   const onOpenCamara = useCallback(() => {
@@ -101,16 +101,40 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
     [imagenes],
   );
 
-  const handleObtenerDireccionGps = useCallback(async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      Toast.error("El GPS no tiene permiso");
-      return;
-    }
-    let location = await Location.getCurrentPositionAsync({});
+  // const handleObtenerDireccionGps = useCallback(async () => {
+  //   const { status } = await Location.requestForegroundPermissionsAsync();
+  //   const enabled = await Location.hasServicesEnabledAsync();
+  //   if (status !== "granted") {
+  //     return { location: null, mensaje: "El GPS no tiene permiso" };
+  //   }
 
-    return location;
-  }, []);
+  //   if (!enabled) {
+  //     return { location: null, mensaje: "El GPS esta apagado" };
+  //   }
+
+  //   try {
+  //     // Usamos Promise.race para limitar el tiempo de espera
+  //     const location = await Promise.race([
+  //       Location.getCurrentPositionAsync({
+  //         accuracy: Location.Accuracy.High,
+  //       }),
+  //       new Promise(
+  //         (_, reject) =>
+  //           setTimeout(
+  //             () => reject(new Error("Tiempo de espera excedido para el gps")),
+  //             5000,
+  //           ), // 5 segundos
+  //       ),
+  //     ]);
+
+  //     return { location, mensaje: "" };
+  //   } catch (error: any) {
+  //     return {
+  //       location: null,
+  //       mensaje: `Error al obtener la ubicación: ${error.message}`,
+  //     };
+  //   }
+  // }, []);
 
   const handleChangeDireccionImagenes = useCallback(
     async (imagenes: IImagenCompleta) => {
@@ -162,12 +186,22 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
     }
     setLoadingGuardado(true);
 
-    const localizacion = await handleObtenerDireccionGps();
+    const localizacion: any = await getUbicacion();
 
-    if (!localizacion) {
-      Toast.error("No se pudo obtener la ubicacion");
-      setLoadingGuardado(false);
-      return;
+    if (localizacion.mensaje !== "") {
+      if (localizacion.mensaje === "El GPS esta apagado") {
+        Toast.error(
+          localizacion.mensaje +
+          " " +
+          ", active el GPS para guardar la ubicación",
+        );
+        setLoadingGuardado(false);
+        return;
+      }
+      Toast.error(localizacion.mensaje + " " + "se guaradara sin la ubicación");
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+      // setLoadingGuardado(false);
+      // return;
     }
 
     const imgs: IImagenesVerificaciones[] = [];
@@ -196,8 +230,12 @@ const ModalRealizarVerificacion: React.FC<PropsModalRealizarVerificacion> = ({
       vdId: cliente.idVerificacion,
       veComentario: observaciones,
       vrFechaVerificacion: format(new Date(), "yyyy-MM-dd hh:mm:ss"),
-      vrLatitud: localizacion.coords.latitude,
-      vrLongitud: localizacion.coords.longitude,
+      vrLatitud: localizacion.location
+        ? localizacion.location.coords.latitude
+        : 0,
+      vrLongitud: localizacion.location
+        ? localizacion.location.coords.longitude
+        : 0,
       vrPeriodo: cliente.periodo,
       vtId: Number(calificacion.value),
       pideActualizacion: actualizarDireccion ? 1 : 0,
