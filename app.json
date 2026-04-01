@@ -23,7 +23,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.jaher.eurionapp",
-      "edgeToEdgeEnabled": false
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
