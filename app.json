@@ -7,13 +7,13 @@
     "icon": "./assets/images/logo.png",
     "scheme": "eurionapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "versionCode": 9,
-      "usesCleartextTraffic": false,
+      "networkSecurityConfig": "./network_security_config.xml",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
