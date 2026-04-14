@@ -43,6 +43,7 @@ const ModalDocumentos: React.FC<PropsModalDocumetos> = ({
         styleLeft={styles.styleLabelLeft}
         styleRight={styles.styleLabelRigth}
       />
+      <Separador color={GRIS_CLARO} />
       <HeaderCard
         labelLeft="Saldo Credito"
         labelRight={formatCurrency(data.crSaldoCredito ?? 0)}
