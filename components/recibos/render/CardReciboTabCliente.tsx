@@ -83,9 +83,9 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
       if (
         valor &&
         (valor?.crSaldoCredito ?? 0) +
-          (valor?.interesGastoCobranza ?? 0) +
-          (valor?.interesGastoMora ?? 0) >=
-          Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
+        (valor?.interesGastoCobranza ?? 0) +
+        (valor?.interesGastoMora ?? 0) >=
+        Number(cantidad !== "" ? cantidad.replace(",", ".") : 0)
       ) {
         setErrorCancelar(false);
       } else {
@@ -105,12 +105,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
       <Separador />
       <HeaderCard
         labelLeft="Deuda Total"
-        labelRight={formatCurrency(
-          (valor?.crSaldoCredito ?? 0) +
-            (valor?.interesGastoCobranza ?? 0) +
-            (valor?.interesGastoMora ?? 0) +
-            (valor?.crSaldoInteres ?? 0),
-        )}
+        labelRight={formatCurrency(valor?.valorTotalCredito ?? 0)}
       />
       <HeaderCard
         labelLeft="Saldo interes"
@@ -118,7 +113,7 @@ const CardReciboTabCliente: React.FC<PropsCardReciboTabCliente> = ({
       />
       <HeaderCard
         labelLeft="Saldo vencido"
-        labelRight={formatCurrency(valor?.crSaldoCredito ?? 0)}
+        labelRight={formatCurrency(valor?.saldoVencido ?? 0)}
       />
       <HeaderCard
         labelLeft="Interes por mora"

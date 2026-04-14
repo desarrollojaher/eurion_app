@@ -6,6 +6,7 @@ import m0001 from './0001_elite_maelstrom.sql';
 import m0002 from './0002_serious_vulcan.sql';
 import m0003 from './0003_goofy_spectrum.sql';
 import m0004 from './0004_curious_the_enforcers.sql';
+import m0005 from './0005_lethal_puck.sql';
 
   export default {
     journal,
@@ -14,7 +15,8 @@ import m0004 from './0004_curious_the_enforcers.sql';
 m0001,
 m0002,
 m0003,
-m0004
+m0004,
+m0005
     }
   }
   

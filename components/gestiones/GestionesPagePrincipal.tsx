@@ -52,6 +52,9 @@ const GestionesPagePrincipal = () => {
     refetch: refetchGestionesCabecera,
   } = useObtenerGestiones({ buscador: debouncedInputValue });
 
+  console.log(dataGestionesCabecera);
+
+
   const { setDatos } = useGestionStore();
 
   const handleOpenImagenes = useCallback((data: IGestionesCabecera) => {

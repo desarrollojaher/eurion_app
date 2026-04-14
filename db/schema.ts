@@ -203,6 +203,7 @@ export const documentosTable = sqliteTable("documentos", {
   cuotasPagadas: int(),
   cuotasPorPagar: int(),
   clId: int(),
+  saldoVencido: integer({ mode: "number" }),
 });
 
 export const documentosDetTable = sqliteTable("documentos_det", {

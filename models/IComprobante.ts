@@ -16,6 +16,7 @@ export interface IComprobante {
   cuotasPagadas: number | null;
   cuotasPorPagar: number | null;
   clId: number | null;
+  saldoVencido: number | null;
   productos: IProducto[];
 }
 

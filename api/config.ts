@@ -17,7 +17,7 @@ const createAxiosInstance = async () => {
   const token = await AsyncStorage.getItem("token");
 
   const instance = axios.create({
-    baseURL: "https://appcert.jmsg.ec/api/eurionapp",
+    baseURL: "http://172.17.28.14:5133/api/eurionapp",
     timeout: 90000, // mucho mejor que 180000
     headers: {
       Connection: "close", // fuerza nueva conexión

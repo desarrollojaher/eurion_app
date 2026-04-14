@@ -111,7 +111,7 @@ const VerificacionDetalle = () => {
             styleRight={styles.labelCardRight}
           />
         </Card>
-        <Card style={styles.cardStyle}>
+        {/* <Card style={styles.cardStyle}>
           <Text style={styles.textTituloHeader}>Buró</Text>
           <Separador />
           <HeaderCard
@@ -135,7 +135,7 @@ const VerificacionDetalle = () => {
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}
           />
-        </Card>
+        </Card> */}
         {data?.datosVivienda && data?.datosVivienda.tdId === 1 && (
           <Card style={styles.cardStyle}>
             <Text style={styles.textTituloHeader}>Datos Vivienda</Text>

@@ -35,14 +35,7 @@ const GestionesPageDetallesDocumenos: React.FC<
   }, [datosDocumentos]);
 
   const saldoTotal = useMemo(() => {
-    return sumBy(
-      datosDocumentos,
-      (item) =>
-        (item.crSaldoCredito ?? 0) +
-        (item.interesGastoCobranza ?? 0) +
-        (item.interesGastoMora ?? 0) +
-        (item.crSaldoInteres ?? 0),
-    );
+    return sumBy(datosDocumentos, (item) => item.saldoVencido ?? 0);
   }, [datosDocumentos]);
 
   const handleOpenDocumeno = useCallback(
@@ -98,7 +91,7 @@ const GestionesPageDetallesDocumenos: React.FC<
             styleRight={styles.styleLabelRigth}
           />
           <HeaderCard
-            labelLeft="Saldo Vencido"
+            labelLeft="Saldo Credito"
             labelRight={formatCurrency(item.crSaldoCredito ?? 0)}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
