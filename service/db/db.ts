@@ -1288,8 +1288,6 @@ export const dbSqliteService = {
           null;
       }
 
-      console.log(facturas);
-      
       return facturas;
     } catch (error: any) {
       const mensajeError = error?.message || "Error desconocido";
