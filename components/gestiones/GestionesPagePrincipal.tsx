@@ -52,7 +52,6 @@ const GestionesPagePrincipal = () => {
     refetch: refetchGestionesCabecera,
   } = useObtenerGestiones({ buscador: debouncedInputValue });
 
-  console.log(dataGestionesCabecera);
 
 
   const { setDatos } = useGestionStore();
@@ -131,8 +130,15 @@ const GestionesPagePrincipal = () => {
           <Text style={styles.styleText}>{item.direccionCliente}</Text>
           <Separador />
           <HeaderCard
-            labelLeft="DEUDA TOTAL"
+            labelLeft="TOTAL CREDITOS"
             labelRight={formatCurrency(Number(item?.deudaTotal ?? "0")) ?? ""}
+            styleContainer={styles.rowCardStyle}
+            styleLeft={styles.labelCardLeft}
+            styleRight={styles.labelCardRight}
+          />
+          <HeaderCard
+            labelLeft="SALDO CREDITOS"
+            labelRight={formatCurrency(Number(item?.saldoTotal ?? "0")) ?? ""}
             styleContainer={styles.rowCardStyle}
             styleLeft={styles.labelCardLeft}
             styleRight={styles.labelCardRight}

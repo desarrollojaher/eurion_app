@@ -42,6 +42,7 @@ export interface IGestionesCabecera {
   peId: number | null;
   imagenCliente: string | null;
   imagenDomicilio: string | null;
+  saldoTotal: number | null;
   tcId: number | null;
   total: number | null;
 }

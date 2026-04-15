@@ -122,7 +122,7 @@ const GestionesPageDetallesDocumenos: React.FC<
           styleRight={styles.styleLabelRigth}
         />
         <HeaderCard
-          labelLeft="Deuda Total"
+          labelLeft="Total Creditos"
           labelRight={formatCurrency(deudaTotal)}
           styleLeft={styles.styleLabelLeft}
           styleRight={styles.styleLabelRigth}
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     gap: convertirTamanoVertical(20),
   },
   styleLabelLeft: {
-    width: convertirTamanoHorizontal(130),
+    width: convertirTamanoHorizontal(160),
   },
   styleLabelRigth: {
     width: convertirTamanoHorizontal(235),

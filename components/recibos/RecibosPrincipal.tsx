@@ -52,7 +52,7 @@ const RecibosPrincipal = () => {
           />
 
           <HeaderCard
-            labelLeft="SALDO TOTAL: "
+            labelLeft="TOTAL VENCIDO: "
             labelRight={formatCurrency(item.deudaPendiente ?? 0)}
             styleLeft={styles.labelLeftStyle}
             styleRight={styles.labelRightStyle}
