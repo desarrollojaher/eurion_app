@@ -79,7 +79,7 @@ const GestionesPageDetallesDocumenos: React.FC<
             styleRight={styles.styleLabelRigth}
           />
           <HeaderCard
-            labelLeft="Interes Cobranza"
+            labelLeft="Gastos Cobranza"
             labelRight={formatCurrency(item.interesGastoCobranza ?? 0)}
             styleLeft={styles.styleLabelLeft}
             styleRight={styles.styleLabelRigth}
