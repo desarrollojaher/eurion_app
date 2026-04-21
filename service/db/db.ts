@@ -1147,6 +1147,10 @@ export const dbSqliteService = {
             or(
               like(schema.clienteTable.apellidoCliente, `%${params.buscador}%`),
               like(schema.clienteTable.nombreCliente, `%${params.buscador}%`),
+              like(
+                schema.clienteTable.identificacionCliente,
+                `%${params.buscador}%`,
+              ),
             ),
           ),
         )
